@@ -35,7 +35,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          python pipeline_journalistique.py --auto
+          python pipeline_journalistique.py
 
       - name: 📁 Préparation des fichiers pour GitHub Pages
         run: |
