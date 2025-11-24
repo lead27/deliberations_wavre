@@ -1,0 +1,59 @@
+{
+  "generated_at": "2025-11-04T10:09:26Z",
+  "seance": {
+    "id": "44670f5589274017a5a97f23c04942d3",
+    "nom": "04 Novembre 2025 (20:00) — Projet de décision"
+  },
+  "topics": [
+    {
+      "titre": "Règlement-redevance pour l'occupation du domaine public pour les terrasses en zone réglementée",
+      "interet": "Impact direct sur les commerçants et la perception des citoyens alors que la ville réévalue son espace public.",
+      "angle": "Analyse de l'impact économique sur les restaurants et commerces locaux suite à la redevance sur l'occupation du domaine public.",
+      "points_a_creuser": [
+        "Évaluation des retombées économiques sur les commerces locaux",
+        "Réactions des citoyens concernant l'occupation du domaine public"
+      ],
+      "references": "Point 21 des délibérations."
+    },
+    {
+      "titre": "Augmentation des tarifs pour l'occupation du domaine public lors des marchés communaux",
+      "interet": "Inquiétudes des travailleurs de marché concernant l'augmentation des coûts d'exploitation.",
+      "angle": "Impact de l'augmentation de 5% des redevances sur les petits commerçants et artisans lors des marchés.",
+      "points_a_creuser": [
+        "Répercussions économiques sur les petits commerçants",
+        "Analyse des alternatives pour éviter l'effet dissuasif sur les exposants"
+      ],
+      "references": "Point 27 des délibérations."
+    },
+    {
+      "titre": "Règlement-taxe sur l’inhumation et dispersion des restes mortels",
+      "interet": "Sensible aux familles qui pourraient être impactées financièrement par de nouveaux frais.",
+      "angle": "Évaluation morale et sociale des décisions financières en matière de services funéraires.",
+      "points_a_creuser": [
+        "Comparaison avec les autres communes",
+        "Sondage sur la perception des citoyens du coût des services funéraires"
+      ],
+      "references": "Point 10 des délibérations."
+    },
+    {
+      "titre": "Nouveau règlement relatif à l'occupation des espaces communaux",
+      "interet": "Décision significative sur l'accès aux espaces publics, pouvant influencer la lutte contre le squat et l'utilisation appropriée des lieux.",
+      "angle": "Exploration des implications pour l'usage communal et les règles de sécurité.",
+      "points_a_creuser": [
+        "Possibilité de recours à des espaces pour des initiatives citoyennes",
+        "Évaluation des impacts sur la sécurité publique"
+      ],
+      "references": "Point 1 des délibérations."
+    },
+    {
+      "titre": "Règlement-redevance sur les spectacles et divertissements",
+      "interet": "Potentiel de controverse lié à la perception de la ville envers les activités culturelles locales.",
+      "angle": "Impact sur le développement culturel et artistique de la commune, et sur l'accessibilité aux spectacles.",
+      "points_a_creuser": [
+        "Réactions des artistes et producteurs locaux",
+        "Analyse de l'importance économique des spectacles pour la commune"
+      ],
+      "references": "Point 28 des délibérations."
+    }
+  ]
+}

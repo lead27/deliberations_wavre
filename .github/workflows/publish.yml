@@ -1,0 +1,62 @@
+name: Génération quotidienne
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Récupération du dépôt
+        uses: actions/checkout@v4
+
+      - name: 🔧 Configuration Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 📦 Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 📰 Génération des analyses
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python pipeline_journalistique.py --auto
+
+      - name: 📁 Préparation des fichiers pour GitHub Pages
+        run: |
+          rm -rf public
+          mkdir -p public
+          cp sujets_journalistiques.html public/index.html
+          cp sujets_journalistiques.json public/sujets_journalistiques.json
+          cp sujets_journalistiques.txt public/sujets_journalistiques.txt
+
+      - name: 📤 Publication de l'artefact Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚀 Déploiement sur GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
