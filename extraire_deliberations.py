@@ -1,21 +1,32 @@
-import requests
-from bs4 import BeautifulSoup
-import time
+import argparse
 import json
+import time
 from datetime import datetime
 
+import requests
+from bs4 import BeautifulSoup
+
 # Configuration
-URL_BASE = "https://www.deliberations.be/wavre/decisions"
+BASE_ROOT = "https://www.deliberations.be"
 DELAI_ENTRE_REQUETES = 3  # secondes entre chaque requête pour éviter de surcharger le serveur
 
-def detecter_seance_la_plus_recente():
+
+def _nom_commune_affichage(commune: str) -> str:
+    return commune.replace("-", " ").title()
+
+
+def construire_url_base(commune: str, base_root: str = BASE_ROOT) -> str:
+    return f"{base_root.rstrip('/')}/{commune}/decisions"
+
+
+def detecter_seance_la_plus_recente(url_base: str):
     """
     Cette fonction détecte automatiquement la séance la plus récente
     en analysant la première page des décisions
     """
     print("Détection de la séance la plus récente...")
     
-    response = requests.get(URL_BASE)
+    response = requests.get(url_base)
     soup = BeautifulSoup(response.content, 'html.parser')
     
     # Chercher le sélecteur de séance
@@ -34,7 +45,7 @@ def detecter_seance_la_plus_recente():
     print("Impossible de détecter la séance. Utilisation de la première carte trouvée...\n")
     return None, None
 
-def extraire_liens_deliberations(seance_id):
+def extraire_liens_deliberations(seance_id, url_base: str):
     """
     Étape 1 : Cette fonction va parcourir TOUTES les pages
     d'une séance spécifique et récupère tous les liens
@@ -49,9 +60,9 @@ def extraire_liens_deliberations(seance_id):
     while True:
         # Construction de l'URL avec la séance et la pagination
         if page_actuelle == 0:
-            url = f"{URL_BASE}?seance={seance_id}"
+            url = f"{url_base}?seance={seance_id}"
         else:
-            url = f"{URL_BASE}?seance={seance_id}&b_start:int={page_actuelle}"
+            url = f"{url_base}?seance={seance_id}&b_start:int={page_actuelle}"
         
         print(f"  📄 Page {page_actuelle // 20 + 1}...")
         
@@ -148,7 +159,14 @@ def extraire_contenu_deliberation(url):
             'contenu': f'Impossible d\'extraire le contenu : {e}'
         }
 
-def sauvegarder_resultats(deliberations, seance_id=None, seance_nom=None, nom_fichier='deliberations_wavre.json'):
+def sauvegarder_resultats(
+    deliberations,
+    seance_id=None,
+    seance_nom=None,
+    nom_fichier="deliberations_wavre.json",
+    commune_slug="wavre",
+    commune_nom=None,
+):
     """
     Étape 3 : Cette fonction sauvegarde tous les résultats
     dans un fichier JSON (format facile à lire) avec des métadonnées
@@ -161,7 +179,11 @@ def sauvegarder_resultats(deliberations, seance_id=None, seance_nom=None, nom_fi
             "id": seance_id,
             "nom": seance_nom
         },
-        "deliberations": deliberations
+        "commune": {
+            "slug": commune_slug,
+            "nom": commune_nom,
+        },
+        "deliberations": deliberations,
     }
 
     with open(nom_fichier, 'w', encoding='utf-8') as f:
@@ -196,23 +218,55 @@ def creer_resume_texte(deliberations, nom_fichier, seance_nom):
     print(f"✅ Résumé créé !\n")
 
 # ===== PROGRAMME PRINCIPAL =====
+def parser_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Extraction des délibérations communales.")
+    parser.add_argument("--commune", default="wavre", help="Slug de la commune (ex: wavre, incourt).")
+    parser.add_argument(
+        "--base-root",
+        default=BASE_ROOT,
+        help="Domaine racine des délibérations (ex: https://www.deliberations.be).",
+    )
+    parser.add_argument("--output-json", default=None, help="Chemin du fichier JSON de sortie.")
+    parser.add_argument("--output-text", default=None, help="Chemin du fichier texte de sortie.")
+    return parser.parse_args()
+
+
 def main():
     """
     C'est ici que tout commence !
     """
+    args = parser_arguments()
+    commune_slug = args.commune.strip().lower()
+    commune_nom = _nom_commune_affichage(commune_slug)
+    url_base = construire_url_base(commune_slug, args.base_root)
+
+    if args.output_json:
+        fichier_json = args.output_json
+    elif commune_slug == "wavre":
+        fichier_json = "deliberations_wavre.json"
+    else:
+        fichier_json = f"deliberations_{commune_slug}.json"
+
+    if args.output_text:
+        fichier_texte = args.output_text
+    elif commune_slug == "wavre":
+        fichier_texte = "resume_deliberations.txt"
+    else:
+        fichier_texte = f"resume_deliberations_{commune_slug}.txt"
+
     print("\n" + "="*80)
-    print("EXTRACTION DES DÉLIBÉRATIONS DU CONSEIL COMMUNAL DE WAVRE")
+    print(f"EXTRACTION DES DÉLIBÉRATIONS DU CONSEIL COMMUNAL DE {commune_nom.upper()}")
     print("="*80 + "\n")
     
     # Étape 0 : Détecter la séance la plus récente
-    seance_id, seance_nom = detecter_seance_la_plus_recente()
+    seance_id, seance_nom = detecter_seance_la_plus_recente(url_base)
     
     if not seance_id:
         print("Erreur : impossible de détecter la séance.")
         return
     
     # Étape 1 : Récupérer tous les liens de cette séance
-    liens = extraire_liens_deliberations(seance_id)
+    liens = extraire_liens_deliberations(seance_id, url_base)
     
     if not liens:
         print("Aucune délibération trouvée. Vérifiez l'URL.")
@@ -229,15 +283,22 @@ def main():
         deliberations.append(delib)
     
     # Étape 3 : Sauvegarder les résultats
-    sauvegarder_resultats(deliberations, seance_id, seance_nom)
-    creer_resume_texte(deliberations, 'resume_deliberations.txt', seance_nom)
+    sauvegarder_resultats(
+        deliberations,
+        seance_id,
+        seance_nom,
+        nom_fichier=fichier_json,
+        commune_slug=commune_slug,
+        commune_nom=commune_nom,
+    )
+    creer_resume_texte(deliberations, fichier_texte, seance_nom)
     
     print("\n" + "="*80)
     print("EXTRACTION TERMINÉE !")
     print("="*80)
     print(f"\nVous pouvez consulter :")
-    print(f"  - deliberations_wavre.json (format structuré)")
-    print(f"  - resume_deliberations.txt (format texte lisible)")
+    print(f"  - {fichier_json} (format structuré)")
+    print(f"  - {fichier_texte} (format texte lisible)")
     print("\nCes fichiers sont dans le même dossier que votre script.\n")
 
 # Point d'entrée du programme

@@ -13,6 +13,10 @@ from openai import OpenAI, OpenAIError
 MODELE_PAR_DEFAUT = "gpt-4o-mini"
 
 
+def _nom_commune_affichage(commune: str) -> str:
+    return commune.replace("-", " ").title()
+
+
 def construire_client_openai() -> OpenAI:
     """Initialise le client OpenAI à partir des variables d'environnement."""
     try:
@@ -187,6 +191,7 @@ def analyser_globalement(
     client: OpenAI,
     deliberations: List[Dict[str, Any]],
     modele: str,
+    commune_nom: str,
     max_sujets: int = 5,
 ) -> List[Dict[str, Any]]:
     """Interroge l'IA pour obtenir la liste des sujets journalistiques."""
@@ -198,7 +203,7 @@ def analyser_globalement(
     resume = creer_resume_court(deliberations)
     prompt = f"""Tu es un journaliste expérimenté qui passe en revue des délibérations d'un conseil communal.
 
-Voici les délibérations récentes du conseil communal de Wavre :
+Voici les délibérations récentes du conseil communal de {commune_nom} :
 
 {resume}
 
@@ -268,12 +273,13 @@ def sauvegarder_analyse_textuelle(
     analyses_detaillees: Dict[int, str],
     chemin_fichier: str,
     seance: Optional[Dict[str, Any]],
+    commune_nom: str,
 ) -> None:
     """Génère le fichier texte lisible rassemblant les sujets."""
     lignes: List[str] = []
     lignes.append("=" * 80)
     lignes.append("ANALYSE JOURNALISTIQUE DES DÉLIBÉRATIONS")
-    lignes.append("Conseil communal de Wavre")
+    lignes.append(f"Conseil communal de {commune_nom}")
     if seance and seance.get("nom"):
         lignes.append(seance["nom"])
     lignes.append("=" * 80 + "\n")
@@ -324,10 +330,12 @@ def sauvegarder_topics_json(
     sujets: List[Dict[str, Any]],
     chemin_fichier: str,
     seance: Optional[Dict[str, Any]],
+    commune_nom: str,
 ) -> None:
     """Sauvegarde les sujets dans un fichier JSON structuré."""
     payload = {
         "generated_at": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
+        "commune": commune_nom,
         "seance": seance,
         "topics": sujets,
     }
@@ -339,10 +347,11 @@ def generer_html(
     sujets: List[Dict[str, Any]],
     chemin_fichier: str,
     seance: Optional[Dict[str, Any]],
+    commune_nom: str,
 ) -> None:
     """Produit la page HTML à partir des sujets identifiés."""
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M")
-    sous_titre = "Conseil communal de Wavre"
+    sous_titre = f"Conseil communal de {commune_nom}"
     if seance and seance.get("nom"):
         sous_titre += f" — {seance['nom']}"
 
@@ -382,7 +391,7 @@ def generer_html(
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Analyse journalistique des délibérations - Conseil communal de Wavre</title>
+  <title>Analyse journalistique des délibérations - Conseil communal de {html.escape(commune_nom)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {{
@@ -511,13 +520,278 @@ def generer_html(
     print(f"✓ Page HTML actualisée dans {chemin_fichier}")
 
 
+def charger_topics_json(chemin_fichier: str) -> Dict[str, Any]:
+    """Charge un fichier JSON de sujets généré par analyser_sujets.py."""
+    try:
+        with open(chemin_fichier, "r", encoding="utf-8") as handle:
+            return json.load(handle)
+    except FileNotFoundError as err:
+        raise RuntimeError(f"Fichier introuvable : {chemin_fichier}") from err
+    except json.JSONDecodeError as err:
+        raise RuntimeError(f"JSON invalide dans {chemin_fichier} : {err}") from err
+
+
+def _sections_html_pour_sujets(sujets: List[Dict[str, Any]]) -> str:
+    if not sujets:
+        return (
+            "<p>Aucun sujet journalistique n'a été identifié pour cette séance. "
+            "Revenez après la prochaine mise à jour automatique.</p>"
+        )
+
+    sections: List[str] = []
+    sections.append("<section>")
+    sections.append("  <h3>Sujets prioritaires pour des articles</h3>")
+    for index, sujet in enumerate(sujets, 1):
+        sections.append('  <article class="subject">')
+        sections.append(f"    <h4>{index}. {html.escape(sujet.get('titre', ''))}</h4>")
+        interet = sujet.get("interet")
+        if interet:
+            sections.append("    <strong>Intérêt</strong>")
+            sections.append(f"    <p>{html.escape(interet)}</p>")
+        angle = sujet.get("angle")
+        if angle:
+            sections.append("    <strong>Angle</strong>")
+            sections.append(f"    <p>{html.escape(angle)}</p>")
+        points = sujet.get("points_a_creuser") or []
+        if points:
+            sections.append("    <strong>Points à creuser</strong>")
+            sections.append("    <ul>")
+            for point in points:
+                sections.append(f"      <li>{html.escape(point)}</li>")
+            sections.append("    </ul>")
+        references = sujet.get("references")
+        if references:
+            sections.append("    <strong>Références</strong>")
+            sections.append(f"    <p>{html.escape(references)}</p>")
+        sections.append("  </article>")
+    sections.append("</section>")
+    return "\n".join(sections)
+
+
+def generer_html_multi(
+    sujets_par_commune: List[Dict[str, Any]],
+    chemin_fichier: str,
+) -> None:
+    """Produit une page HTML unique regroupant plusieurs communes."""
+    generated_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    sections: List[str] = []
+    sections.append('<section class="toc">')
+    sections.append("  <h2>Communes analysées</h2>")
+    sections.append("  <ul>")
+    for bloc in sujets_par_commune:
+        nom = bloc.get("commune_nom") or "Commune"
+        anchor = bloc.get("anchor") or ""
+        sections.append(f'    <li><a href="#{html.escape(anchor)}">{html.escape(nom)}</a></li>')
+    sections.append("  </ul>")
+    sections.append("</section>")
+
+    for bloc in sujets_par_commune:
+        nom = bloc.get("commune_nom") or "Commune"
+        anchor = bloc.get("anchor") or ""
+        seance_nom = bloc.get("seance_nom")
+        generated_at_commune = bloc.get("generated_at")
+        sections.append(f'<section class="commune" id="{html.escape(anchor)}">')
+        sections.append(f"  <h2>Conseil communal de {html.escape(nom)}</h2>")
+        meta_parts = []
+        if seance_nom:
+            meta_parts.append(html.escape(seance_nom))
+        if generated_at_commune:
+            meta_parts.append(f"Mise à jour automatique du {html.escape(generated_at_commune)}")
+        if meta_parts:
+            sections.append(f"  <p class=\"meta\">{' — '.join(meta_parts)}</p>")
+        sections.append(_sections_html_pour_sujets(bloc.get("topics", [])))
+        sections.append("</section>")
+
+    contenu_section = "\n".join(sections)
+
+    contenu_html = f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Analyse journalistique des délibérations - Communes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {{
+      color-scheme: light dark;
+    }}
+
+    body {{
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 2rem 1.5rem 3rem;
+      background-color: #f3f4f6;
+      color: #1f2933;
+      display: grid;
+      place-items: center;
+    }}
+
+    main {{
+      width: min(100%, 960px);
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.08);
+      padding: 2.5rem;
+    }}
+
+    header {{
+      text-align: center;
+      margin-bottom: 2rem;
+    }}
+
+    header h1 {{
+      margin: 0;
+      font-size: 2rem;
+      letter-spacing: 0.02em;
+    }}
+
+    header p {{
+      margin-top: 0.5rem;
+      color: #52606d;
+      font-size: 1.05rem;
+    }}
+
+    .toc {{
+      margin-bottom: 2rem;
+      padding: 1.25rem 1.5rem;
+      background: #f0f4f8;
+      border-radius: 12px;
+    }}
+
+    .toc ul {{
+      margin: 0.5rem 0 0;
+      padding-left: 1.2rem;
+    }}
+
+    .toc a {{
+      color: #0b7285;
+      text-decoration: none;
+    }}
+
+    .commune {{
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e4e7eb;
+    }}
+
+    .commune:first-of-type {{
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }}
+
+    .commune h2 {{
+      font-size: 1.65rem;
+      margin-bottom: 0.35rem;
+      color: #102a43;
+    }}
+
+    .meta {{
+      color: #52606d;
+      margin-top: 0;
+      margin-bottom: 1.25rem;
+    }}
+
+    section h3 {{
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      color: #102a43;
+    }}
+
+    .subject {{
+      border-top: 1px solid #e4e7eb;
+      padding: 1.5rem 0;
+    }}
+
+    .subject:first-of-type {{
+      border-top: none;
+      padding-top: 0;
+    }}
+
+    .subject h4 {{
+      margin: 0;
+      font-size: 1.2rem;
+      color: #0b7285;
+    }}
+
+    .subject strong {{
+      display: inline-block;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      color: #102a43;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }}
+
+    .subject p {{
+      margin: 0.35rem 0 0.35rem;
+      color: #334e68;
+      font-size: 1rem;
+    }}
+
+    .subject ul {{
+      margin: 0.75rem 0 0.5rem 1.25rem;
+      color: #243b53;
+    }}
+
+    .subject li {{
+      margin: 0.25rem 0;
+    }}
+
+    footer {{
+      margin-top: 2.5rem;
+      text-align: center;
+      color: #7b8794;
+      font-size: 0.9rem;
+    }}
+
+    @media (max-width: 600px) {{
+      main {{
+        padding: 2rem 1.5rem;
+      }}
+
+      header h1 {{
+        font-size: 1.6rem;
+      }}
+
+      .subject h4 {{
+        font-size: 1.1rem;
+      }}
+    }}
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Analyse journalistique des délibérations</h1>
+      <p>Mise à jour automatique du {generated_at}</p>
+    </header>
+    {contenu_section}
+    <footer>
+      <p>Compilation générée automatiquement à partir des délibérations les plus récentes.</p>
+    </footer>
+  </main>
+</body>
+</html>
+"""
+
+    Path(chemin_fichier).write_text(contenu_html, encoding="utf-8")
+    print(f"✓ Page HTML multi-communes actualisée dans {chemin_fichier}")
+
+
 def parser_arguments() -> argparse.Namespace:
     """Analyse les arguments de la ligne de commande."""
     parser = argparse.ArgumentParser(description="Analyse les délibérations et génère les sujets journalistiques.")
-    parser.add_argument("--deliberations", default="deliberations_wavre.json", help="Fichier JSON des délibérations.")
-    parser.add_argument("--texte", default="sujets_journalistiques.txt", help="Fichier texte de sortie.")
-    parser.add_argument("--json", dest="json_path", default="sujets_journalistiques.json", help="Fichier JSON de sortie.")
-    parser.add_argument("--html", default="sujets_journalistiques.html", help="Fichier HTML de sortie.")
+    parser.add_argument("--commune", default="wavre", help="Slug de la commune (ex: wavre, incourt).")
+    parser.add_argument(
+        "--communes",
+        nargs="*",
+        help="Liste des communes à compiler (utilisé avec --merge-html).",
+    )
+    parser.add_argument("--deliberations", default=None, help="Fichier JSON des délibérations.")
+    parser.add_argument("--texte", default=None, help="Fichier texte de sortie.")
+    parser.add_argument("--json", dest="json_path", default=None, help="Fichier JSON de sortie.")
+    parser.add_argument("--html", default=None, help="Fichier HTML de sortie.")
     parser.add_argument("--auto", action="store_true", help="Mode automatique (aucune interaction utilisateur).")
     parser.add_argument(
         "--modele",
@@ -526,6 +800,11 @@ def parser_arguments() -> argparse.Namespace:
     )
     parser.add_argument("--skip-html", action="store_true", help="Ne pas générer la page HTML.")
     parser.add_argument("--skip-json", action="store_true", help="Ne pas générer le fichier JSON.")
+    parser.add_argument(
+        "--merge-html",
+        action="store_true",
+        help="Génère une seule page HTML regroupant plusieurs communes.",
+    )
     parser.add_argument(
         "--details",
         nargs="*",
@@ -538,7 +817,51 @@ def parser_arguments() -> argparse.Namespace:
 def main() -> None:
     args = parser_arguments()
 
-    deliberations, seance = charger_deliberations(args.deliberations)
+    if args.merge_html:
+        communes = [commune.strip().lower() for commune in (args.communes or []) if commune.strip()]
+        if not communes:
+            print("Aucune commune fournie pour la compilation HTML.")
+            return
+        html_path = args.html or "sujets_journalistiques.html"
+        blocs: List[Dict[str, Any]] = []
+        for commune in communes:
+            json_path = (
+                "sujets_journalistiques.json"
+                if commune == "wavre"
+                else f"sujets_journalistiques_{commune}.json"
+            )
+            donnees = charger_topics_json(json_path)
+            seance = donnees.get("seance") or {}
+            commune_nom = donnees.get("commune") or _nom_commune_affichage(commune)
+            blocs.append(
+                {
+                    "commune_nom": commune_nom,
+                    "anchor": commune,
+                    "seance_nom": seance.get("nom"),
+                    "generated_at": donnees.get("generated_at"),
+                    "topics": donnees.get("topics", []),
+                }
+            )
+        generer_html_multi(blocs, html_path)
+        return
+
+    commune_slug = args.commune.strip().lower()
+    commune_nom = _nom_commune_affichage(commune_slug)
+
+    deliberations_path = args.deliberations
+    if deliberations_path is None:
+        deliberations_path = "deliberations_wavre.json" if commune_slug == "wavre" else f"deliberations_{commune_slug}.json"
+    texte_path = args.texte
+    if texte_path is None:
+        texte_path = "sujets_journalistiques.txt" if commune_slug == "wavre" else f"sujets_journalistiques_{commune_slug}.txt"
+    json_path = args.json_path
+    if json_path is None:
+        json_path = "sujets_journalistiques.json" if commune_slug == "wavre" else f"sujets_journalistiques_{commune_slug}.json"
+    html_path = args.html
+    if html_path is None:
+        html_path = "sujets_journalistiques.html" if commune_slug == "wavre" else f"sujets_journalistiques_{commune_slug}.html"
+
+    deliberations, seance = charger_deliberations(deliberations_path)
 
     client = construire_client_openai()
 
@@ -546,7 +869,7 @@ def main() -> None:
         print("Aucune délibération à analyser. Arrêt.")
         return
 
-    sujets = analyser_globalement(client, deliberations, modele=args.modele)
+    sujets = analyser_globalement(client, deliberations, modele=args.modele, commune_nom=commune_nom)
 
     analyses_detaillees: Dict[int, str] = {}
 
@@ -573,16 +896,16 @@ def main() -> None:
         analyse = analyser_sujet_specifique(client, deliberations[numero - 1], numero, modele=args.modele)
         analyses_detaillees[numero] = analyse
 
-    sauvegarder_analyse_textuelle(sujets, analyses_detaillees, args.texte, seance)
+    sauvegarder_analyse_textuelle(sujets, analyses_detaillees, texte_path, seance, commune_nom)
     if not args.skip_json:
-        sauvegarder_topics_json(sujets, args.json_path, seance)
+        sauvegarder_topics_json(sujets, json_path, seance, commune_nom)
     if not args.skip_html:
-        generer_html(sujets, args.html, seance)
+        generer_html(sujets, html_path, seance, commune_nom)
 
     print("=" * 80)
     print("ANALYSE TERMINÉE !")
     print("=" * 80)
-    print(f"\nConsultez :\n  - {args.texte}\n  - {args.json_path}\n  - {args.html if not args.skip_html else '(HTML non généré)'}\n")
+    print(f"\nConsultez :\n  - {texte_path}\n  - {json_path}\n  - {html_path if not args.skip_html else '(HTML non généré)'}\n")
 
 
 if __name__ == "__main__":

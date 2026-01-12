@@ -5,11 +5,10 @@ import sys
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from extraire_deliberations import detecter_seance_la_plus_recente
+from extraire_deliberations import construire_url_base, detecter_seance_la_plus_recente
 
 
 RACINE = Path(__file__).resolve().parent
-FICHIER_DELIB = RACINE / "deliberations_wavre.json"
 
 
 def executer(description: str, commande: List[str]) -> None:
@@ -65,48 +64,74 @@ def parser_arguments() -> argparse.Namespace:
         action="store_true",
         help="Force l'extraction/analyse même si aucune nouvelle séance n'est détectée.",
     )
+    parser.add_argument(
+        "--communes",
+        nargs="*",
+        default=["wavre"],
+        help="Liste des communes à analyser (ex: wavre incourt walhain).",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parser_arguments()
 
-    if not args.skip_extraction:
-        seance_vue_id, seance_vue_nom = charger_derniere_seance(FICHIER_DELIB)
-        nouvelle_seance_id, nouvelle_seance_nom = detecter_seance_la_plus_recente()
-
-        if nouvelle_seance_id and seance_vue_id == nouvelle_seance_id and not args.force:
-            print("=" * 80)
-            print("Aucune nouvelle séance détectée, extraction et analyse ignorées.")
-            print("=" * 80)
-            return
-
-        if nouvelle_seance_id is None:
-            print("⚠ Séance la plus récente inconnue. L'extraction sera tout de même tentée.")
-
-        executer(
-            "Étape 1/2 - Extraction des délibérations",
-            [sys.executable, "extraire_deliberations.py"],
-        )
-    else:
-        print("Extraction ignorée (--skip-extraction).\n")
-
-    if args.skip_analyse:
-        print("Analyse journalistique ignorée (--skip-analyse).\n")
+    communes = [commune.strip().lower() for commune in args.communes if commune.strip()]
+    if not communes:
+        print("Aucune commune fournie.")
         return
 
-    commande = [sys.executable, "analyser_sujets.py", "--auto"]
-    if args.modele:
-        commande.extend(["--modele", args.modele])
-    if args.skip_html:
-        commande.append("--skip-html")
-    if args.skip_json:
-        commande.append("--skip-json")
-    if args.details:
-        commande.append("--details")
-        commande.extend(str(num) for num in args.details)
+    for commune in communes:
+        fichier_delib = RACINE / (
+            "deliberations_wavre.json" if commune == "wavre" else f"deliberations_{commune}.json"
+        )
+        url_base = construire_url_base(commune)
 
-    executer("Étape 2/2 - Analyse journalistique et génération des sorties", commande)
+        if not args.skip_extraction:
+            seance_vue_id, seance_vue_nom = charger_derniere_seance(fichier_delib)
+            nouvelle_seance_id, nouvelle_seance_nom = detecter_seance_la_plus_recente(url_base)
+
+            if nouvelle_seance_id and seance_vue_id == nouvelle_seance_id and not args.force:
+                print("=" * 80)
+                print(f"Aucune nouvelle séance détectée pour {commune}, extraction et analyse ignorées.")
+                print("=" * 80)
+                continue
+
+            if nouvelle_seance_id is None:
+                print(f"⚠ Séance la plus récente inconnue pour {commune}. L'extraction sera tout de même tentée.")
+
+            executer(
+                f"Étape 1/2 - Extraction des délibérations ({commune})",
+                [sys.executable, "extraire_deliberations.py", "--commune", commune],
+            )
+        else:
+            print(f"Extraction ignorée (--skip-extraction) pour {commune}.\n")
+
+        if args.skip_analyse:
+            print(f"Analyse journalistique ignorée (--skip-analyse) pour {commune}.\n")
+            continue
+
+        commande = [sys.executable, "analyser_sujets.py", "--auto", "--commune", commune]
+        if args.modele:
+            commande.extend(["--modele", args.modele])
+        if args.skip_html or len(communes) > 1:
+            commande.append("--skip-html")
+        if args.skip_json:
+            commande.append("--skip-json")
+        if args.details:
+            commande.append("--details")
+            commande.extend(str(num) for num in args.details)
+
+        executer(
+            f"Étape 2/2 - Analyse journalistique et génération des sorties ({commune})",
+            commande,
+        )
+
+    if len(communes) > 1 and not args.skip_html:
+        executer(
+            "Compilation HTML multi-communes",
+            [sys.executable, "analyser_sujets.py", "--merge-html", "--communes", *communes],
+        )
 
 
 if __name__ == "__main__":
