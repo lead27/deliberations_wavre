@@ -163,24 +163,21 @@ def _normaliser_points(points: Any) -> List[str]:
 
 
 def extraire_topics_depuis_reponse(reponse: str) -> List[Dict[str, Any]]:
-    """Parse la réponse JSON d'Ollama pour obtenir la liste des sujets."""
+    """Parse la réponse JSON pour obtenir la liste des points."""
     contenu_json = _nettoyer_sortie_json(reponse)
     try:
         donnees = json.loads(contenu_json)
     except json.JSONDecodeError as err:
-        raise RuntimeError("Impossible de décoder la réponse d'Ollama en JSON") from err
+        raise RuntimeError("Impossible de décoder la réponse du modèle en JSON") from err
 
-    topics_bruts = donnees.get("topics", [])
+    topics_bruts = donnees.get("points", [])
     sujets: List[Dict[str, Any]] = []
     for brut in topics_bruts:
         if not isinstance(brut, dict):
             continue
         sujet = {
-            "titre": brut.get("titre", "").strip(),
-            "interet": brut.get("interet", "").strip(),
-            "angle": brut.get("angle", "").strip(),
-            "points_a_creuser": _normaliser_points(brut.get("points_a_creuser")),
-            "references": (brut.get("references", "") or "").strip(),
+            "titre": (brut.get("titre", "") or "").strip(),
+            "description": (brut.get("description", "") or "").strip(),
         }
         if sujet["titre"]:
             sujets.append(sujet)
@@ -194,9 +191,9 @@ def analyser_globalement(
     commune_nom: str,
     max_sujets: int = 5,
 ) -> List[Dict[str, Any]]:
-    """Interroge l'IA pour obtenir la liste des sujets journalistiques."""
+    """Interroge l'IA pour obtenir la liste des points abordés."""
     print("=" * 80)
-    print("ANALYSE GLOBALE : Recherche des sujets journalistiques")
+    print("ANALYSE GLOBALE : Liste des points abordés")
     print("=" * 80 + "\n")
     print("L'IA analyse toutes les délibérations (2-3 minutes)...\n")
 
@@ -208,20 +205,16 @@ Voici les délibérations récentes du conseil communal de {commune_nom} :
 {resume}
 
 Objectif :
-- Identifier les sujets journalistiques réellement pertinents (maximum {max_sujets}).
-- Ignorer les points purement administratifs ou sans intérêt citoyen.
-
-Critères : impact sur les citoyens, caractère inédit, enjeux financiers importants, potentiel de controverse.
+- Lister tous les points abordés, dans l'ordre du document.
+- Ne rien filtrer. Une entrée par point, même si le point semble technique ou administratif.
+- Fournir 1 à 3 phrases de description, sans proposer d'angle, d'enjeux ou de questions.
 
 Format de réponse : renvoie UNIQUEMENT un objet JSON valide de la forme
 {{
-  "topics": [
+  "points": [
     {{
       "titre": "...",
-      "interet": "...",
-      "angle": "...",
-      "points_a_creuser": ["...", "..."],
-      "references": "..."
+      "description": "..."
     }}
   ]
 }}
@@ -235,7 +228,7 @@ Règles :
     reponse = appeler_modele_json(client, prompt, modele)
     sujets = extraire_topics_depuis_reponse(reponse)
 
-    print(f"✓ {len(sujets)} sujet(s) proposé(s) par l'IA\n")
+    print(f"✓ {len(sujets)} point(s) listé(s) par l'IA\n")
     return sujets
 
 
@@ -284,25 +277,17 @@ def sauvegarder_analyse_textuelle(
         lignes.append(seance["nom"])
     lignes.append("=" * 80 + "\n")
 
-    lignes.append("ANALYSE GLOBALE - TOP SUJETS")
+    lignes.append("ANALYSE GLOBALE - LISTE DES POINTS")
     lignes.append("=" * 80 + "\n")
 
     if not sujets:
-        lignes.append("Aucun sujet journalistique majeur n'a été identifié pour cette séance.\n")
+        lignes.append("Aucun point n'a été identifié pour cette séance.\n")
     else:
-        lignes.append("Voici les sujets les plus prometteurs :\n")
+        lignes.append("Voici la liste des points dans l'ordre :\n")
         for index, sujet in enumerate(sujets, 1):
             lignes.append(f"**{index}. Titre : \"{sujet['titre']}\"**")
-            if sujet["interet"]:
-                lignes.append(f"**INTÉRÊT :** {sujet['interet']}")
-            if sujet["angle"]:
-                lignes.append(f"**ANGLE :** {sujet['angle']}")
-            if sujet["points_a_creuser"]:
-                lignes.append("**POINTS À CREUSER :**")
-                for point in sujet["points_a_creuser"]:
-                    lignes.append(f"* {point}")
-            if sujet["references"]:
-                lignes.append(f"**NUMÉROS :** {sujet['references']}")
+            if sujet.get("description"):
+                lignes.append(f"**DESCRIPTION :** {sujet['description']}")
             lignes.append("")
 
     lignes.append("=" * 80 + "\n")
@@ -337,7 +322,7 @@ def sauvegarder_topics_json(
         "generated_at": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
         "commune": commune_nom,
         "seance": seance,
-        "topics": sujets,
+        "points": sujets,
     }
     Path(chemin_fichier).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"✓ Résultats structurés sauvegardés dans {chemin_fichier}")
@@ -351,41 +336,23 @@ def generer_html(
 ) -> None:
     """Produit la page HTML à partir des sujets identifiés."""
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M")
-    sous_titre = f"Conseil communal de {commune_nom}"
-    if seance and seance.get("nom"):
-        sous_titre += f" — {seance['nom']}"
-
-    sections: List[str] = []
-    if not sujets:
-        sections.append(
-            "<p>Aucun sujet journalistique n'a été identifié pour cette séance. "
-            "Revenez après la prochaine mise à jour automatique.</p>"
-        )
-    else:
-        sections.append("<section>")
-        sections.append("  <h2>Sujets prioritaires pour des articles</h2>")
-        for index, sujet in enumerate(sujets, 1):
-            sections.append('  <article class="subject">')
-            sections.append(f"    <h3>{index}. {html.escape(sujet['titre'])}</h3>")
-            if sujet["interet"]:
-                sections.append("    <strong>Intérêt</strong>")
-                sections.append(f"    <p>{html.escape(sujet['interet'])}</p>")
-            if sujet["angle"]:
-                sections.append("    <strong>Angle</strong>")
-                sections.append(f"    <p>{html.escape(sujet['angle'])}</p>")
-            if sujet["points_a_creuser"]:
-                sections.append("    <strong>Points à creuser</strong>")
-                sections.append("    <ul>")
-                for point in sujet["points_a_creuser"]:
-                    sections.append(f"      <li>{html.escape(point)}</li>")
-                sections.append("    </ul>")
-            if sujet["references"]:
-                sections.append("    <strong>Références</strong>")
-                sections.append(f"    <p>{html.escape(sujet['references'])}</p>")
-            sections.append("  </article>")
-        sections.append("</section>")
-
-    contenu_section = "\n".join(sections)
+    seance_nom = seance.get("nom") if seance else None
+    table_rows = _table_row_html(commune_nom, seance_nom, sujets)
+    contenu_section = f"""<section class="table-section">
+      <table>
+        <thead>
+          <tr>
+            <th>Commune</th>
+            <th>Date du dernier conseil</th>
+            <th>Type</th>
+            <th>Points à l'ordre du jour</th>
+          </tr>
+        </thead>
+        <tbody>
+          {table_rows}
+        </tbody>
+      </table>
+    </section>"""
 
     contenu_html = f"""<!DOCTYPE html>
 <html lang="fr">
@@ -433,50 +400,78 @@ def generer_html(
       font-size: 1.05rem;
     }}
 
-    section h2 {{
-      font-size: 1.65rem;
-      margin-bottom: 1rem;
+    .table-section {{
+      margin-top: 2rem;
+    }}
+
+    table {{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.98rem;
+    }}
+
+    th, td {{
+      text-align: left;
+      vertical-align: top;
+      padding: 0.85rem 0.75rem;
+      border-bottom: 1px solid #e4e7eb;
+    }}
+
+    th {{
+      background: #f0f4f8;
       color: #102a43;
-    }}
-
-    .subject {{
-      border-top: 1px solid #e4e7eb;
-      padding: 1.75rem 0;
-    }}
-
-    .subject:first-of-type {{
-      border-top: none;
-      padding-top: 0;
-    }}
-
-    .subject h3 {{
-      margin: 0;
-      font-size: 1.35rem;
-      color: #0b7285;
-    }}
-
-    .subject strong {{
-      display: inline-block;
-      margin-top: 0.75rem;
+      font-weight: 600;
       font-size: 0.95rem;
-      color: #102a43;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
     }}
 
-    .subject p {{
-      margin: 0.35rem 0 0.35rem;
+    td:first-child {{
+      font-weight: 600;
+      color: #0b7285;
+      width: 18%;
+    }}
+
+    td:nth-child(2) {{
+      width: 20%;
       color: #334e68;
-      font-size: 1rem;
     }}
 
-    .subject ul {{
-      margin: 0.75rem 0 0.5rem 1.25rem;
-      color: #243b53;
+    td:nth-child(3) {{
+      width: 16%;
+      color: #52606d;
     }}
 
-    .subject li {{
-      margin: 0.25rem 0;
+    td:nth-child(4) {{
+      width: 46%;
+    }}
+
+    details {{
+      margin-bottom: 0.5rem;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid #e4e7eb;
+    }}
+
+    details[open] {{
+      border-color: #9fb3c8;
+      background: #f8fafc;
+    }}
+
+    summary {{
+      cursor: pointer;
+      font-weight: 600;
+      color: #0b7285;
+      list-style: none;
+    }}
+
+    summary::-webkit-details-marker {{
+      display: none;
+    }}
+
+    .point-description {{
+      margin-top: 0.5rem;
+      color: #334e68;
+      font-size: 0.95rem;
     }}
 
     footer {{
@@ -495,8 +490,12 @@ def generer_html(
         font-size: 1.6rem;
       }}
 
-      .subject h3 {{
-        font-size: 1.2rem;
+      table {{
+        font-size: 0.95rem;
+      }}
+
+      td:first-child {{
+        width: auto;
       }}
     }}
   </style>
@@ -505,7 +504,7 @@ def generer_html(
   <main>
     <header>
       <h1>Analyse journalistique des délibérations</h1>
-      <p>{html.escape(sous_titre)} &mdash; Mise à jour automatique du {generated_at}</p>
+      <p>Conseil communal de {html.escape(commune_nom)} &mdash; Mise à jour automatique du {generated_at}</p>
     </header>
     {contenu_section}
     <footer>
@@ -534,76 +533,122 @@ def charger_topics_json(chemin_fichier: str) -> Dict[str, Any]:
 def _sections_html_pour_sujets(sujets: List[Dict[str, Any]]) -> str:
     if not sujets:
         return (
-            "<p>Aucun sujet journalistique n'a été identifié pour cette séance. "
+            "<p>Aucun point n'a été identifié pour cette séance. "
             "Revenez après la prochaine mise à jour automatique.</p>"
         )
 
     sections: List[str] = []
     sections.append("<section>")
-    sections.append("  <h3>Sujets prioritaires pour des articles</h3>")
+    sections.append("  <h3>Liste des points abordés</h3>")
     for index, sujet in enumerate(sujets, 1):
         sections.append('  <article class="subject">')
         sections.append(f"    <h4>{index}. {html.escape(sujet.get('titre', ''))}</h4>")
-        interet = sujet.get("interet")
-        if interet:
-            sections.append("    <strong>Intérêt</strong>")
-            sections.append(f"    <p>{html.escape(interet)}</p>")
-        angle = sujet.get("angle")
-        if angle:
-            sections.append("    <strong>Angle</strong>")
-            sections.append(f"    <p>{html.escape(angle)}</p>")
-        points = sujet.get("points_a_creuser") or []
-        if points:
-            sections.append("    <strong>Points à creuser</strong>")
-            sections.append("    <ul>")
-            for point in points:
-                sections.append(f"      <li>{html.escape(point)}</li>")
-            sections.append("    </ul>")
-        references = sujet.get("references")
-        if references:
-            sections.append("    <strong>Références</strong>")
-            sections.append(f"    <p>{html.escape(references)}</p>")
+        description = sujet.get("description")
+        if description:
+            sections.append("    <strong>Description</strong>")
+            sections.append(f"    <p>{html.escape(description)}</p>")
         sections.append("  </article>")
     sections.append("</section>")
+    return "\n".join(sections)
+
+
+def _extraire_date_et_type_seance(seance_nom: Optional[str]) -> Tuple[str, str]:
+    if not seance_nom:
+        return "", ""
+    if "—" in seance_nom:
+        parts = [part.strip() for part in seance_nom.split("—", 1)]
+    elif " - " in seance_nom:
+        parts = [part.strip() for part in seance_nom.split(" - ", 1)]
+    else:
+        return seance_nom.strip(), ""
+    if len(parts) == 2:
+        return parts[0], parts[1]
+    return seance_nom.strip(), ""
+
+
+def _points_html(sujets: List[Dict[str, Any]]) -> str:
+    if not sujets:
+        return "<p>Aucun point n'a été identifié.</p>"
+    elements: List[str] = []
+    for index, sujet in enumerate(sujets, 1):
+        titre = html.escape(sujet.get("titre", ""))
+        description = html.escape(sujet.get("description", "")) if sujet.get("description") else ""
+        elements.append("<details>")
+        elements.append(f"  <summary>{index}. {titre}</summary>")
+        if description:
+            elements.append(f"  <p class=\"point-description\">{description}</p>")
+        elements.append("</details>")
+    return "\n".join(elements)
+
+
+def _table_row_html(commune_nom: str, seance_nom: Optional[str], sujets: List[Dict[str, Any]]) -> str:
+    date_seance, type_seance = _extraire_date_et_type_seance(seance_nom)
+    points_html = _points_html(sujets)
+    return (
+        "<tr>"
+        f"<td>{html.escape(commune_nom)}</td>"
+        f"<td>{html.escape(date_seance)}</td>"
+        f"<td>{html.escape(type_seance)}</td>"
+        f"<td>{points_html}</td>"
+        "</tr>"
+    )
+
+
+def _build_table_html(rows: List[str]) -> str:
+    return f"""<section class="table-section">
+      <table>
+        <thead>
+          <tr>
+            <th>Commune</th>
+            <th>Date du dernier conseil</th>
+            <th>Type</th>
+            <th>Points à l'ordre du jour</th>
+          </tr>
+        </thead>
+        <tbody>
+          {' '.join(rows)}
+        </tbody>
+      </table>
+    </section>"""
+
+
+def _group_tables_html(
+    rows: List[str],
+    group_labels: Optional[List[str]],
+    group_sizes: Optional[List[int]],
+) -> str:
+    if not group_labels or not group_sizes or len(group_labels) != len(group_sizes):
+        return _build_table_html(rows)
+
+    if sum(group_sizes) != len(rows):
+        return _build_table_html(rows)
+
+    sections: List[str] = []
+    index = 0
+    for label, size in zip(group_labels, group_sizes):
+        group_rows = rows[index : index + size]
+        index += size
+        sections.append(f"<section class=\"group\"><h2>{html.escape(label)}</h2></section>")
+        sections.append(_build_table_html(group_rows))
     return "\n".join(sections)
 
 
 def generer_html_multi(
     sujets_par_commune: List[Dict[str, Any]],
     chemin_fichier: str,
+    group_labels: Optional[List[str]] = None,
+    group_sizes: Optional[List[int]] = None,
 ) -> None:
     """Produit une page HTML unique regroupant plusieurs communes."""
     generated_at = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    sections: List[str] = []
-    sections.append('<section class="toc">')
-    sections.append("  <h2>Communes analysées</h2>")
-    sections.append("  <ul>")
+    rows: List[str] = []
     for bloc in sujets_par_commune:
         nom = bloc.get("commune_nom") or "Commune"
-        anchor = bloc.get("anchor") or ""
-        sections.append(f'    <li><a href="#{html.escape(anchor)}">{html.escape(nom)}</a></li>')
-    sections.append("  </ul>")
-    sections.append("</section>")
-
-    for bloc in sujets_par_commune:
-        nom = bloc.get("commune_nom") or "Commune"
-        anchor = bloc.get("anchor") or ""
         seance_nom = bloc.get("seance_nom")
-        generated_at_commune = bloc.get("generated_at")
-        sections.append(f'<section class="commune" id="{html.escape(anchor)}">')
-        sections.append(f"  <h2>Conseil communal de {html.escape(nom)}</h2>")
-        meta_parts = []
-        if seance_nom:
-            meta_parts.append(html.escape(seance_nom))
-        if generated_at_commune:
-            meta_parts.append(f"Mise à jour automatique du {html.escape(generated_at_commune)}")
-        if meta_parts:
-            sections.append(f"  <p class=\"meta\">{' — '.join(meta_parts)}</p>")
-        sections.append(_sections_html_pour_sujets(bloc.get("topics", [])))
-        sections.append("</section>")
+        rows.append(_table_row_html(nom, seance_nom, bloc.get("topics", [])))
 
-    contenu_section = "\n".join(sections)
+    contenu_section = _group_tables_html(rows, group_labels, group_sizes)
 
     contenu_html = f"""<!DOCTYPE html>
 <html lang="fr">
@@ -651,91 +696,84 @@ def generer_html_multi(
       font-size: 1.05rem;
     }}
 
-    .toc {{
-      margin-bottom: 2rem;
-      padding: 1.25rem 1.5rem;
+    .table-section {{
+      margin-top: 2rem;
+    }}
+
+    .group h2 {{
+      margin: 2rem 0 0.75rem;
+      font-size: 1.6rem;
+      color: #102a43;
+    }}
+
+    table {{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.98rem;
+    }}
+
+    th, td {{
+      text-align: left;
+      vertical-align: top;
+      padding: 0.85rem 0.75rem;
+      border-bottom: 1px solid #e4e7eb;
+    }}
+
+    th {{
       background: #f0f4f8;
-      border-radius: 12px;
+      color: #102a43;
+      font-weight: 600;
+      font-size: 0.95rem;
     }}
 
-    .toc ul {{
-      margin: 0.5rem 0 0;
-      padding-left: 1.2rem;
-    }}
-
-    .toc a {{
+    td:first-child {{
+      font-weight: 600;
       color: #0b7285;
-      text-decoration: none;
+      width: 18%;
     }}
 
-    .commune {{
-      margin-top: 2.5rem;
-      padding-top: 2rem;
-      border-top: 1px solid #e4e7eb;
-    }}
-
-    .commune:first-of-type {{
-      border-top: none;
-      padding-top: 0;
-      margin-top: 0;
-    }}
-
-    .commune h2 {{
-      font-size: 1.65rem;
-      margin-bottom: 0.35rem;
-      color: #102a43;
-    }}
-
-    .meta {{
-      color: #52606d;
-      margin-top: 0;
-      margin-bottom: 1.25rem;
-    }}
-
-    section h3 {{
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-      color: #102a43;
-    }}
-
-    .subject {{
-      border-top: 1px solid #e4e7eb;
-      padding: 1.5rem 0;
-    }}
-
-    .subject:first-of-type {{
-      border-top: none;
-      padding-top: 0;
-    }}
-
-    .subject h4 {{
-      margin: 0;
-      font-size: 1.2rem;
-      color: #0b7285;
-    }}
-
-    .subject strong {{
-      display: inline-block;
-      margin-top: 0.75rem;
-      font-size: 0.9rem;
-      color: #102a43;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }}
-
-    .subject p {{
-      margin: 0.35rem 0 0.35rem;
+    td:nth-child(2) {{
+      width: 20%;
       color: #334e68;
-      font-size: 1rem;
     }}
 
-    .subject ul {{
-      margin: 0.75rem 0 0.5rem 1.25rem;
-      color: #243b53;
+    td:nth-child(3) {{
+      width: 16%;
+      color: #52606d;
     }}
 
-    .subject li {{
-      margin: 0.25rem 0;
+    td:nth-child(4) {{
+      width: 46%;
+    }}
+
+    details {{
+      margin-bottom: 0.5rem;
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid #e4e7eb;
+    }}
+
+    details[open] {{
+      border-color: #9fb3c8;
+      background: #f8fafc;
+    }}
+
+    summary {{
+      cursor: pointer;
+      font-weight: 600;
+      color: #0b7285;
+      list-style: none;
+    }}
+
+    summary::-webkit-details-marker {{
+      display: none;
+    }}
+
+    .point-description {{
+      margin-top: 0.5rem;
+      color: #334e68;
+      font-size: 0.95rem;
     }}
 
     footer {{
@@ -754,8 +792,12 @@ def generer_html_multi(
         font-size: 1.6rem;
       }}
 
-      .subject h4 {{
-        font-size: 1.1rem;
+      table {{
+        font-size: 0.95rem;
+      }}
+
+      td:first-child {{
+        width: auto;
       }}
     }}
   </style>
@@ -806,6 +848,17 @@ def parser_arguments() -> argparse.Namespace:
         help="Génère une seule page HTML regroupant plusieurs communes.",
     )
     parser.add_argument(
+        "--group-labels",
+        nargs="*",
+        help="Libellés de groupes pour la page HTML multi-communes (ex: 'Brabant wallon' 'Namur').",
+    )
+    parser.add_argument(
+        "--group-sizes",
+        nargs="*",
+        type=int,
+        help="Nombre de communes par groupe, dans l'ordre des libellés.",
+    )
+    parser.add_argument(
         "--details",
         nargs="*",
         type=int,
@@ -830,7 +883,11 @@ def main() -> None:
                 if commune == "wavre"
                 else f"sujets_journalistiques_{commune}.json"
             )
-            donnees = charger_topics_json(json_path)
+            try:
+                donnees = charger_topics_json(json_path)
+            except RuntimeError as exc:
+                print(f"⚠ {exc}. Commune ignorée pour la compilation HTML.")
+                continue
             seance = donnees.get("seance") or {}
             commune_nom = donnees.get("commune") or _nom_commune_affichage(commune)
             blocs.append(
@@ -839,10 +896,15 @@ def main() -> None:
                     "anchor": commune,
                     "seance_nom": seance.get("nom"),
                     "generated_at": donnees.get("generated_at"),
-                    "topics": donnees.get("topics", []),
+                    "topics": donnees.get("points", []),
                 }
             )
-        generer_html_multi(blocs, html_path)
+        generer_html_multi(
+            blocs,
+            html_path,
+            group_labels=args.group_labels,
+            group_sizes=args.group_sizes,
+        )
         return
 
     commune_slug = args.commune.strip().lower()

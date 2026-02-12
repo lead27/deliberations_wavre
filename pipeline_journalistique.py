@@ -9,6 +9,94 @@ from extraire_deliberations import construire_url_base, detecter_seance_la_plus_
 
 
 RACINE = Path(__file__).resolve().parent
+GROUPES_COMMUNES = {
+    "bw": [
+        "wavre",
+        "incourt",
+        "ramillies",
+        "rebecq",
+        "tubize",
+        "braine-le-chateau",
+        "ittre",
+        "braine-lalleud",
+        "nivelles",
+        "genappe",
+        "lasne",
+        "la-hulpe",
+        "rixensart",
+        "ottignies-louvain-la-neuve",
+        "court-saint-etienne",
+        "chastre",
+        "mont-saint-guibert",
+        "walhain",
+        "chaumont-gistoux",
+        "grez-doiceau",
+        "helecine",
+    ],
+    "namur": [
+        "dinant",
+        "hamois",
+        "havelange",
+        "houyet",
+        "onhaye",
+        "rochefort",
+        "somme-leuze",
+        "vresse-sur-semois",
+        "yvoir",
+        "andenne",
+        "assesse",
+        "eghezee",
+        "gembloux",
+        "jemeppe-sur-sambre",
+        "la-bruyere",
+        "mettet",
+        "namur",
+        "ohey",
+        "sambreville",
+        "sombreffe",
+        "cerfontaine",
+        "doische",
+        "florennes",
+        "philippeville",
+        "viroinval",
+        "walcourt",
+    ],
+    "lux": [
+        "arlon",
+        "bastogne",
+        "bertrix",
+        "chiny",
+        "daverdisse",
+        "durbuy",
+        "erezee",
+        "etalle",
+        "florenville",
+        "habay",
+        "la-roche-en-ardenne",
+        "leglise",
+        "libin",
+        "libramont",
+        "manhay",
+        "marche-en-famenne",
+        "martelange",
+        "meix-devant-virton",
+        "nassogne",
+        "paliseul",
+        "rendeux",
+        "rouvroy",
+        "sainte-ode",
+        "saint-hubert",
+        "saint-leger",
+        "tellin",
+        "virton",
+        "wellin",
+    ],
+}
+GROUPES_LABELS = {
+    "bw": "Brabant wallon",
+    "namur": "Namur",
+    "lux": "Luxembourg",
+}
 
 
 def executer(description: str, commande: List[str]) -> None:
@@ -44,6 +132,25 @@ def charger_derniere_seance(path: Path) -> Tuple[Optional[str], Optional[str]]:
     return None, None
 
 
+def fichier_deliberations_disponible(path: Path) -> bool:
+    """Vérifie que le fichier de délibérations existe et contient des données."""
+    if not path.exists():
+        return False
+    try:
+        with path.open("r", encoding="utf-8") as handle:
+            donnees = json.load(handle)
+    except (json.JSONDecodeError, OSError):
+        return False
+
+    if isinstance(donnees, dict):
+        deliberations = donnees.get("deliberations") or []
+    elif isinstance(donnees, list):
+        deliberations = donnees
+    else:
+        return False
+    return bool(deliberations)
+
+
 def parser_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Chaîne d'automatisation quotidienne pour extraire, analyser et publier les délibérations.",
@@ -70,13 +177,37 @@ def parser_arguments() -> argparse.Namespace:
         default=["wavre"],
         help="Liste des communes à analyser (ex: wavre incourt walhain).",
     )
+    parser.add_argument(
+        "--groupe",
+        help="Nom d'un groupe de communes predefini (ex: bw).",
+    )
+    parser.add_argument(
+        "--groupes",
+        nargs="*",
+        help="Liste de groupes de communes predefinis (ex: bw namur).",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parser_arguments()
 
-    communes = [commune.strip().lower() for commune in args.communes if commune.strip()]
+    groupes = []
+    if args.groupes:
+        groupes = [g.strip().lower() for g in args.groupes if g.strip()]
+    elif args.groupe:
+        groupes = [args.groupe.strip().lower()]
+
+    if groupes:
+        communes = []
+        for groupe in groupes:
+            communes_groupe = GROUPES_COMMUNES.get(groupe, [])
+            if not communes_groupe:
+                print(f"Groupe inconnu: {groupe}")
+                return
+            communes.extend(communes_groupe)
+    else:
+        communes = [commune.strip().lower() for commune in args.communes if commune.strip()]
     if not communes:
         print("Aucune commune fournie.")
         return
@@ -110,6 +241,9 @@ def main() -> None:
         if args.skip_analyse:
             print(f"Analyse journalistique ignorée (--skip-analyse) pour {commune}.\n")
             continue
+        if not fichier_deliberations_disponible(fichier_delib):
+            print(f"⚠ Aucune délibération disponible pour {commune}, analyse ignorée.")
+            continue
 
         commande = [sys.executable, "analyser_sujets.py", "--auto", "--commune", commune]
         if args.modele:
@@ -128,10 +262,13 @@ def main() -> None:
         )
 
     if len(communes) > 1 and not args.skip_html:
-        executer(
-            "Compilation HTML multi-communes",
-            [sys.executable, "analyser_sujets.py", "--merge-html", "--communes", *communes],
-        )
+        commande_html = [sys.executable, "analyser_sujets.py", "--merge-html", "--communes", *communes]
+        if groupes:
+            group_labels = [GROUPES_LABELS.get(g, g.title()) for g in groupes]
+            group_sizes = [len(GROUPES_COMMUNES[g]) for g in groupes]
+            commande_html.extend(["--group-labels", *group_labels])
+            commande_html.extend(["--group-sizes", *[str(n) for n in group_sizes]])
+        executer("Compilation HTML multi-communes", commande_html)
 
 
 if __name__ == "__main__":

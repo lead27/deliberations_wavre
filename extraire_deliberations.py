@@ -9,11 +9,24 @@ from bs4 import BeautifulSoup
 # Configuration
 BASE_ROOT = "https://www.deliberations.be"
 DELAI_ENTRE_REQUETES = 3  # secondes entre chaque requête pour éviter de surcharger le serveur
+TIMEOUT_REQUETE = 30
+NB_TENTATIVES = 3
 
 
 def _nom_commune_affichage(commune: str) -> str:
     return commune.replace("-", " ").title()
 
+
+def _get_with_retries(url: str, timeout: int = TIMEOUT_REQUETE, retries: int = NB_TENTATIVES):
+    derniere_erreur = None
+    for tentative in range(1, retries + 1):
+        try:
+            return requests.get(url, timeout=timeout)
+        except requests.RequestException as err:
+            derniere_erreur = err
+            print(f"  ⚠ Tentative {tentative}/{retries} échouée pour {url}: {err}")
+            time.sleep(2)
+    raise derniere_erreur
 
 def construire_url_base(commune: str, base_root: str = BASE_ROOT) -> str:
     return f"{base_root.rstrip('/')}/{commune}/decisions"
@@ -26,23 +39,26 @@ def detecter_seance_la_plus_recente(url_base: str):
     """
     print("Détection de la séance la plus récente...")
     
-    response = requests.get(url_base)
+    response = _get_with_retries(url_base)
     soup = BeautifulSoup(response.content, 'html.parser')
     
     # Chercher le sélecteur de séance
     select_seance = soup.find('select', {'id': 'seance'})
-    
+
     if select_seance:
         # Trouver l'option sélectionnée (selected="selected")
         option_selectionnee = select_seance.find('option', {'selected': 'selected'})
+        if option_selectionnee is None:
+            # Fallback : première option avec une valeur
+            option_selectionnee = select_seance.find('option', {'value': True})
         if option_selectionnee:
             seance_id = option_selectionnee.get('value')
-            seance_nom = option_selectionnee.get('title')
+            seance_nom = option_selectionnee.get('title') or option_selectionnee.get_text(strip=True)
             print(f"Séance détectée : {seance_nom}")
             print(f"ID : {seance_id}\n")
             return seance_id, seance_nom
-    
-    print("Impossible de détecter la séance. Utilisation de la première carte trouvée...\n")
+
+    print("Impossible de détecter la séance. Utilisation de la liste par défaut...\n")
     return None, None
 
 def extraire_liens_deliberations(seance_id, url_base: str):
@@ -57,24 +73,50 @@ def extraire_liens_deliberations(seance_id, url_base: str):
     page_actuelle = 0
     pages_vides_consecutives = 0
     
+    use_faceted = False
+
+    increment = 20
+
     while True:
         # Construction de l'URL avec la séance et la pagination
-        if page_actuelle == 0:
-            url = f"{url_base}?seance={seance_id}"
+        if use_faceted:
+            base_faceted = f"{url_base.rstrip('/')}/@@faceted_query"
+            if page_actuelle == 0:
+                url = base_faceted
+            else:
+                url = f"{base_faceted}?b_start={page_actuelle}"
+            if seance_id:
+                separateur = "&" if "?" in url else "?"
+                url = f"{url}{separateur}seance={seance_id}"
+        elif seance_id:
+            if page_actuelle == 0:
+                url = f"{url_base}?seance={seance_id}"
+            else:
+                url = f"{url_base}?seance={seance_id}&b_start:int={page_actuelle}"
         else:
-            url = f"{url_base}?seance={seance_id}&b_start:int={page_actuelle}"
+            if page_actuelle == 0:
+                url = f"{url_base}"
+            else:
+                url = f"{url_base}?b_start:int={page_actuelle}"
         
         print(f"  📄 Page {page_actuelle // 20 + 1}...")
         
         try:
             # On fait une demande pour récupérer la page web
-            response = requests.get(url, timeout=10)
+            response = _get_with_retries(url)
             soup = BeautifulSoup(response.content, 'html.parser')
             
             # On cherche toutes les cartes de délibérations
             cartes = soup.find_all('div', class_='item-card')
             
             if not cartes:
+                if not use_faceted:
+                    # Certaines communes chargent les résultats via @@faceted_query
+                    print("  ⚠️  Aucune carte trouvée, tentative via @@faceted_query...")
+                    use_faceted = True
+                    page_actuelle = 0
+                    pages_vides_consecutives = 0
+                    continue
                 # Plus de cartes = on a fini
                 print("  ⚠️  Aucune carte trouvée sur cette page")
                 break
@@ -96,6 +138,8 @@ def extraire_liens_deliberations(seance_id, url_base: str):
                         nouveaux_liens += 1
             
             print(f"     → {nouveaux_liens} nouvelles délibérations trouvées")
+            if use_faceted:
+                increment = max(len(cartes), 1)
             
             # Si on n'a trouvé aucun nouveau lien, on arrête
             if nouveaux_liens == 0:
@@ -107,7 +151,7 @@ def extraire_liens_deliberations(seance_id, url_base: str):
                 pages_vides_consecutives = 0
             
             # Passer à la page suivante
-            page_actuelle += 20
+            page_actuelle += increment
             time.sleep(1)  # Petite pause entre les pages
             
         except Exception as e:
@@ -128,7 +172,7 @@ def extraire_contenu_deliberation(url):
     time.sleep(DELAI_ENTRE_REQUETES)
     
     try:
-        response = requests.get(url)
+        response = _get_with_retries(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         
         # On récupère le titre
@@ -262,8 +306,7 @@ def main():
     seance_id, seance_nom = detecter_seance_la_plus_recente(url_base)
     
     if not seance_id:
-        print("Erreur : impossible de détecter la séance.")
-        return
+        print("⚠ Séance non détectée, tentative d'extraction sur la liste par défaut.")
     
     # Étape 1 : Récupérer tous les liens de cette séance
     liens = extraire_liens_deliberations(seance_id, url_base)
