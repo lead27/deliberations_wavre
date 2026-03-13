@@ -132,6 +132,20 @@ def charger_derniere_seance(path: Path) -> Tuple[Optional[str], Optional[str]]:
     return None, None
 
 
+def seance_identique(
+    seance_a_id: Optional[str],
+    seance_a_nom: Optional[str],
+    seance_b_id: Optional[str],
+    seance_b_nom: Optional[str],
+) -> bool:
+    """Compare deux séances en privilégiant l'ID, puis le libellé."""
+    if seance_a_id and seance_b_id:
+        return seance_a_id == seance_b_id
+    if seance_a_nom and seance_b_nom:
+        return seance_a_nom.strip() == seance_b_nom.strip()
+    return False
+
+
 def fichier_deliberations_disponible(path: Path) -> bool:
     """Vérifie que le fichier de délibérations existe et contient des données."""
     if not path.exists():
@@ -149,6 +163,23 @@ def fichier_deliberations_disponible(path: Path) -> bool:
     else:
         return False
     return bool(deliberations)
+
+
+def chemins_sortie(commune: str) -> Tuple[Path, Path, Path, Path]:
+    """Construit les chemins de sortie standards pour une commune."""
+    if commune == "wavre":
+        return (
+            RACINE / "deliberations_wavre.json",
+            RACINE / "sujets_journalistiques.txt",
+            RACINE / "sujets_journalistiques.json",
+            RACINE / "sujets_journalistiques.html",
+        )
+    return (
+        RACINE / f"deliberations_{commune}.json",
+        RACINE / f"sujets_journalistiques_{commune}.txt",
+        RACINE / f"sujets_journalistiques_{commune}.json",
+        RACINE / f"sujets_journalistiques_{commune}.html",
+    )
 
 
 def parser_arguments() -> argparse.Namespace:
@@ -213,30 +244,57 @@ def main() -> None:
         return
 
     for commune in communes:
-        fichier_delib = RACINE / (
-            "deliberations_wavre.json" if commune == "wavre" else f"deliberations_{commune}.json"
-        )
+        fichier_delib, fichier_texte, fichier_json, fichier_html = chemins_sortie(commune)
         url_base = construire_url_base(commune)
 
         if not args.skip_extraction:
             seance_vue_id, seance_vue_nom = charger_derniere_seance(fichier_delib)
             nouvelle_seance_id, nouvelle_seance_nom = detecter_seance_la_plus_recente(url_base)
 
-            if nouvelle_seance_id and seance_vue_id == nouvelle_seance_id and not args.force:
+            if (
+                not args.force
+                and seance_identique(seance_vue_id, seance_vue_nom, nouvelle_seance_id, nouvelle_seance_nom)
+            ):
                 print("=" * 80)
-                print(f"Aucune nouvelle séance détectée pour {commune}, extraction et analyse ignorées.")
+                print(f"Aucune nouvelle séance détectée pour {commune}, extraction ignorée.")
                 print("=" * 80)
-                continue
+            else:
+                if nouvelle_seance_id is None:
+                    print(f"⚠ Séance la plus récente inconnue pour {commune}. L'extraction sera tout de même tentée.")
 
-            if nouvelle_seance_id is None:
-                print(f"⚠ Séance la plus récente inconnue pour {commune}. L'extraction sera tout de même tentée.")
-
-            executer(
-                f"Étape 1/2 - Extraction des délibérations ({commune})",
-                [sys.executable, "extraire_deliberations.py", "--commune", commune],
-            )
+                executer(
+                    f"Étape 1/2 - Extraction des délibérations ({commune})",
+                    [sys.executable, "extraire_deliberations.py", "--commune", commune],
+                )
         else:
             print(f"Extraction ignorée (--skip-extraction) pour {commune}.\n")
+
+        seance_analyse_id, seance_analyse_nom = charger_derniere_seance(fichier_json)
+        seance_delib_id, seance_delib_nom = charger_derniere_seance(fichier_delib)
+
+        sorties_analyse_presentes = (
+            fichier_json.exists()
+            and fichier_texte.exists()
+            and (args.skip_html or len(communes) > 1 or fichier_html.exists())
+        )
+
+        analyse_a_jour = sorties_analyse_presentes and seance_identique(
+            seance_delib_id,
+            seance_delib_nom,
+            seance_analyse_id,
+            seance_analyse_nom,
+        )
+
+        if not args.force and analyse_a_jour:
+            print("=" * 80)
+            print(f"Séance inchangée pour {commune}, analyse existante conservée.")
+            print("=" * 80)
+            continue
+
+        if not args.force and not fichier_json.exists():
+            print(f"Analyse absente pour {commune}, génération nécessaire.")
+        elif not args.force and seance_delib_nom:
+            print(f"Nouvelle séance à analyser pour {commune} : {seance_delib_nom}")
 
         if args.skip_analyse:
             print(f"Analyse journalistique ignorée (--skip-analyse) pour {commune}.\n")
