@@ -1,5 +1,6 @@
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -138,12 +139,80 @@ def seance_identique(
     seance_b_id: Optional[str],
     seance_b_nom: Optional[str],
 ) -> bool:
-    """Compare deux séances en privilégiant l'ID, puis le libellé."""
-    if seance_a_id and seance_b_id:
-        return seance_a_id == seance_b_id
-    if seance_a_nom and seance_b_nom:
-        return seance_a_nom.strip() == seance_b_nom.strip()
-    return False
+    """
+    Compare deux séances par date et type/statut.
+
+    Si la date du conseil est la même, on considère la séance inchangée et
+    on court-circuite l'extraction/analyse, sauf si le type/statut a évolué
+    (ex: "Projet de décision" -> "Décision").
+    """
+    date_a, type_a = decrire_seance(seance_a_id, seance_a_nom)
+    date_b, type_b = decrire_seance(seance_b_id, seance_b_nom)
+
+    if not date_a or not date_b or date_a != date_b:
+        return False
+
+    if type_a and type_b:
+        return type_a == type_b
+
+    # Si le type manque d'un côté, on s'arrête tout de même sur la date
+    # pour éviter une réanalyse complète nocturne inutile.
+    return True
+
+
+def decrire_seance(seance_id: Optional[str], seance_nom: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
+    """Extrait une clé de date et une clé de type à partir des métadonnées de séance."""
+    date_nom, type_nom = extraire_date_et_type_depuis_nom(seance_nom)
+    date_id = normaliser_date_depuis_id(seance_id)
+
+    date_cle = date_nom or date_id
+    type_cle = normaliser_type_seance(type_nom)
+    return date_cle, type_cle
+
+
+def extraire_date_et_type_depuis_nom(seance_nom: Optional[str]) -> Tuple[Optional[str], Optional[str]]:
+    if not seance_nom:
+        return None, None
+
+    libelle = seance_nom.strip()
+    if "—" in libelle:
+        parts = [part.strip() for part in libelle.split("—", 1)]
+    elif " - " in libelle:
+        parts = [part.strip() for part in libelle.split(" - ", 1)]
+    else:
+        return normaliser_date_depuis_nom(libelle), None
+
+    date_part = parts[0] if parts else libelle
+    type_part = parts[1] if len(parts) > 1 else None
+    return normaliser_date_depuis_nom(date_part), type_part
+
+
+def normaliser_date_depuis_nom(date_texte: Optional[str]) -> Optional[str]:
+    if not date_texte:
+        return None
+
+    # On compare la date telle qu'affichée, normalisée pour absorber les écarts
+    # cosmétiques de casse ou d'espaces.
+    normalisee = " ".join(date_texte.split()).casefold()
+    return normalisee or None
+
+
+def normaliser_date_depuis_id(seance_id: Optional[str]) -> Optional[str]:
+    if not seance_id:
+        return None
+
+    # Les IDs ressemblent à 04-novembre-2025-20-00 ; on normalise seulement
+    # la partie date/heure pour comparer les séances d'un même conseil.
+    correspondance = re.match(r"^(\d{1,2}-[a-zA-ZÀ-ÿ]+-\d{4}-\d{1,2}-\d{2})", seance_id.strip())
+    if correspondance:
+        return correspondance.group(1).casefold()
+    return seance_id.strip().casefold() or None
+
+
+def normaliser_type_seance(type_texte: Optional[str]) -> Optional[str]:
+    if not type_texte:
+        return None
+    return " ".join(type_texte.split()).casefold() or None
 
 
 def fichier_deliberations_disponible(path: Path) -> bool:
