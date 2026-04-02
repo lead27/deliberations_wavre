@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-03-20T09:28:41Z",
+  "commune": "Lasne",
+  "seance": {
+    "id": "09f93091c7b9465bb0f660808934ec83",
+    "nom": "23 Mars 2026 (19:30) — Projet de décision"
+  },
+  "points": [
+    {
+      "titre": "Démission des fonctions du Bourgmestre - Prise d'acte",
+      "description": "Ce point porte sur la prise d'acte de la démission du Bourgmestre, marquant un changement dans la direction du conseil communal."
+    },
+    {
+      "titre": "Remplacement d'un Conseiller communal démissionnaire - Vérification des pouvoirs - Prestation de serment - Modification du tableau de préséance.",
+      "description": "Cette délibération concerne le remplacement d'un conseiller démissionnaire, incluant la vérification des pouvoirs et la prestation de serment du nouvel élu."
+    },
+    {
+      "titre": "Adoption d'un second avenant au pacte de majorité - Prestations de serment",
+      "description": "Le conseil communal examine et adopte un second avenant au pacte de majorité, accompagnée des prestations de serment des nouveaux membres."
+    },
+    {
+      "titre": "Election de plein droit des membres du Conseil de l’Action Sociale - Prise d'acte",
+      "description": "Ce point traite de l'élection de plein droit des membres du Conseil de l’Action Sociale, formalité essentielle au bon fonctionnement de cette institution."
+    },
+    {
+      "titre": "Approbation du procès-verbal de la séance du 10 février 2026",
+      "description": "Le conseil communal approuve le procès-verbal de la séance précédente, permettant ainsi de valider les décisions prises lors de celle-ci."
+    }
+  ]
+}

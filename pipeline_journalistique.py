@@ -239,15 +239,15 @@ def chemins_sortie(commune: str) -> Tuple[Path, Path, Path, Path]:
     if commune == "wavre":
         return (
             RACINE / "deliberations_wavre.json",
-            RACINE / "sujets_journalistiques.txt",
-            RACINE / "sujets_journalistiques.json",
-            RACINE / "sujets_journalistiques.html",
+            RACINE / "analyse_conseils_communaux.txt",
+            RACINE / "analyse_conseils_communaux.json",
+            RACINE / "analyse_conseils_communaux.html",
         )
     return (
         RACINE / f"deliberations_{commune}.json",
-        RACINE / f"sujets_journalistiques_{commune}.txt",
-        RACINE / f"sujets_journalistiques_{commune}.json",
-        RACINE / f"sujets_journalistiques_{commune}.html",
+        RACINE / f"analyse_conseils_communaux_{commune}.txt",
+        RACINE / f"analyse_conseils_communaux_{commune}.json",
+        RACINE / f"analyse_conseils_communaux_{commune}.html",
     )
 
 
@@ -328,8 +328,19 @@ def main() -> None:
                 print(f"Aucune nouvelle séance détectée pour {commune}, extraction ignorée.")
                 print("=" * 80)
             else:
+                if nouvelle_seance_id is None and not args.force:
+                    print("=" * 80)
+                    print(
+                        f"⚠ Séance la plus récente indétectable pour {commune}, "
+                        "commune ignorée pour éviter d'extraire tout l'historique."
+                    )
+                    print("=" * 80)
+                    continue
                 if nouvelle_seance_id is None:
-                    print(f"⚠ Séance la plus récente inconnue pour {commune}. L'extraction sera tout de même tentée.")
+                    print(
+                        f"⚠ Séance la plus récente inconnue pour {commune}. "
+                        "L'extraction complète est forcée (--force)."
+                    )
 
                 executer(
                     f"Étape 1/2 - Extraction des délibérations ({commune})",

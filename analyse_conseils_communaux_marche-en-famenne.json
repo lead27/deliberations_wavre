@@ -1,0 +1,98 @@
+{
+  "generated_at": "2026-03-20T11:26:34Z",
+  "commune": "Marche En Famenne",
+  "seance": {
+    "id": "9b2e7889f60843209062c46dd95129b2",
+    "nom": "02 Mars 2026 (19:00) — Projet de décision"
+  },
+  "points": [
+    {
+      "titre": "Approbation du procès-verbal de la séance précédente - Séance publique",
+      "description": "Le conseil a approuvé le procès-verbal de la séance publique précédente, assurant ainsi la continuité des délibérations."
+    },
+    {
+      "titre": "Energie - Communes Energ-Ethiques - Rapport d'activités pour l'année 2025 - Approbation",
+      "description": "Le rapport d'activités de l'année 2025 des Communes Energ-Ethiques a été présenté et approuvé par le conseil, soulignant les efforts en matière d'énergies renouvelables."
+    },
+    {
+      "titre": "Cellule Transition - Communauté d’Énergie - Création de l’ASBL \"Communauté d’Énergie Citoyenne (CEC)\" entre la Ville et le CPAS de Marche pour les bâtiments communaux et du CPAS et approbation des statuts",
+      "description": "Un projet de création d'une ASBL pour promouvoir la transition énergétique a été élaboré, avec approbation des statuts nécessaires."
+    },
+    {
+      "titre": "Mandataires - ASBL \"Communauté d’Énergie Citoyenne entre la Ville et le CPAS de Marche\" - Assemblée générale - Désignation des représentants de la Ville",
+      "description": "Les représentants de la Ville ont été désignés pour participer à l'assemblée générale de l'ASBL dédiée à la communauté d'énergie citoyenne."
+    },
+    {
+      "titre": "CPAS - Création de l'ASBL \"Communauté d’Énergie Citoyenne entre la Ville et le CPAS de Marche-en-Famenne\" - Prise de participation - Tutelle du Conseil communal",
+      "description": "Le conseil a décidé de prendre part à la création de l'ASBL, tout en assurant la tutelle nécessaire pour garantir une bonne gouvernance."
+    },
+    {
+      "titre": "CPAS - Commission Locale pour l’Énergie (CLE) - Rapport annuel 2025 - Approbation",
+      "description": "Le rapport annuel de la Commission Locale pour l'Énergie a été approuvé, détaillant les initiatives et résultats de l'année 2025."
+    },
+    {
+      "titre": "Direction financière - Golazo Brands - Crelan 3x3 Masters 2026 - Organisation d'un match de qualification - Demande de soutien financier - Approbation",
+      "description": "Une demande de soutien financier pour l'organisation d'un match qualificatif des Crelan 3x3 Masters 2026 a été soumise et approuvée."
+    },
+    {
+      "titre": "Direction financière - Royal Entente Roy - Tournoi des jeunes 2025 - Demande de subside - Approbation",
+      "description": "Le conseil a approuvé une demande de subside pour soutenir le tournoi des jeunes organisé par la Royal Entente Roy en 2025."
+    },
+    {
+      "titre": "Marche-en-Famenne - Nouvelle caserne des pompiers - Contournement - N839 - Proposition de nom de rue - Approbation",
+      "description": "Une proposition de nom de rue pour le nouveau contournement N839 lié à la caserne des pompiers a été approuvée."
+    },
+    {
+      "titre": "PCS - Modifications de la programmation - Approbation",
+      "description": "Des modifications de la programmation au sein du Plan Communal de Développement ont été présentées et approuvées."
+    },
+    {
+      "titre": "Office Communal du Tourisme (OCT) - Concours \"Marche, commune verte et fleurie\" 2026 - Règlement - Catégories Maisons et Façades - Modification",
+      "description": "Le règlement du concours \"Marche, commune verte et fleurie\" pour l'année 2026 a subi des modifications concernant les catégories maisons et façades."
+    },
+    {
+      "titre": "Office Communal du Tourisme (OCT) - Concours \"Marche, commune verte et fleurie\" 2026 - Règlement - Potagers - Modification",
+      "description": "Des modifications ont été apportées au règlement du concours portant sur la catégorie des potagers pour l'année 2026."
+    },
+    {
+      "titre": "Personnel - Statut administratif - Chapitre XI - Section 10 - Article 100 et 100 Ter, 8° - Règlement de travail - Annexe 4 - Jour sans certificat - Modification",
+      "description": "Une modification a été apportée au règlement de travail relatif aux jours sans certificat au sein du statut administratif."
+    },
+    {
+      "titre": "Mandataires - ASBL \"Bibliothèque Locale de Marche\" (BiLoM) - Assemblée générale - Délégué de la Ville pour la mandature 2024-2030 - Remplacement",
+      "description": "Le conseil a approuvé le remplacement du délégué de la Ville pour l'assemblée générale de l'ASBL Bibliothèque Locale de Marche."
+    },
+    {
+      "titre": "Mandataires - ASBL \"Espace Parents Enfants\" - Assemblée générale - Délégué de la Ville - Remplacement",
+      "description": "Un délégué de la Ville a été désigné pour remplacer un membre de l'ASBL Espace Parents Enfants lors de l'assemblée générale."
+    },
+    {
+      "titre": "Enseignement - Écoles communales - Nombre d'élèves - Comptage au 15 janvier 2026 - Information",
+      "description": "Un comptage du nombre d'élèves dans les écoles communales a eu lieu, avec une présentation des résultats au conseil."
+    },
+    {
+      "titre": "Intercommunale - VIVALIA - Plan 2030 - Etat d'avancement - Information",
+      "description": "L'état d'avancement du Plan 2030 de l'intercommunale VIVALIA a été présenté aux membres du conseil."
+    },
+    {
+      "titre": "Place aux Foires - Travaux de la Halle - Information",
+      "description": "Le conseil a été informé des travaux en cours à la Halle de la Place aux Foires."
+    },
+    {
+      "titre": "Patrimoine - Vente de terrains à bâtir communaux - Année 2026 - Rond-point de la Carrière à Waha - Principe et conditions",
+      "description": "Les principes et conditions de vente de terrains à bâtir communaux situés au rond-point de la Carrière à Waha pour l'année 2026 ont été exposés."
+    },
+    {
+      "titre": "Patrimoine - Marche - Église Saint Remacle - Restauration des toitures - Conditions (cahier spécial des charges, estimatif, procédure ouverte, PSS, ...) - Approbation",
+      "description": "Les conditions relatives à la restauration des toitures de l'église Saint Remacle ont été approuvées, incluant le cahier des charges et le processus de sélection."
+    },
+    {
+      "titre": "Approbations de la Tutelle - Communications au Conseil communal",
+      "description": "Des communications relatives aux approbations de la tutelle ont été partagées avec le conseil communal."
+    },
+    {
+      "titre": "Marchés publics - Information au Conseil communal",
+      "description": "Le conseil communal a été informé sur les marchés publics en cours et leurs implications."
+    }
+  ]
+}

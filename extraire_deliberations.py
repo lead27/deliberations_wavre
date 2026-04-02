@@ -2,6 +2,7 @@ import argparse
 import json
 import time
 from datetime import datetime
+from urllib.parse import unquote, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -12,9 +13,110 @@ DELAI_ENTRE_REQUETES = 3  # secondes entre chaque requête pour éviter de surch
 TIMEOUT_REQUETE = 30
 NB_TENTATIVES = 3
 
+COMMUNES_LABELS = {
+    "andenne": "Andenne",
+    "arlon": "Arlon",
+    "assesse": "Assesse",
+    "bastogne": "Bastogne",
+    "bertrix": "Bertrix",
+    "braine-lalleud": "Braine-l'Alleud",
+    "braine-le-chateau": "Braine-le-Château",
+    "cerfontaine": "Cerfontaine",
+    "chastre": "Chastre",
+    "chaumont-gistoux": "Chaumont-Gistoux",
+    "chiny": "Chiny",
+    "court-saint-etienne": "Court-Saint-Etienne",
+    "daverdisse": "Daverdisse",
+    "dinant": "Dinant",
+    "doische": "Doische",
+    "durbuy": "Durbuy",
+    "eghezee": "Eghezée",
+    "erezee": "Erezée",
+    "etalle": "Etalle",
+    "florennes": "Florennes",
+    "florenville": "Florenville",
+    "gembloux": "Gembloux",
+    "genappe": "Genappe",
+    "grez-doiceau": "Grez-Doiceau",
+    "habay": "Habay",
+    "hamois": "Hamois",
+    "havelange": "Havelange",
+    "helecine": "Hélécine",
+    "houyet": "Houyet",
+    "incourt": "Incourt",
+    "ittre": "Ittre",
+    "jemeppe-sur-sambre": "Jemeppe-sur-Sambre",
+    "la-bruyere": "La Bruyère",
+    "la-hulpe": "La Hulpe",
+    "la-roche-en-ardenne": "La Roche-en-Ardenne",
+    "lasne": "Lasne",
+    "leglise": "Léglise",
+    "libin": "Libin",
+    "libramont": "Libramont-Chevigny",
+    "manhay": "Manhay",
+    "marche-en-famenne": "Marche-en-Famenne",
+    "martelange": "Martelange",
+    "meix-devant-virton": "Meix-devant-Virton",
+    "mettet": "Mettet",
+    "mont-saint-guibert": "Mont-Saint-Guibert",
+    "namur": "Namur",
+    "nassogne": "Nassogne",
+    "nivelles": "Nivelles",
+    "ohey": "Ohey",
+    "onhaye": "Onhaye",
+    "ottignies-louvain-la-neuve": "Ottignies-Louvain-la-Neuve",
+    "paliseul": "Paliseul",
+    "philippeville": "Philippeville",
+    "ramillies": "Ramillies",
+    "rebecq": "Rebecq",
+    "rendeux": "Rendeux",
+    "rixensart": "Rixensart",
+    "rochefort": "Rochefort",
+    "rouvroy": "Rouvroy",
+    "saint-hubert": "Saint-Hubert",
+    "saint-leger": "Saint-Léger",
+    "sainte-ode": "Sainte-Ode",
+    "sambreville": "Sambreville",
+    "sombreffe": "Sombreffe",
+    "somme-leuze": "Somme-Leuze",
+    "tellin": "Tellin",
+    "tubize": "Tubize",
+    "viroinval": "Viroinval",
+    "virton": "Virton",
+    "vresse-sur-semois": "Vresse-sur-Semois",
+    "walcourt": "Walcourt",
+    "walhain": "Walhain",
+    "wavre": "Wavre",
+    "wellin": "Wellin",
+    "yvoir": "Yvoir",
+}
+
 
 def _nom_commune_affichage(commune: str) -> str:
-    return commune.replace("-", " ").title()
+    slug = commune.strip().lower().replace("_", "-")
+    return COMMUNES_LABELS.get(slug, slug.replace("-", " ").title())
+
+
+def _titre_secours_depuis_url(url: str) -> str:
+    slug = unquote(urlparse(url).path.rstrip("/").split("/")[-1])
+    correspondances = {
+        "convention-relative-a-ladhesion-au-package-de-base-ecosysteme-dinbw-en-matiere-denergie-approbation-svm": (
+            "Convention relative à l'adhésion au package de base "
+            "Écosystème d'in BW en matière d'énergie - Approbation / SVM"
+        ),
+        "bpost-projet-bbox-distributeur-de-colis-sur-le-territoire-communal-convention-de-mise-a-disposition": (
+            "bpost - Projet bBox distributeur de colis sur le territoire communal "
+            "- Convention de mise à disposition"
+        ),
+        "pcdr-operation-de-developpement-rural-rapport-annuel-2025-approbation": (
+            "PCDR - Opération de développement rural - Rapport annuel 2025 - Approbation"
+        ),
+    }
+    if slug in correspondances:
+        return correspondances[slug]
+
+    titre = slug.replace("-", " ").strip()
+    return titre[:1].upper() + titre[1:] if titre else "Titre indisponible"
 
 
 def _get_with_retries(url: str, timeout: int = TIMEOUT_REQUETE, retries: int = NB_TENTATIVES):
@@ -178,6 +280,8 @@ def extraire_contenu_deliberation(url):
         # On récupère le titre
         titre = soup.find('h1')
         titre_texte = titre.get_text(strip=True) if titre else "Titre non trouvé"
+        if "bad gateway" in titre_texte.casefold():
+            titre_texte = _titre_secours_depuis_url(url)
         
         # On récupère tout le contenu principal
         contenu = soup.find('article', id='content')
@@ -185,8 +289,8 @@ def extraire_contenu_deliberation(url):
             # On enlève les balises HTML pour garder juste le texte
             texte = contenu.get_text(separator='\n', strip=True)
         else:
-            texte = "Contenu non trouvé"
-        
+            texte = "Contenu indisponible lors de l'extraction."
+
         print(f"✅ Extraction réussie\n")
         
         return {
@@ -306,7 +410,12 @@ def main():
     seance_id, seance_nom = detecter_seance_la_plus_recente(url_base)
     
     if not seance_id:
-        print("⚠ Séance non détectée, tentative d'extraction sur la liste par défaut.")
+        print(
+            "⚠ Séance non détectée. Extraction annulée pour éviter de parcourir "
+            "toute la liste historique de la commune."
+        )
+        print("   Utilisez --force via le pipeline si vous voulez vraiment tenter une extraction complète.")
+        return
     
     # Étape 1 : Récupérer tous les liens de cette séance
     liens = extraire_liens_deliberations(seance_id, url_base)

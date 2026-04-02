@@ -1,0 +1,218 @@
+{
+  "generated_at": "2026-03-20T10:50:45Z",
+  "commune": "Sambreville",
+  "seance": {
+    "id": "827dbdb212cd468eb55036ebafda991a",
+    "nom": "23 Mars 2026 (19:00) — Projet de décision"
+  },
+  "points": [
+    {
+      "titre": "Désignation de Monsieur Marc PARMENTIER",
+      "description": "Le groupe PS a désigné Monsieur Marc PARMENTIER en tant que représentant de l'organe d'administration à la Maison de la Jeunesse AROCA."
+    },
+    {
+      "titre": "Démission et désignation au Conseil consultatif communal du Bien-être animal",
+      "description": "Déborah Dumarteau a démissionné de son poste, Céline Fautré a été désignée pour la remplacer."
+    },
+    {
+      "titre": "Règlement complémentaire de police - zone de livraisons à Auvelais",
+      "description": "Mise en place d'un règlement complémentaire de police pour la zone de livraisons située rue Pont Sainte-Maxence à Auvelais."
+    },
+    {
+      "titre": "Règlement complémentaire de police - emplacement taxis à Auvelais",
+      "description": "Un règlement complémentaire de police a été adopté concernant l'emplacement des taxis à la Grand-Place d'Auvelais."
+    },
+    {
+      "titre": "Règlement complémentaire de police - limitation de tonnage rue de la Vacherie",
+      "description": "A l'exception de la desserte locale, une limitation de tonnage a été instaurée sur la partie en impasse de la rue de la Vacherie."
+    },
+    {
+      "titre": "Règlement complémentaire de police - zone de livraisons rue du Comté",
+      "description": "Un règlement complémentaire de police a été mis en place pour une zone de livraisons située rue du Comté à Auvelais."
+    },
+    {
+      "titre": "Règlement complémentaire de police - limitation de tonnage rue d'Hamion",
+      "description": "Une limitation de tonnage a été instaurée sur la rue d'Hamion à Falisolle, avec exception pour la desserte locale."
+    },
+    {
+      "titre": "Règlement complémentaire de police - abrogation d'emplacement handicapé à Falisolle",
+      "description": "Abrogation d'un emplacement réservé aux personnes handicapées situé rue Saint-Roch à Falisolle."
+    },
+    {
+      "titre": "Règlement complémentaire de police - abrogation d'emplacement handicapé à Tamines",
+      "description": "Un emplacement handicapé situé rue du Bois à Tamines a été abrogé."
+    },
+    {
+      "titre": "Règlement complémentaire de police - limitation de tonnage à Tamines",
+      "description": "Sur la rue d'Oignies à Tamines, une limitation de tonnage a été mise en place, sauf pour la desserte locale."
+    },
+    {
+      "titre": "Règlement complémentaire de police - carrefour à Tamines",
+      "description": "Un règlement complémentaire de police a été adopté concernant le carrefour entre la rue Roi Albert et la rue du 22 Août à Tamines."
+    },
+    {
+      "titre": "Règlement complémentaire de police - passage piéton à Tamines",
+      "description": "Mise en place d'un passage piéton au N988 sur la Rue de Velaine à Tamines."
+    },
+    {
+      "titre": "Règlement complémentaire de police - chicanes à Velaine",
+      "description": "Des chicanes seront mises en place rue Culot du Bois à Velaine."
+    },
+    {
+      "titre": "Règlement complémentaire de police - sens unique rue Docteur Séverin",
+      "description": "Les cyclistes seront autorisés à circuler à contre-sens dans la rue Docteur Séverin à Velaine, avec un sens unique établi sur une portion de la rue."
+    },
+    {
+      "titre": "Assemblée Générale Extraordinaire de l'INASEP",
+      "description": "L'Assemblée Générale Extraordinaire de l'INASEP se tiendra le 8 avril 2026."
+    },
+    {
+      "titre": "Rapport d'activité de la Régie communale autonome",
+      "description": "Un rapport d'activité 2025, un plan stratégique 2025 et un plan d'entreprise 2026 ont été présentés par la Régie communale autonome."
+    },
+    {
+      "titre": "Soutien à un nouveau service d'activités citoyennes",
+      "description": "Le conseil a décidé de soutenir la création d'un second Service d’Activités Citoyennes 'Au Cap' et d’accorder un soutien financier à l'ASBL Sambr’Action."
+    },
+    {
+      "titre": "Vérification de la caisse du quatrième trimestre 2025",
+      "description": "Une vérification de la caisse pour le quatrième trimestre de l’année 2025 a été effectuée."
+    },
+    {
+      "titre": "Déclaration de vacance d'un emploi de Chef de Bureau technique",
+      "description": "Une déclaration a été faite concernant la vacance d'un emploi de Chef de Bureau technique."
+    },
+    {
+      "titre": "Déclaration de vacance d'un emploi de contremaître en chef",
+      "description": "Une déclaration a été faite concernant la vacance d'un emploi de contremaître en chef."
+    },
+    {
+      "titre": "Ratification du paiement des décorations et pensions",
+      "description": "Le collège a ratifié le paiement des décorations, gratifications et pensions dans le service social du personnel de la commune et du CPAS."
+    },
+    {
+      "titre": "Appel à projets PCI 2026-2027",
+      "description": "Présentation et approbation d'un projet intitulé 'Ensemble contre le racisme : paroles et regards citoyens' dans le cadre des appels à projets PCI 2026-2027."
+    },
+    {
+      "titre": "Appel à projets du S.P.W. 2026",
+      "description": "Un appel à projets a été lancé par le S.P.W. pour des actions communales en matière de bien-être animal."
+    },
+    {
+      "titre": "Prolongation des Plans Stratégique de Sécurité et de Prévention",
+      "description": "Une convention a été signée pour prolonger les Plans Stratégique de Sécurité et de Prévention jusqu’au 31 décembre 2026."
+    },
+    {
+      "titre": "Maintien des agents constatateurs environnement",
+      "description": "Déclaration concernant le maintien de trois agents constatateurs environnement en 2026 dans le cadre d'un nouveau régime de subventionnement."
+    },
+    {
+      "titre": "Recyparc mobile",
+      "description": "Reconduction du service de Recyparc mobile pour l'année 2026 ; une convention a été signée avec le BEP Environnement."
+    },
+    {
+      "titre": "Zone portuaire de Tamines - concession",
+      "description": "Approbation d'un avenant 1 pour la concession à long terme de la zone portuaire de Tamines."
+    },
+    {
+      "titre": "Acquisition du Hall relais - CréaSambre à Auvelais",
+      "description": "Approbation de principe pour l'acquisition du Hall relais - CréaSambre à Auvelais."
+    },
+    {
+      "titre": "Prolongation de la Convention de Commodat immobilier",
+      "description": "Prolongation de la convention de commodat immobilier entre l'école industrielle et commerciale d'Auvelais et le Forem, section soudure."
+    },
+    {
+      "titre": "Convention pour l'école de Moignelée",
+      "description": "Mise en place d'une convention pour le Pôle territorial à l'école de Moignelée."
+    },
+    {
+      "titre": "Reprise de parcelle au cimetière de Tamines Bachères",
+      "description": "Décision concernant la reprise d'une parcelle située au N°240E au cimetière de Tamines Bachères."
+    },
+    {
+      "titre": "Dépassement budgétaire pour la lutte contre les animaux nuisibles",
+      "description": "Demande de régularisation concernant un dépassement budgétaire pour la lutte contre les animaux nuisibles."
+    },
+    {
+      "titre": "Aménagement d’équipements d’aires de jeux",
+      "description": "Approbation des conditions et du mode de passation pour l'aménagement d'équipements d’aires de jeux et d’aires multisports."
+    },
+    {
+      "titre": "Convention d'adhésion à la centrale d’achat IDEFIN",
+      "description": "Convention d'adhésion relative à la fourniture de gaz et d’électricité pour les années 2027-2028."
+    },
+    {
+      "titre": "Impact des exclusions du chômage",
+      "description": "Une évaluation de l'impact des exclusions du chômage a été présentée."
+    },
+    {
+      "titre": "Suivi du dossier AROCA",
+      "description": "Un point a été fait sur le suivi du dossier AROCA."
+    },
+    {
+      "titre": "Procès verbal de la séance publique du 2 février 2026",
+      "description": "Le procès verbal de la séance publique qui s'est tenue le 2 février 2026 a été présenté."
+    },
+    {
+      "titre": "Assemblée Générale Ordinaire de Proxiprêt",
+      "description": "L'Assemblée Générale Ordinaire de Proxiprêt se tiendra le 31 mars 2026."
+    },
+    {
+      "titre": "Convention de mise à disposition de locaux à Auvelais",
+      "description": "Une convention a été signée pour la mise à disposition des locaux 'Théâtre' et 'locaux administratifs' situés à Auvelais."
+    },
+    {
+      "titre": "Motion 'Sambreville Ville Antifasciste'",
+      "description": "Un suivi a été présenté concernant la motion 'Sambreville Ville Antifasciste'."
+    },
+    {
+      "titre": "Motion sur l'explosion des prix de l'énergie",
+      "description": "Une motion relative à l'explosion des prix de l'énergie et à ses impacts locaux a été discutée."
+    },
+    {
+      "titre": "Question orale sur les odeurs nauséabondes à Auvelais",
+      "description": "Une question orale concernant les odeurs nauséabondes à Auvelais, notamment Avenue de l'Europe, a été posée."
+    },
+    {
+      "titre": "Question orale sur Batopin",
+      "description": "Une question orale relative au projet Batopin a été soumise."
+    },
+    {
+      "titre": "Question orale sur la Maison des Jeunes de Tamines",
+      "description": "Une question orale a été posée concernant la Maison des Jeunes de Tamines et l'ASBL AROCA."
+    },
+    {
+      "titre": "Question orale sur le label 'Wallonie en Fleurs'",
+      "description": "Une question a été formulée sur l'obtention du label 'Wallonie en Fleurs'."
+    },
+    {
+      "titre": "Question orale sur le nouveau code bien-être animal",
+      "description": "Une question a été posée concernant l'implémentation du nouveau code de bien-être animal."
+    },
+    {
+      "titre": "Question orale sur le sport sur ordonnance",
+      "description": "Une question orale a été soulevée au sujet du sport sur ordonnance."
+    },
+    {
+      "titre": "Question orale sur le télétravail dans l'administration",
+      "description": "Une évaluation du télétravail au sein de l'administration communale a été mise à l'ordre du jour."
+    },
+    {
+      "titre": "Question orale sur l'éclairage public à Sambreville",
+      "description": "Une question a été posée sur la conversion à l'éclairage public LED à Sambreville."
+    },
+    {
+      "titre": "Question orale sur la qualité de l'air",
+      "description": "Une question orale a été formulée concernant la qualité de l air et les nuisances olfactives à Sambreville."
+    },
+    {
+      "titre": "Question orale sur la santé publique et l'obésité",
+      "description": "Une question orale a été soulevée sur la santé publique, notamment sur un stand dédié à la sensibilisation autour de l'obésité."
+    },
+    {
+      "titre": "Question orale sur l'avenir du site hospitalier d'Auvelais",
+      "description": "Une question a été posée concernant l'avenir du site hospitalier du CHR d'Auvelais."
+    }
+  ]
+}

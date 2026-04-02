@@ -1,0 +1,130 @@
+{
+  "generated_at": "2026-03-20T11:36:36Z",
+  "commune": "Rendeux",
+  "seance": {
+    "id": "2592b7624ba94fde981c1adb06bc4db1",
+    "nom": "19 Mars 2026 (20:00) — Projet de décision"
+  },
+  "points": [
+    {
+      "titre": "Examen et approbation du PV de la séance précédente",
+      "description": "Ce point concerne la validation du procès-verbal de la séance précédente, afin d'assurer la continuité des travaux du conseil communal."
+    },
+    {
+      "titre": "ADMINISTRATION COMMUNALE - Démission d'une conseillère - Prise d'acte",
+      "description": "Le conseil communal prend acte de la démission d'une conseillère, ce qui entraîne d'éventuelles modifications dans la composition du conseil."
+    },
+    {
+      "titre": "ADMINISTRATION COMMUNALE - Installation d'une conseillère communale suppléante",
+      "description": "Ce point porte sur l'installation d'une conseillère suppléante en remplacement d'une conseillère démissionnaire, ainsi que la vérification de ses pouvoirs."
+    },
+    {
+      "titre": "ADMINISTRATION COMMUNALE - Ordre de préséance des conseillers communaux",
+      "description": "Un renouvellement de l'ordre de préséance des conseillers communaux est proposé pour assurer une meilleure organisation lors des séances."
+    },
+    {
+      "titre": "Centre Public d'Action Sociale - Démission d'une conseillère - Prise d'acte",
+      "description": "Le conseil de l'Action Sociale prend acte de la démission d'une de ses conseillères, affectant la structure de l'instance."
+    },
+    {
+      "titre": "Centre Public d'Action Sociale - Désignation d'une Conseillère",
+      "description": "Le conseil doit désigner une nouvelle conseillère de l'Action Sociale en remplacement d'une conseillère démissionnaire."
+    },
+    {
+      "titre": "Décret Gouvernance – Rapport de rémunération",
+      "description": "Une révision du rapport de rémunération selon l'article 71 du décret du 29 mars 2018 est présentée pour approbation."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer une subvention annuelle à l'asbl Au Fil des Jours - Exercice 2026",
+      "description": "Le conseil examine et approuve l'octroi d'une subvention annuelle à l'association Au Fil des Jours pour l'exercice 2026."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer une subvention annuelle à l'asbl Accompagner - Exercice 2026",
+      "description": "L'octroi d'une subvention annuelle à l'asbl Accompagner est soumis à l'examen et à l'approbation du conseil."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer une subvention annuelle au Festival Baroque - Année 2026",
+      "description": "Le conseil se penche sur la décision d'octroyer une subvention annuelle au Festival Baroque pour l'année 2026."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer une subvention annuelle à l'ASBL Lire au Fil de l'Ourthe - Année 2026",
+      "description": "Une subvention annuelle à l'ASBL Lire au Fil de l'Ourthe est proposée pour approbation dans le cadre de l'année 2026."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer une subvention annuelle à l'ASBL Centre de Secours Médicalisé de Bra-sur-Lienne - Année 2026",
+      "description": "Le conseil doit approuver l'octroi d'une subvention annuelle à l'ASBL Centre de Secours Médicalisé de Bra-sur-Lienne pour 2026."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer une subvention annuelle à l’ASBL 'Musée de la Grande Ardenne' - Année 2026",
+      "description": "Une subvention annuelle à l'ASBL 'Musée de la Grande Ardenne' est examinée pour l'année 2026."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer une subvention à l’ASBL Maison de l'Urbanisme - Année 2026",
+      "description": "Le conseil examine l'octroi d'une subvention à l'ASBL Maison de l'Urbanisme pour l'année 2026."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer un subside de lancement au Comité de parents de l'école communale de Rendeux",
+      "description": "Un subside de lancement pour le Comité de parents de l'école communale de Rendeux est proposé pour approbation."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer une subvention annuelle au Conseil Consultatif Communal des Aînés (CCCA)",
+      "description": "Le conseil se penche sur l'octroi d'une subvention annuelle au Conseil Consultatif Communal des Aînés (CCCA)."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'octroyer une subvention au Contrat de Rivière Ourthe - Année 2026",
+      "description": "L'approbation d'une subvention au Contrat de Rivière Ourthe pour l'année 2026 est à l'ordre du jour."
+    },
+    {
+      "titre": "Examen et approbation de la convention de mise à disposition des murs de certains bâtiments publics pour des expositions culturelles",
+      "description": "Le conseil examine une convention pour permettre l'utilisation de murs de bâtiments publics pour des expositions culturelles."
+    },
+    {
+      "titre": "Opération de Développement Rural - Examen et approbation du rapport annuel 2025",
+      "description": "Un rapport annuel 2025 relatif à l'Opération de Développement Rural est présenté pour examen et approbation."
+    },
+    {
+      "titre": "Examen et approbation du rapport annuel de la CCATM - Exercice 2025",
+      "description": "Le rapport annuel de la CCATM pour l'exercice 2025 est soumis à l'examen et à l'approbation du conseil."
+    },
+    {
+      "titre": "Création d'une Zone d'Immersion Temporaire (ZIT) à Nohaipré",
+      "description": "Le conseil discute de la suppression d'une partie d'un chemin dans le cadre de la création d'une Zone d'Immersion Temporaire et de la vente de l'emprise."
+    },
+    {
+      "titre": "Examen et approbation du budget 2026 et annexes de la Fabrique d'Eglise de Rendeux-Haut",
+      "description": "L'examen et l'approbation du budget 2026 ainsi que des annexes de la Fabrique d'Eglise de Rendeux-Haut sont à l'ordre du jour."
+    },
+    {
+      "titre": "Travaux d'assainissement énergétique de l'école communale de Rendeux - Décision d'ester en justice",
+      "description": "Le conseil aborde une décision relative à des travaux d'assainissement énergétique de l'école communale, envisgeant des actions en justice."
+    },
+    {
+      "titre": "Désignation d'un auteur de projet pour les travaux de rénovation de la maison de village de Chéoux",
+      "description": "Le conseil doit désigner un auteur de projet chargé de l'étude et du contrôle des travaux de rénovation d'une maison de village."
+    },
+    {
+      "titre": "Marchés conjoints Commune-CPAS - Approbation de la convention",
+      "description": "Une convention pour des marchés conjoints entre la commune et le CPAS est examinée pour approbation."
+    },
+    {
+      "titre": "Examen et approbation de la décision d'acquérir une parcelle forestière à Marcourt",
+      "description": "L'acquisition d'une parcelle forestière à Marcourt est proposée pour examen et approbation."
+    },
+    {
+      "titre": "Vente d'une parcelle communale à Rendeux-Haut",
+      "description": "Le conseil délibère sur la vente d'une parcelle communale située à Rendeux-Haut."
+    },
+    {
+      "titre": "Notification des décisions de l'autorité de tutelle",
+      "description": "Le conseil prend connaissance des décisions transmises par l'autorité de tutelle."
+    },
+    {
+      "titre": "Notification des autorisations de chantier et arrêtés du Bourgmestre",
+      "description": "Les autorisations de chantier et les arrêtés du Bourgmestre sont portés à la connaissance du conseil."
+    },
+    {
+      "titre": "Divers",
+      "description": "Ce point permet d'aborder tout sujet non prévu à l'ordre du jour ou des affaires courantes."
+    }
+  ]
+}

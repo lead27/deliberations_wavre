@@ -3,6 +3,7 @@ import html
 import json
 import re
 import sys
+import unicodedata
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -11,10 +12,106 @@ from openai import OpenAI, OpenAIError
 
 
 MODELE_PAR_DEFAUT = "gpt-4o-mini"
+MOIS_FR = {
+    "janvier": 1,
+    "fevrier": 2,
+    "février": 2,
+    "mars": 3,
+    "avril": 4,
+    "mai": 5,
+    "juin": 6,
+    "juillet": 7,
+    "aout": 8,
+    "août": 8,
+    "septembre": 9,
+    "octobre": 10,
+    "novembre": 11,
+    "decembre": 12,
+    "décembre": 12,
+}
+
+COMMUNES_LABELS = {
+    "andenne": "Andenne",
+    "arlon": "Arlon",
+    "assesse": "Assesse",
+    "bastogne": "Bastogne",
+    "bertrix": "Bertrix",
+    "braine-lalleud": "Braine-l'Alleud",
+    "braine-le-chateau": "Braine-le-Château",
+    "cerfontaine": "Cerfontaine",
+    "chastre": "Chastre",
+    "chaumont-gistoux": "Chaumont-Gistoux",
+    "chiny": "Chiny",
+    "court-saint-etienne": "Court-Saint-Etienne",
+    "daverdisse": "Daverdisse",
+    "dinant": "Dinant",
+    "doische": "Doische",
+    "durbuy": "Durbuy",
+    "eghezee": "Eghezée",
+    "erezee": "Erezée",
+    "etalle": "Etalle",
+    "florennes": "Florennes",
+    "florenville": "Florenville",
+    "gembloux": "Gembloux",
+    "genappe": "Genappe",
+    "grez-doiceau": "Grez-Doiceau",
+    "habay": "Habay",
+    "hamois": "Hamois",
+    "havelange": "Havelange",
+    "helecine": "Hélécine",
+    "houyet": "Houyet",
+    "incourt": "Incourt",
+    "ittre": "Ittre",
+    "jemeppe-sur-sambre": "Jemeppe-sur-Sambre",
+    "la-bruyere": "La Bruyère",
+    "la-hulpe": "La Hulpe",
+    "la-roche-en-ardenne": "La Roche-en-Ardenne",
+    "lasne": "Lasne",
+    "leglise": "Léglise",
+    "libin": "Libin",
+    "libramont": "Libramont-Chevigny",
+    "manhay": "Manhay",
+    "marche-en-famenne": "Marche-en-Famenne",
+    "martelange": "Martelange",
+    "meix-devant-virton": "Meix-devant-Virton",
+    "mettet": "Mettet",
+    "mont-saint-guibert": "Mont-Saint-Guibert",
+    "namur": "Namur",
+    "nassogne": "Nassogne",
+    "nivelles": "Nivelles",
+    "ohey": "Ohey",
+    "onhaye": "Onhaye",
+    "ottignies-louvain-la-neuve": "Ottignies-Louvain-la-Neuve",
+    "paliseul": "Paliseul",
+    "philippeville": "Philippeville",
+    "ramillies": "Ramillies",
+    "rebecq": "Rebecq",
+    "rendeux": "Rendeux",
+    "rixensart": "Rixensart",
+    "rochefort": "Rochefort",
+    "rouvroy": "Rouvroy",
+    "saint-hubert": "Saint-Hubert",
+    "saint-leger": "Saint-Léger",
+    "sainte-ode": "Sainte-Ode",
+    "sambreville": "Sambreville",
+    "sombreffe": "Sombreffe",
+    "somme-leuze": "Somme-Leuze",
+    "tellin": "Tellin",
+    "tubize": "Tubize",
+    "viroinval": "Viroinval",
+    "virton": "Virton",
+    "vresse-sur-semois": "Vresse-sur-Semois",
+    "walcourt": "Walcourt",
+    "walhain": "Walhain",
+    "wavre": "Wavre",
+    "wellin": "Wellin",
+    "yvoir": "Yvoir",
+}
 
 
 def _nom_commune_affichage(commune: str) -> str:
-    return commune.replace("-", " ").title()
+    slug = commune.strip().lower().replace("_", "-")
+    return COMMUNES_LABELS.get(slug, slug.replace("-", " ").title())
 
 
 def construire_client_openai() -> OpenAI:
@@ -162,6 +259,64 @@ def _normaliser_points(points: Any) -> List[str]:
     return []
 
 
+def _normaliser_titre_sujet(titre: str, max_mots: int = 16) -> str:
+    """Nettoie et raccourcit l'intitulé affiché dans l'ordre du jour."""
+    propre = re.sub(r"\s+", " ", titre).strip(" .;:-")
+    if not propre:
+        return ""
+    mots = propre.split()
+    if len(mots) <= max_mots:
+        return propre
+    return " ".join(mots[:max_mots]).rstrip(",;:") + "…"
+
+
+def _extraire_type_document(deliberation: Dict[str, Any], seance: Optional[Dict[str, Any]]) -> str:
+    """Déduit le type du document source pour le libellé du lien."""
+    contenu = deliberation.get("contenu", "")
+    match = re.search(r"\bState\s*\n([^\n]+)", contenu)
+    if match:
+        return match.group(1).strip()
+
+    titre = deliberation.get("titre", "")
+    if "projet de décision" in titre.casefold():
+        return "Projet de décision"
+
+    seance_nom = (seance or {}).get("nom") or ""
+    if "—" in seance_nom:
+        return seance_nom.split("—", 1)[1].strip()
+    if " - " in seance_nom:
+        return seance_nom.split(" - ", 1)[1].strip()
+    return ""
+
+
+def _libelle_lien_document(type_document: str) -> str:
+    type_normalise = (type_document or "").casefold()
+    if "projet" in type_normalise:
+        return "Lien vers le projet de décision"
+    return "Lien vers la décision"
+
+
+def _associer_sources_aux_sujets(
+    sujets: List[Dict[str, Any]],
+    deliberations: List[Dict[str, Any]],
+    seance: Optional[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Ajoute à chaque sujet le lien vers la carte source sur deliberations.be."""
+    sujets_enrichis: List[Dict[str, Any]] = []
+    for index, sujet in enumerate(sujets):
+        sujet_enrichi = dict(sujet)
+        if index < len(deliberations):
+            deliberation = deliberations[index]
+            type_document = _extraire_type_document(deliberation, seance)
+            url_source = (deliberation.get("url") or "").strip()
+            if url_source:
+                sujet_enrichi["source_url"] = url_source
+                sujet_enrichi["source_type"] = type_document
+                sujet_enrichi["source_label"] = _libelle_lien_document(type_document)
+        sujets_enrichis.append(sujet_enrichi)
+    return sujets_enrichis
+
+
 def extraire_topics_depuis_reponse(reponse: str) -> List[Dict[str, Any]]:
     """Parse la réponse JSON pour obtenir la liste des points."""
     contenu_json = _nettoyer_sortie_json(reponse)
@@ -176,7 +331,7 @@ def extraire_topics_depuis_reponse(reponse: str) -> List[Dict[str, Any]]:
         if not isinstance(brut, dict):
             continue
         sujet = {
-            "titre": (brut.get("titre", "") or "").strip(),
+            "titre": _normaliser_titre_sujet((brut.get("titre", "") or "").strip()),
             "description": (brut.get("description", "") or "").strip(),
         }
         if sujet["titre"]:
@@ -207,7 +362,13 @@ Voici les délibérations récentes du conseil communal de {commune_nom} :
 Objectif :
 - Lister tous les points abordés, dans l'ordre du document.
 - Ne rien filtrer. Une entrée par point, même si le point semble technique ou administratif.
-- Fournir 1 à 3 phrases de description, sans proposer d'angle, d'enjeux ou de questions.
+- Pour chaque point, reformuler le sujet avec un titre clair et déjà informatif.
+- Le champ "titre" ne doit pas reprendre tel quel le libellé administratif du site deliberations.be.
+- Le champ "titre" doit rester compréhensible pour un lecteur non spécialiste, avec un niveau de détail intermédiaire.
+- Le champ "titre" peut faire environ 8 à 16 mots et tenir sur 2 à 3 lignes dans une carte.
+- Fournir dans "description" 2 à 3 phrases qui résument directement le contenu concret du point.
+- Dans "description", intégrer quand ils existent les éléments précis du dossier : montant, objet de l'achat, type de travaux, localisation, public concerné, calendrier, procédure ou mesures décidées.
+- Dans "description", écrire un mini résumé direct et factuel, pas une phrase qui explique ce que le point ou la délibération aborde.
 
 Format de réponse : renvoie UNIQUEMENT un objet JSON valide de la forme
 {{
@@ -223,6 +384,10 @@ Règles :
 - Ne renvoie aucun texte en dehors de ce JSON.
 - Si aucun sujet n'est pertinent, retourne {{ "topics": [] }}.
 - Les champs texte doivent être rédigés en français, ton professionnel.
+- "titre" doit être une reformulation éditoriale lisible, pas un copier-coller du point d'ordre du jour.
+- Exemple de bon niveau de détail pour "titre" : "Réfection urgente de la toiture de l'école communale".
+- "description" doit être rédigée de manière directe, sans formulations comme "le point concerne", "la délibération porte sur", "le conseil examine" ou "le dossier précise".
+- "description" doit résumer ce qui est prévu, acheté, financé, modifié ou organisé, avec des informations concrètes lorsqu'elles sont disponibles.
 """
 
     reponse = appeler_modele_json(client, prompt, modele)
@@ -285,7 +450,7 @@ def sauvegarder_analyse_textuelle(
     else:
         lignes.append("Voici la liste des points dans l'ordre :\n")
         for index, sujet in enumerate(sujets, 1):
-            lignes.append(f"**{index}. Titre : \"{sujet['titre']}\"**")
+            lignes.append(f"**{index}. Résumé court : \"{sujet['titre']}\"**")
             if sujet.get("description"):
                 lignes.append(f"**DESCRIPTION :** {sujet['description']}")
             lignes.append("")
@@ -335,7 +500,7 @@ def generer_html(
     commune_nom: str,
 ) -> None:
     """Produit la page HTML à partir des sujets identifiés."""
-    generated_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+    generated_at = _horodatage_affichage()
     seance_nom = seance.get("nom") if seance else None
     table_rows = _table_row_html(commune_nom, seance_nom, sujets)
     contenu_section = f"""<section class="table-section">
@@ -343,9 +508,9 @@ def generer_html(
         <thead>
           <tr>
             <th>Commune</th>
-            <th>Date du dernier conseil</th>
+            <th>Date</th>
             <th>Type</th>
-            <th>Points à l'ordre du jour</th>
+            <th>Ordre du jour</th>
           </tr>
         </thead>
         <tbody>
@@ -358,7 +523,7 @@ def generer_html(
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Analyse journalistique des délibérations - Conseil communal de {html.escape(commune_nom)}</title>
+  <title>Analyse conseils communaux - {html.escape(commune_nom)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {{
@@ -474,11 +639,24 @@ def generer_html(
       font-size: 0.95rem;
     }}
 
-    footer {{
-      margin-top: 2.5rem;
-      text-align: center;
-      color: #7b8794;
-      font-size: 0.9rem;
+    .point-link {{
+      margin-top: 0.75rem;
+    }}
+
+    .decision-link {{
+      display: inline-block;
+      padding: 0.55rem 0.8rem;
+      border-radius: 999px;
+      background: #0b7285;
+      color: #ffffff;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+    }}
+
+    .decision-link:hover,
+    .decision-link:focus {{
+      background: #095c6b;
     }}
 
     @media (max-width: 600px) {{
@@ -503,13 +681,10 @@ def generer_html(
 <body>
   <main>
     <header>
-      <h1>Analyse journalistique des délibérations</h1>
-      <p>Conseil communal de {html.escape(commune_nom)} &mdash; Mise à jour automatique du {generated_at}</p>
+      <h1>Analyse conseils communaux</h1>
+      <p>Conseil communal de {html.escape(commune_nom)} &mdash; Mise à jour automatique le {generated_at}</p>
     </header>
     {contenu_section}
-    <footer>
-      <p>Compilation générée automatiquement à partir des délibérations les plus récentes.</p>
-    </footer>
   </main>
 </body>
 </html>
@@ -547,6 +722,15 @@ def _sections_html_pour_sujets(sujets: List[Dict[str, Any]]) -> str:
         if description:
             sections.append("    <strong>Description</strong>")
             sections.append(f"    <p>{html.escape(description)}</p>")
+        source_url = sujet.get("source_url")
+        source_label = sujet.get("source_label") or "Lien vers la décision"
+        if source_url:
+            sections.append(
+                "    <p><a href=\"{}\" target=\"_blank\" rel=\"noopener noreferrer\">{}</a></p>".format(
+                    html.escape(source_url, quote=True),
+                    html.escape(source_label),
+                )
+            )
         sections.append("  </article>")
     sections.append("</section>")
     return "\n".join(sections)
@@ -573,19 +757,52 @@ def _points_html(sujets: List[Dict[str, Any]]) -> str:
     for index, sujet in enumerate(sujets, 1):
         titre = html.escape(sujet.get("titre", ""))
         description = html.escape(sujet.get("description", "")) if sujet.get("description") else ""
+        source_url = sujet.get("source_url")
+        source_label = html.escape(sujet.get("source_label", "Lien vers la décision"))
         elements.append("<details>")
         elements.append(f"  <summary>{index}. {titre}</summary>")
         if description:
             elements.append(f"  <p class=\"point-description\">{description}</p>")
+        if source_url:
+            elements.append("  <p class=\"point-link\">")
+            elements.append(
+                f"    <a class=\"decision-link\" href=\"{html.escape(source_url, quote=True)}\" "
+                f"target=\"_blank\" rel=\"noopener noreferrer\">{source_label}</a>"
+            )
+            elements.append("  </p>")
         elements.append("</details>")
     return "\n".join(elements)
 
 
+def _cle_tri_date(date_seance: str) -> str:
+    match = re.match(
+        r"^\s*(\d{1,2})\s+([A-Za-zÀ-ÿ]+)\s+(\d{4})(?:\s+\((\d{1,2}):(\d{2})\))?\s*$",
+        date_seance,
+    )
+    if not match:
+        return "0000-00-00 00:00"
+
+    jour = int(match.group(1))
+    mois_label = match.group(2).strip().lower()
+    annee = int(match.group(3))
+    heure = int(match.group(4) or 0)
+    minute = int(match.group(5) or 0)
+    mois = MOIS_FR.get(mois_label)
+    if mois is None:
+        return "0000-00-00 00:00"
+    return f"{annee:04d}-{mois:02d}-{jour:02d} {heure:02d}:{minute:02d}"
+
+
+def _horodatage_affichage() -> str:
+    return datetime.now().strftime("%d/%m/%Y à %H:%M")
+
+
 def _table_row_html(commune_nom: str, seance_nom: Optional[str], sujets: List[Dict[str, Any]]) -> str:
     date_seance, type_seance = _extraire_date_et_type_seance(seance_nom)
+    date_sort = _cle_tri_date(date_seance)
     points_html = _points_html(sujets)
     return (
-        "<tr>"
+        f"<tr data-commune=\"{html.escape(commune_nom)}\" data-date-sort=\"{date_sort}\">"
         f"<td>{html.escape(commune_nom)}</td>"
         f"<td>{html.escape(date_seance)}</td>"
         f"<td>{html.escape(type_seance)}</td>"
@@ -594,15 +811,21 @@ def _table_row_html(commune_nom: str, seance_nom: Optional[str], sujets: List[Di
     )
 
 
+def _cle_tri_commune(nom: str) -> str:
+    normalise = unicodedata.normalize("NFKD", nom)
+    sans_accents = "".join(car for car in normalise if not unicodedata.combining(car))
+    return sans_accents.casefold()
+
+
 def _build_table_html(rows: List[str]) -> str:
     return f"""<section class="table-section">
       <table>
         <thead>
           <tr>
             <th>Commune</th>
-            <th>Date du dernier conseil</th>
+            <th>Date</th>
             <th>Type</th>
-            <th>Points à l'ordre du jour</th>
+            <th>Ordre du jour</th>
           </tr>
         </thead>
         <tbody>
@@ -613,24 +836,40 @@ def _build_table_html(rows: List[str]) -> str:
 
 
 def _group_tables_html(
-    rows: List[str],
+    rows: List[Dict[str, str]],
     group_labels: Optional[List[str]],
     group_sizes: Optional[List[int]],
 ) -> str:
     if not group_labels or not group_sizes or len(group_labels) != len(group_sizes):
-        return _build_table_html(rows)
+        rows_tries = sorted(rows, key=lambda row: _cle_tri_commune(row["commune_nom"]))
+        return _build_table_html([row["html"] for row in rows_tries])
 
     if sum(group_sizes) != len(rows):
-        return _build_table_html(rows)
+        rows_tries = sorted(rows, key=lambda row: _cle_tri_commune(row["commune_nom"]))
+        return _build_table_html([row["html"] for row in rows_tries])
 
     sections: List[str] = []
     index = 0
     for label, size in zip(group_labels, group_sizes):
         group_rows = rows[index : index + size]
         index += size
-        sections.append(f"<section class=\"group\"><h2>{html.escape(label)}</h2></section>")
-        sections.append(_build_table_html(group_rows))
+        group_rows = sorted(group_rows, key=lambda row: _cle_tri_commune(row["commune_nom"]))
+        sections.append(
+            f"""<section class="province-section" data-province="{html.escape(label)}">
+  <section class="group"><h2>{html.escape(label)}</h2></section>
+  {_build_table_html([row["html"] for row in group_rows])}
+</section>"""
+        )
     return "\n".join(sections)
+
+
+def _all_table_html(rows: List[Dict[str, str]]) -> str:
+    rows_tries = sorted(rows, key=lambda row: _cle_tri_commune(row["commune_nom"]))
+    return (
+        '<section id="all-provinces-view">'
+        f"{_build_table_html([row['html'] for row in rows_tries])}"
+        "</section>"
+    )
 
 
 def generer_html_multi(
@@ -640,21 +879,35 @@ def generer_html_multi(
     group_sizes: Optional[List[int]] = None,
 ) -> None:
     """Produit une page HTML unique regroupant plusieurs communes."""
-    generated_at = datetime.now().strftime("%Y-%m-%d %H:%M")
+    generated_at = _horodatage_affichage()
 
-    rows: List[str] = []
+    rows: List[Dict[str, str]] = []
+    commune_options: List[str] = []
     for bloc in sujets_par_commune:
-        nom = bloc.get("commune_nom") or "Commune"
+        slug = (bloc.get("anchor") or "").strip().lower()
+        nom = _nom_commune_affichage(slug) if slug else (bloc.get("commune_nom") or "Commune")
+        commune_options.append(nom)
         seance_nom = bloc.get("seance_nom")
-        rows.append(_table_row_html(nom, seance_nom, bloc.get("topics", [])))
+        rows.append(
+            {
+                "commune_nom": nom,
+                "html": _table_row_html(nom, seance_nom, bloc.get("topics", [])),
+            }
+        )
 
-    contenu_section = _group_tables_html(rows, group_labels, group_sizes)
+    contenu_section = _all_table_html(rows) + _group_tables_html(rows, group_labels, group_sizes)
+    commune_options = sorted(set(commune_options), key=_cle_tri_commune)
+    options_html = "\n".join(
+        f'          <option value="{html.escape(nom)}"></option>'
+        for nom in commune_options
+    )
+    commune_options_js = json.dumps(commune_options, ensure_ascii=False)
 
     contenu_html = f"""<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Analyse journalistique des délibérations - Communes</title>
+  <title>Analyse conseils communaux</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {{
@@ -698,6 +951,57 @@ def generer_html_multi(
 
     .table-section {{
       margin-top: 2rem;
+    }}
+
+    .filters {{
+      display: flex;
+      justify-content: flex-start;
+      align-items: end;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 0 0 1.5rem;
+    }}
+
+    .filter-field {{
+      display: grid;
+      gap: 0.45rem;
+      min-width: min(100%, 280px);
+    }}
+
+    .filter-field label {{
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #334e68;
+      text-align: left;
+    }}
+
+    .filter-toggle {{
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-height: 48px;
+      padding-bottom: 0.1rem;
+      color: #334e68;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }}
+
+    .filter-toggle input {{
+      width: 1rem;
+      height: 1rem;
+      accent-color: #0b7285;
+    }}
+
+    .filter-field select,
+    .filter-field input {{
+      appearance: none;
+      border: 1px solid #cbd2d9;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #102a43;
+      padding: 0.75rem 0.95rem;
+      font-size: 0.98rem;
+      font-family: inherit;
     }}
 
     .group h2 {{
@@ -805,14 +1109,200 @@ def generer_html_multi(
 <body>
   <main>
     <header>
-      <h1>Analyse journalistique des délibérations</h1>
-      <p>Mise à jour automatique du {generated_at}</p>
+      <h1>Analyse conseils communaux</h1>
+      <p>Mise à jour automatique le {generated_at}</p>
     </header>
+    <section class="filters" aria-label="Filtres">
+      <div class="filter-field">
+        <label for="province-filter">Province</label>
+        <select id="province-filter" name="province">
+          <option value="Toutes">Toutes</option>
+          <option value="Brabant wallon">Brabant wallon</option>
+          <option value="Luxembourg">Luxembourg</option>
+          <option value="Namur">Namur</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="commune-search">Commune</label>
+        <input
+          id="commune-search"
+          name="commune-search"
+          type="search"
+          list="communes-list"
+          placeholder="Chercher une commune"
+          autocomplete="off"
+        >
+        <datalist id="communes-list">
+{options_html}
+        </datalist>
+      </div>
+      <div class="filter-field">
+        <label for="sort-filter">Trier par</label>
+        <select id="sort-filter" name="sort">
+          <option value="alpha">Ordre alphabétique</option>
+          <option value="date_asc">Date (chronologique)</option>
+          <option value="date_desc">Date (anti-chronologique)</option>
+        </select>
+      </div>
+      <label class="filter-toggle" for="upcoming-only">
+        <input id="upcoming-only" name="upcoming-only" type="checkbox">
+        Afficher uniquement les conseils à venir
+      </label>
+    </section>
     {contenu_section}
-    <footer>
-      <p>Compilation générée automatiquement à partir des délibérations les plus récentes.</p>
-    </footer>
   </main>
+  <script>
+    const main = document.querySelector("main");
+    const allProvincesView = document.getElementById("all-provinces-view");
+    const provinceFilter = document.getElementById("province-filter");
+    const communeSearch = document.getElementById("commune-search");
+    const communesList = document.getElementById("communes-list");
+    const sortFilter = document.getElementById("sort-filter");
+    const upcomingOnly = document.getElementById("upcoming-only");
+    const provinceSections = Array.from(document.querySelectorAll(".province-section"));
+    const groupedRows = provinceSections.flatMap((section) =>
+      Array.from(section.querySelectorAll("tr[data-commune]"))
+    );
+    const allRows = allProvincesView
+      ? Array.from(allProvincesView.querySelectorAll("tr[data-commune]"))
+      : [];
+    const communeOptions = {commune_options_js};
+    const provinceToCommunes = Object.fromEntries(
+      provinceSections.map((section) => [
+        section.dataset.province || "",
+        Array.from(section.querySelectorAll("tr[data-commune]")).map((row) => row.dataset.commune || ""),
+      ])
+    );
+
+    const normalizeText = (value) =>
+      value
+        .normalize("NFD")
+        .replace(/[\\u0300-\\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
+    if (provinceFilter && communeSearch && communesList && sortFilter && upcomingOnly && provinceSections.length) {{
+      const updateCommuneSuggestions = () => {{
+        const selectedProvince = provinceFilter.value;
+        const searchValue = normalizeText(communeSearch.value);
+        const availableOptions = selectedProvince === "Toutes"
+          ? communeOptions
+          : (provinceToCommunes[selectedProvince] || []);
+        const matchingOptions = !searchValue
+          ? availableOptions
+          : availableOptions.filter((option) => normalizeText(option).startsWith(searchValue));
+
+        communesList.innerHTML = "";
+        matchingOptions.forEach((option) => {{
+          const optionElement = document.createElement("option");
+          optionElement.value = option;
+          communesList.appendChild(optionElement);
+        }});
+      }};
+
+      const sortProvinceSections = () => {{
+        if (!main || !footer || provinceFilter.value !== "Toutes") {{
+          return;
+        }}
+
+        const sortedSections = [...provinceSections].sort((a, b) => {{
+          const provinceA = normalizeText(a.dataset.province || "");
+          const provinceB = normalizeText(b.dataset.province || "");
+          return provinceA.localeCompare(provinceB, "fr");
+        }});
+
+        sortedSections.forEach((section) => main.insertBefore(section, footer));
+      }};
+
+      const sortRows = () => {{
+        const sortMode = sortFilter.value;
+
+        const sortRowsInTbody = (tbody) => {{
+          if (!tbody) {{
+            return;
+          }}
+
+          const rows = Array.from(tbody.querySelectorAll("tr[data-commune]"));
+          rows.sort((a, b) => {{
+            if (sortMode === "date_desc" || sortMode === "date_asc") {{
+              const dateA = a.dataset.dateSort || "";
+              const dateB = b.dataset.dateSort || "";
+              if (dateA !== dateB) {{
+                return sortMode === "date_desc"
+                  ? dateB.localeCompare(dateA)
+                  : dateA.localeCompare(dateB);
+              }}
+            }}
+
+            const communeA = normalizeText(a.dataset.commune || "");
+            const communeB = normalizeText(b.dataset.commune || "");
+            return communeA.localeCompare(communeB, "fr");
+          }});
+
+          rows.forEach((row) => tbody.appendChild(row));
+        }};
+
+        if (allProvincesView) {{
+          sortRowsInTbody(allProvincesView.querySelector("tbody"));
+        }}
+
+        provinceSections.forEach((section) => {{
+          sortRowsInTbody(section.querySelector("tbody"));
+        }});
+      }};
+
+      const applyFilters = () => {{
+        const selectedProvince = provinceFilter.value;
+        const searchValue = normalizeText(communeSearch.value);
+        const upcomingOnlyChecked = upcomingOnly.checked;
+        const today = new Date();
+        const todayKey = [
+          today.getFullYear().toString().padStart(4, "0"),
+          (today.getMonth() + 1).toString().padStart(2, "0"),
+          today.getDate().toString().padStart(2, "0"),
+        ].join("-");
+
+        const updateRowVisibility = (row) => {{
+          const commune = normalizeText(row.dataset.commune || "");
+          const matchesSearch = !searchValue || commune.includes(searchValue);
+          const rowDate = (row.dataset.dateSort || "").slice(0, 10);
+          const matchesUpcoming = !upcomingOnlyChecked || (rowDate && rowDate >= todayKey);
+          row.hidden = !matchesSearch || !matchesUpcoming;
+        }};
+
+        allRows.forEach(updateRowVisibility);
+        groupedRows.forEach(updateRowVisibility);
+
+        if (allProvincesView) {{
+          const visibleRows = allProvincesView.querySelectorAll("tr[data-commune]:not([hidden])").length;
+          allProvincesView.hidden = selectedProvince !== "Toutes" || visibleRows === 0;
+        }}
+
+        provinceSections.forEach((section) => {{
+          const province = section.dataset.province || "";
+          const matchesProvince = selectedProvince !== "Toutes" && province === selectedProvince;
+          const visibleRows = section.querySelectorAll("tr[data-commune]:not([hidden])").length;
+          section.hidden = !matchesProvince || visibleRows === 0;
+        }});
+
+        sortProvinceSections();
+        sortRows();
+      }};
+
+      provinceFilter.addEventListener("change", () => {{
+        updateCommuneSuggestions();
+        applyFilters();
+      }});
+      communeSearch.addEventListener("input", () => {{
+        updateCommuneSuggestions();
+        applyFilters();
+      }});
+      sortFilter.addEventListener("change", applyFilters);
+      upcomingOnly.addEventListener("change", applyFilters);
+      updateCommuneSuggestions();
+      applyFilters();
+    }}
+  </script>
 </body>
 </html>
 """
@@ -875,13 +1365,13 @@ def main() -> None:
         if not communes:
             print("Aucune commune fournie pour la compilation HTML.")
             return
-        html_path = args.html or "sujets_journalistiques.html"
+        html_path = args.html or "analyse_conseils_communaux.html"
         blocs: List[Dict[str, Any]] = []
         for commune in communes:
             json_path = (
-                "sujets_journalistiques.json"
+                "analyse_conseils_communaux.json"
                 if commune == "wavre"
-                else f"sujets_journalistiques_{commune}.json"
+                else f"analyse_conseils_communaux_{commune}.json"
             )
             try:
                 donnees = charger_topics_json(json_path)
@@ -915,13 +1405,13 @@ def main() -> None:
         deliberations_path = "deliberations_wavre.json" if commune_slug == "wavre" else f"deliberations_{commune_slug}.json"
     texte_path = args.texte
     if texte_path is None:
-        texte_path = "sujets_journalistiques.txt" if commune_slug == "wavre" else f"sujets_journalistiques_{commune_slug}.txt"
+        texte_path = "analyse_conseils_communaux.txt" if commune_slug == "wavre" else f"analyse_conseils_communaux_{commune_slug}.txt"
     json_path = args.json_path
     if json_path is None:
-        json_path = "sujets_journalistiques.json" if commune_slug == "wavre" else f"sujets_journalistiques_{commune_slug}.json"
+        json_path = "analyse_conseils_communaux.json" if commune_slug == "wavre" else f"analyse_conseils_communaux_{commune_slug}.json"
     html_path = args.html
     if html_path is None:
-        html_path = "sujets_journalistiques.html" if commune_slug == "wavre" else f"sujets_journalistiques_{commune_slug}.html"
+        html_path = "analyse_conseils_communaux.html" if commune_slug == "wavre" else f"analyse_conseils_communaux_{commune_slug}.html"
 
     deliberations, seance = charger_deliberations(deliberations_path)
 
@@ -932,6 +1422,7 @@ def main() -> None:
         return
 
     sujets = analyser_globalement(client, deliberations, modele=args.modele, commune_nom=commune_nom)
+    sujets = _associer_sources_aux_sujets(sujets, deliberations, seance)
 
     analyses_detaillees: Dict[int, str] = {}
 

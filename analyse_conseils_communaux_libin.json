@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-03-20T11:22:05Z",
+  "commune": "Libin",
+  "seance": {
+    "id": "c16db805be104347b6e7a857e18b0608",
+    "nom": "09 Mars 2026 (19:30) — Projet de décision"
+  },
+  "points": [
+    {
+      "titre": "Approbation du procès-verbal de la séance précédente",
+      "description": "Le conseil communal a approuvé le procès-verbal de la réunion précédente. Cette étape est nécessaire pour valider les discussions et décisions antérieures."
+    },
+    {
+      "titre": "Désignation d'un représentant à l'assemblée générale de la S.R.L. Ardenne et Lesse",
+      "description": "Le conseil a désigné un représentant pour siéger à l'assemblée générale de la S.R.L. Ardenne et Lesse. Cela vise à assurer une représentation adéquate des intérêts communaux."
+    },
+    {
+      "titre": "Convention de mise à disposition de terrains communaux au profit de l'ASBL Moto-club de Libin",
+      "description": "Une convention a été approuvée pour la mise à disposition de terrains communaux en faveur de l'ASBL Moto-club de Libin. Cette action soutient les activités associatives locales."
+    },
+    {
+      "titre": "Fabrique d'Eglise de Libin - Budget 2026",
+      "description": "Le budget pour le fonctionnement de la Fabrique d'Eglise de Libin pour l'année 2026 a été présenté et débattu. Ce budget est crucial pour les opérations et projets de l'église."
+    },
+    {
+      "titre": "Fixation de la dotation communale à la Zone de Secours du Luxembourg - Approbation",
+      "description": "Le conseil communal a approuvé la dotation financière destinée à la Zone de Secours du Luxembourg. Cela contribue à assurer la sécurité et le secours dans la région."
+    },
+    {
+      "titre": "Fixation de la dotation communale à la Zone de Police Semois et Lesse - Approbation",
+      "description": "Une dotation a été fixée pour la Zone de Police Semois et Lesse. Cette mesure est essentielle pour le financement des activités policières locales."
+    },
+    {
+      "titre": "Conseil communal des enfants - Accord de principe",
+      "description": "Un accord de principe a été donné pour constituer un conseil communal des enfants. Cette initiative vise à impliquer les jeunes dans les affaires communales."
+    },
+    {
+      "titre": "Règlement complémentaire de circulation - Emplacement de stationnement à durée limitée",
+      "description": "Un règlement complémentaire de circulation a été proposé concernant la création d'emplacements de stationnement à durée limitée. Cela a pour but d'améliorer la gestion du stationnement dans la commune."
+    }
+  ]
+}

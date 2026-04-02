@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-03-20T10:24:48Z",
+  "commune": "Somme Leuze",
+  "seance": {
+    "id": "2c19bf602fb0467db2d87a17a0c59217",
+    "nom": "23 Mars 2026 (20:00) — Projet de décision"
+  },
+  "points": [
+    {
+      "titre": "Installation d’un conseiller communal en remplacement d’un conseiller démissionnaire",
+      "description": "Cette délibération concerne l'installation d'un nouveau conseiller communal pour remplacer un conseiller ayant récemment démissionné."
+    },
+    {
+      "titre": "Désignation de 2 délégués du Conseil au sein des commissions - Commission paritaire locale",
+      "description": "Cette décision porte sur la désignation de deux délégués du Conseil pour représenter le conseil communal au sein de la Commission paritaire locale."
+    },
+    {
+      "titre": "Désignation d'un délégué du Conseil au sein des commissions - Commission locale de Développement rural",
+      "description": "La délibération vise à désigner un délégué du Conseil pour intégrer la Commission locale de Développement rural."
+    },
+    {
+      "titre": "Désignation d'un délégué du Conseil aux Assemblées générales des intercommunales - Intercommunale de Mutualisation Informatique et Organisationnelle (IMIO)",
+      "description": "Cette décision concerne la désignation d'un délégué du Conseil pour les Assemblées générales de l'intercommunale IMIO."
+    },
+    {
+      "titre": "Fabrique d’église de Hogne – Compte 2025 - Tutelle",
+      "description": "Le Conseil examine le compte 2025 de la Fabrique d’église de Hogne sous tutelle."
+    },
+    {
+      "titre": "Fabrique d’église de Waillet – Compte 2025 - Tutelle",
+      "description": "Cette délibération porte sur l'examen du compte 2025 de la Fabrique d’église de Waillet également sous tutelle."
+    },
+    {
+      "titre": "Assemblée générale d'INASEP – Ordre du jour",
+      "description": "Le Conseil se penche sur l'ordre du jour de l'Assemblée générale d'INASEP."
+    },
+    {
+      "titre": "Commission locale de développement rural – Approbation du rapport annuel",
+      "description": "Cette délibération vise à approuver le rapport annuel de la Commission locale de développement rural."
+    },
+    {
+      "titre": "CPAS – Rapport de la Commission locale pour l’énergie – Prise d’acte",
+      "description": "Le Conseil prend acte du rapport présenté par la Commission locale pour l’énergie du CPAS."
+    },
+    {
+      "titre": "Opération de Développement Rural – Approbation de la convention d’accompagnement avec la Fondation Rurale de Wallonie",
+      "description": "Le Conseil examine et approuve la convention d’accompagnement pour l'Opération de Développement Rural avec la Fondation Rurale de Wallonie."
+    },
+    {
+      "titre": "Cuisine collective pour la Maison de Village de Nettinne - Approbation des conditions",
+      "description": "Cette délibération porte sur l'approbation des conditions relatives à la mise en place d'une cuisine collective pour la Maison de Village de Nettinne."
+    },
+    {
+      "titre": "Information - Décision(s) de la tutelle",
+      "description": "Le Conseil reçoit des informations concernant les décisions prises par la tutelle."
+    }
+  ]
+}

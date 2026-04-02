@@ -1,0 +1,38 @@
+{
+  "generated_at": "2026-03-20T10:20:02Z",
+  "commune": "Havelange",
+  "seance": {
+    "id": "f271e33f2e2e4dadb64323fe731d8392",
+    "nom": "26 Janvier 2026 (20:00) — Projet de décision"
+  },
+  "points": [
+    {
+      "titre": "Approuve le procès-verbal de la séance précédente",
+      "description": "Le conseil communal a voté en faveur de l'approbation du procès-verbal de la séance antérieure."
+    },
+    {
+      "titre": "Octroi Titres-repas électroniques - Modification Règlement d'octroi - Approbation",
+      "description": "Une modification du règlement d'octroi des titres-repas électroniques a été proposée et approuvée."
+    },
+    {
+      "titre": "Redevance communale sur l’utilisation du taxi rural de la Commune – Exercices 2026 à 2031 inclus - Décision",
+      "description": "Le conseil a décidé d'instaurer une redevance communale pour l'utilisation du taxi rural pour la période allant de 2026 à 2031."
+    },
+    {
+      "titre": "Redevance communale relative aux repas chauds dans les écoles communales – Exercice 2026 - Décision",
+      "description": "Une décision a été prise concernant la redevance communale pour les repas chauds dans les écoles pour l'année 2026."
+    },
+    {
+      "titre": "Distribution de repas chauds dans les écoles communales - Règlement d'ordre intérieur - Année 2026 - Approbation",
+      "description": "Le règlement d'ordre intérieur concernant la distribution de repas chauds dans les écoles communales pour l'année 2026 a été approuvé."
+    },
+    {
+      "titre": "Enduisages 2025 - Entretien des voiries - Approbation du choix du mode de passation, du cahier des charges et de l'estimatif - Fixation des conditions du marché",
+      "description": "Le conseil a approuvé les modalités concernant le mode de passation, le cahier des charges et l'estimatif pour l'entretien des voiries en 2025."
+    },
+    {
+      "titre": "ATL/AES - Convention Partenariat Automne Détente (PAD) Stage Détente - Arlequin & Compagnie - Approbation",
+      "description": "Une convention de partenariat pour le stage détente automnal proposé par Arlequin & Compagnie a été approuvée par le conseil."
+    }
+  ]
+}

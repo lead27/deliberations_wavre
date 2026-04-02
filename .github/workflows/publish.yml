@@ -41,9 +41,9 @@ jobs:
         run: |
           rm -rf public
           mkdir -p public
-          cp sujets_journalistiques.html public/index.html
-          cp sujets_journalistiques.json public/sujets_journalistiques.json
-          cp sujets_journalistiques.txt public/sujets_journalistiques.txt
+          cp analyse_conseils_communaux.html public/index.html
+          cp analyse_conseils_communaux.json public/analyse_conseils_communaux.json
+          cp analyse_conseils_communaux.txt public/analyse_conseils_communaux.txt
 
       - name: 📤 Publication de l'artefact Pages
         uses: actions/upload-pages-artifact@v3
