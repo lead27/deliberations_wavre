@@ -1,6 +1,7 @@
 import argparse
 import html
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -317,6 +318,35 @@ def _associer_sources_aux_sujets(
     return sujets_enrichis
 
 
+def _consigne_type_seance(seance: Optional[Dict[str, Any]]) -> str:
+    """Construit une consigne de rédaction adaptée au type de séance."""
+    seance_nom = (seance or {}).get("nom") or ""
+    type_seance = ""
+    if "—" in seance_nom:
+        type_seance = seance_nom.split("—", 1)[1].strip()
+    elif " - " in seance_nom:
+        type_seance = seance_nom.split(" - ", 1)[1].strip()
+
+    type_normalise = type_seance.casefold()
+    if "projet" in type_normalise:
+        return (
+            '- Les documents de cette séance sont des "Projets de décision". '
+            'N\'écris donc pas que le conseil "a adopté", "a approuvé", "a validé" ou '
+            '"a décidé" ; préfère des formulations comme "prévoit", "propose", "vise", '
+            '"présente", "fixe", "organise", "détaille" ou "mentionne".'
+        )
+    if "décision" in type_normalise or "decision" in type_normalise:
+        return (
+            '- Les documents de cette séance sont des "Décisions". '
+            'Tu peux employer des formulations au passé comme "le conseil a décidé", '
+            '"a approuvé" ou "a validé" si cela correspond bien au contenu.'
+        )
+    return (
+        '- Si le statut du document n\'est pas certain, évite de présenter le contenu '
+        'comme définitivement adopté et préfère des formulations neutres.'
+    )
+
+
 def extraire_topics_depuis_reponse(reponse: str) -> List[Dict[str, Any]]:
     """Parse la réponse JSON pour obtenir la liste des points."""
     contenu_json = _nettoyer_sortie_json(reponse)
@@ -344,6 +374,7 @@ def analyser_globalement(
     deliberations: List[Dict[str, Any]],
     modele: str,
     commune_nom: str,
+    seance: Optional[Dict[str, Any]],
     max_sujets: int = 5,
 ) -> List[Dict[str, Any]]:
     """Interroge l'IA pour obtenir la liste des points abordés."""
@@ -353,6 +384,7 @@ def analyser_globalement(
     print("L'IA analyse toutes les délibérations (2-3 minutes)...\n")
 
     resume = creer_resume_court(deliberations)
+    consigne_type_seance = _consigne_type_seance(seance)
     prompt = f"""Tu es un journaliste expérimenté qui passe en revue des délibérations d'un conseil communal.
 
 Voici les délibérations récentes du conseil communal de {commune_nom} :
@@ -366,9 +398,11 @@ Objectif :
 - Le champ "titre" ne doit pas reprendre tel quel le libellé administratif du site deliberations.be.
 - Le champ "titre" doit rester compréhensible pour un lecteur non spécialiste, avec un niveau de détail intermédiaire.
 - Le champ "titre" peut faire environ 8 à 16 mots et tenir sur 2 à 3 lignes dans une carte.
-- Fournir dans "description" 2 à 3 phrases qui résument directement le contenu concret du point.
+- Fournir dans "description" 2 à 4 phrases qui résument directement le contenu concret du point.
 - Dans "description", intégrer quand ils existent les éléments précis du dossier : montant, objet de l'achat, type de travaux, localisation, public concerné, calendrier, procédure ou mesures décidées.
-- Dans "description", écrire un mini résumé direct et factuel, pas une phrase qui explique ce que le point ou la délibération aborde.
+- Dans "description", écrire un mini résumé direct et factuel, déjà un peu développé, pas une phrase qui explique ce que le point ou la délibération aborde.
+- Quand l'information existe, préciser les éléments concrets du contenu lui-même plutôt que de rester général.
+- {consigne_type_seance}
 
 Format de réponse : renvoie UNIQUEMENT un objet JSON valide de la forme
 {{
@@ -388,6 +422,8 @@ Règles :
 - Exemple de bon niveau de détail pour "titre" : "Réfection urgente de la toiture de l'école communale".
 - "description" doit être rédigée de manière directe, sans formulations comme "le point concerne", "la délibération porte sur", "le conseil examine" ou "le dossier précise".
 - "description" doit résumer ce qui est prévu, acheté, financé, modifié ou organisé, avec des informations concrètes lorsqu'elles sont disponibles.
+- N'écris pas que le conseil "a adopté", "a approuvé", "a validé" ou "a décidé" si cela n'est pas explicitement certain dans le texte.
+- En cas de doute, préfère des formulations neutres comme "prévoit", "vise", "organise", "présente", "propose", "fixe", "détaille" ou "mentionne".
 """
 
     reponse = appeler_modele_json(client, prompt, modele)
@@ -511,6 +547,7 @@ def generer_html(
             <th>Date</th>
             <th>Type</th>
             <th>Ordre du jour</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -523,7 +560,7 @@ def generer_html(
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Analyse conseils communaux - {html.escape(commune_nom)}</title>
+  <title>Conseils communaux - {html.escape(commune_nom)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {{
@@ -606,7 +643,11 @@ def generer_html(
     }}
 
     td:nth-child(4) {{
-      width: 46%;
+      width: 34%;
+    }}
+
+    td:nth-child(5) {{
+      width: 12%;
     }}
 
     details {{
@@ -659,6 +700,147 @@ def generer_html(
       background: #095c6b;
     }}
 
+    .notes-cell {{
+      min-width: 220px;
+    }}
+
+    .notes-list {{
+      display: grid;
+      gap: 0.55rem;
+      margin-bottom: 0.75rem;
+    }}
+
+    .notes-empty {{
+      margin: 0;
+      color: #7b8794;
+      font-size: 0.9rem;
+    }}
+
+    .note-item {{
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #d9e2ec;
+    }}
+
+    .note-author {{
+      margin: 0 0 0.35rem;
+      font-weight: 700;
+      color: #102a43;
+      font-size: 0.9rem;
+    }}
+
+    .note-content {{
+      margin: 0;
+      color: #334e68;
+      white-space: pre-wrap;
+      font-size: 0.92rem;
+    }}
+
+    .notes-add-button {{
+      width: 2rem;
+      height: 2rem;
+      border: 0;
+      border-radius: 999px;
+      background: #0b7285;
+      color: #ffffff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+    }}
+
+    .notes-add-button:hover,
+    .notes-add-button:focus {{
+      background: #095c6b;
+    }}
+
+    .notes-modal {{
+      width: min(92vw, 540px);
+      border: 0;
+      border-radius: 18px;
+      padding: 0;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+    }}
+
+    .notes-modal::backdrop {{
+      background: rgba(15, 23, 42, 0.45);
+    }}
+
+    .notes-form {{
+      display: grid;
+      gap: 0.8rem;
+      padding: 1.4rem;
+    }}
+
+    .notes-modal-header {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }}
+
+    .notes-modal-header h2 {{
+      margin: 0;
+      font-size: 1.25rem;
+      color: #102a43;
+    }}
+
+    .notes-close-button {{
+      border: 0;
+      background: transparent;
+      color: #52606d;
+      font-size: 1.7rem;
+      line-height: 1;
+      cursor: pointer;
+    }}
+
+    .notes-form label {{
+      font-weight: 600;
+      color: #334e68;
+    }}
+
+    .notes-form input,
+    .notes-form textarea {{
+      border: 1px solid #cbd2d9;
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      font: inherit;
+      color: #102a43;
+      background: #ffffff;
+    }}
+
+    .notes-form textarea {{
+      resize: vertical;
+      min-height: 140px;
+    }}
+
+    .notes-actions {{
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 0.4rem;
+    }}
+
+    .notes-primary-button,
+    .notes-secondary-button {{
+      border: 0;
+      border-radius: 999px;
+      padding: 0.7rem 1rem;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }}
+
+    .notes-primary-button {{
+      background: #0b7285;
+      color: #ffffff;
+    }}
+
+    .notes-secondary-button {{
+      background: #e4e7eb;
+      color: #334e68;
+    }}
+
     @media (max-width: 600px) {{
       main {{
         padding: 2rem 1.5rem;
@@ -681,11 +863,14 @@ def generer_html(
 <body>
   <main>
     <header>
-      <h1>Analyse conseils communaux</h1>
+      <h1>Conseils communaux</h1>
       <p>Conseil communal de {html.escape(commune_nom)} &mdash; Mise à jour automatique le {generated_at}</p>
     </header>
     {contenu_section}
+    {_notes_modal_html()}
   </main>
+{_notes_bootstrap_script()}
+{_notes_script()}
 </body>
 </html>
 """
@@ -797,16 +982,241 @@ def _horodatage_affichage() -> str:
     return datetime.now().strftime("%d/%m/%Y à %H:%M")
 
 
+def _cle_note(commune_nom: str, date_seance: str, type_seance: str) -> str:
+    base = f"{commune_nom}|{date_seance}|{type_seance}"
+    normalise = unicodedata.normalize("NFKD", base)
+    sans_accents = "".join(car for car in normalise if not unicodedata.combining(car))
+    return re.sub(r"[^a-zA-Z0-9]+", "-", sans_accents.casefold()).strip("-")
+
+
+def _notes_cell_html(note_key: str) -> str:
+    key = html.escape(note_key, quote=True)
+    return (
+        f'<td class="notes-cell" data-note-key="{key}">'
+        '<div class="notes-list"></div>'
+        f'<button type="button" class="notes-add-button" data-note-key="{key}" aria-label="Ajouter une note">+</button>'
+        "</td>"
+    )
+
+
+def _notes_modal_html() -> str:
+    return """<dialog id="notes-modal" class="notes-modal">
+  <form method="dialog" class="notes-form" id="notes-form">
+    <div class="notes-modal-header">
+      <h2>Ajouter une note</h2>
+      <button type="button" class="notes-close-button" id="notes-cancel" aria-label="Fermer">×</button>
+    </div>
+    <input type="hidden" id="notes-target-key" name="notes-target-key">
+    <label for="notes-author">Votre nom</label>
+    <input id="notes-author" name="notes-author" type="text" maxlength="80" required>
+    <label for="notes-content">Note</label>
+    <textarea id="notes-content" name="notes-content" rows="6" maxlength="2000" required></textarea>
+    <div class="notes-actions">
+      <button type="button" class="notes-secondary-button" id="notes-cancel-secondary">Annuler</button>
+      <button type="submit" class="notes-primary-button">Valider</button>
+    </div>
+  </form>
+</dialog>"""
+
+
+def _supabase_public_config() -> Dict[str, str]:
+    return {
+        "url": os.getenv("SUPABASE_URL", "").strip(),
+        "anon_key": os.getenv("SUPABASE_ANON_KEY", "").strip(),
+    }
+
+
+def _notes_bootstrap_script() -> str:
+    config_json = json.dumps(_supabase_public_config(), ensure_ascii=False)
+    return f"""
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    window.CONSEILS_COMMUNAUX_SUPABASE = {config_json};
+  </script>"""
+
+
+def _notes_script() -> str:
+    return """
+  <script>
+    const supabaseConfig = window.CONSEILS_COMMUNAUX_SUPABASE || { url: "", anon_key: "" };
+    const canUseSharedNotes =
+      typeof window.supabase !== "undefined" &&
+      !!supabaseConfig.url &&
+      !!supabaseConfig.anon_key;
+    const supabaseClient = canUseSharedNotes
+      ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anon_key)
+      : null;
+    const notesModal = document.getElementById("notes-modal");
+    const notesForm = document.getElementById("notes-form");
+    const notesTargetKey = document.getElementById("notes-target-key");
+    const notesAuthor = document.getElementById("notes-author");
+    const notesContent = document.getElementById("notes-content");
+    const notesCancel = document.getElementById("notes-cancel");
+    const notesCancelSecondary = document.getElementById("notes-cancel-secondary");
+    const renderNotesForKey = async (noteKey) => {
+      const cell = document.querySelector(`.notes-cell[data-note-key="${noteKey}"]`);
+      if (!cell) {
+        return;
+      }
+
+      const notesList = cell.querySelector(".notes-list");
+      if (!notesList) {
+        return;
+      }
+
+      notesList.innerHTML = "";
+
+      if (!canUseSharedNotes || !supabaseClient) {
+        const disabledState = document.createElement("p");
+        disabledState.className = "notes-empty";
+        disabledState.textContent = "Notes non configurées";
+        notesList.appendChild(disabledState);
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from("notes")
+        .select("author, content, created_at")
+        .eq("note_key", noteKey)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        const errorState = document.createElement("p");
+        errorState.className = "notes-empty";
+        errorState.textContent = "Erreur de chargement";
+        notesList.appendChild(errorState);
+        return;
+      }
+
+      const notes = Array.isArray(data) ? data : [];
+
+      if (!notes.length) {
+        const emptyState = document.createElement("p");
+        emptyState.className = "notes-empty";
+        emptyState.textContent = "Aucune note";
+        notesList.appendChild(emptyState);
+        return;
+      }
+
+      notes.forEach((note) => {
+        const article = document.createElement("article");
+        article.className = "note-item";
+
+        const author = document.createElement("p");
+        author.className = "note-author";
+        author.textContent = note.author || "Nom inconnu";
+
+        const content = document.createElement("p");
+        content.className = "note-content";
+        content.textContent = note.content || "";
+
+        article.appendChild(author);
+        article.appendChild(content);
+        notesList.appendChild(article);
+      });
+    };
+
+    const renderAllNotes = () => {
+      document.querySelectorAll(".notes-cell[data-note-key]").forEach((cell) => {
+        void renderNotesForKey(cell.dataset.noteKey || "");
+      });
+    };
+
+    const closeNotesModal = () => {
+      if (notesModal && notesModal.open) {
+        notesModal.close();
+      }
+      if (notesForm) {
+        notesForm.reset();
+      }
+    };
+
+    document.querySelectorAll(".notes-add-button[data-note-key]").forEach((button) => {
+      if (!canUseSharedNotes) {
+        button.disabled = true;
+        button.title = "Notes partagées non configurées";
+      }
+      button.addEventListener("click", () => {
+        if (!canUseSharedNotes || !notesModal || !notesForm || !notesTargetKey || !notesAuthor) {
+          return;
+        }
+        notesTargetKey.value = button.dataset.noteKey || "";
+        notesForm.reset();
+        if (typeof notesModal.showModal === "function") {
+          notesModal.showModal();
+        }
+        notesAuthor.focus();
+      });
+    });
+
+    if (notesCancel) {
+      notesCancel.addEventListener("click", closeNotesModal);
+    }
+
+    if (notesCancelSecondary) {
+      notesCancelSecondary.addEventListener("click", closeNotesModal);
+    }
+
+    if (notesModal) {
+      notesModal.addEventListener("click", (event) => {
+        const rect = notesModal.getBoundingClientRect();
+        const inside =
+          rect.top <= event.clientY &&
+          event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX &&
+          event.clientX <= rect.left + rect.width;
+        if (!inside) {
+          closeNotesModal();
+        }
+      });
+    }
+
+    if (notesForm) {
+      notesForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const noteKey = (notesTargetKey && notesTargetKey.value) || "";
+        const authorValue = ((notesAuthor && notesAuthor.value) || "").trim();
+        const contentValue = ((notesContent && notesContent.value) || "").trim();
+
+        if (!noteKey || !authorValue || !contentValue) {
+          return;
+        }
+
+        if (!supabaseClient) {
+          return;
+        }
+
+        const { error } = await supabaseClient.from("notes").insert({
+          note_key: noteKey,
+          author: authorValue,
+          content: contentValue
+        });
+
+        if (error) {
+          return;
+        }
+
+        await renderNotesForKey(noteKey);
+        closeNotesModal();
+      });
+    }
+
+    renderAllNotes();
+  </script>"""
+
+
 def _table_row_html(commune_nom: str, seance_nom: Optional[str], sujets: List[Dict[str, Any]]) -> str:
     date_seance, type_seance = _extraire_date_et_type_seance(seance_nom)
     date_sort = _cle_tri_date(date_seance)
     points_html = _points_html(sujets)
+    notes_html = _notes_cell_html(_cle_note(commune_nom, date_seance, type_seance))
     return (
         f"<tr data-commune=\"{html.escape(commune_nom)}\" data-date-sort=\"{date_sort}\">"
         f"<td>{html.escape(commune_nom)}</td>"
         f"<td>{html.escape(date_seance)}</td>"
         f"<td>{html.escape(type_seance)}</td>"
         f"<td>{points_html}</td>"
+        f"{notes_html}"
         "</tr>"
     )
 
@@ -826,6 +1236,7 @@ def _build_table_html(rows: List[str]) -> str:
             <th>Date</th>
             <th>Type</th>
             <th>Ordre du jour</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -907,7 +1318,7 @@ def generer_html_multi(
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Analyse conseils communaux</title>
+  <title>Conseils communaux</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {{
@@ -1047,7 +1458,11 @@ def generer_html_multi(
     }}
 
     td:nth-child(4) {{
-      width: 46%;
+      width: 34%;
+    }}
+
+    td:nth-child(5) {{
+      width: 12%;
     }}
 
     details {{
@@ -1080,6 +1495,147 @@ def generer_html_multi(
       font-size: 0.95rem;
     }}
 
+    .notes-cell {{
+      min-width: 220px;
+    }}
+
+    .notes-list {{
+      display: grid;
+      gap: 0.55rem;
+      margin-bottom: 0.75rem;
+    }}
+
+    .notes-empty {{
+      margin: 0;
+      color: #7b8794;
+      font-size: 0.9rem;
+    }}
+
+    .note-item {{
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #d9e2ec;
+    }}
+
+    .note-author {{
+      margin: 0 0 0.35rem;
+      font-weight: 700;
+      color: #102a43;
+      font-size: 0.9rem;
+    }}
+
+    .note-content {{
+      margin: 0;
+      color: #334e68;
+      white-space: pre-wrap;
+      font-size: 0.92rem;
+    }}
+
+    .notes-add-button {{
+      width: 2rem;
+      height: 2rem;
+      border: 0;
+      border-radius: 999px;
+      background: #0b7285;
+      color: #ffffff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+    }}
+
+    .notes-add-button:hover,
+    .notes-add-button:focus {{
+      background: #095c6b;
+    }}
+
+    .notes-modal {{
+      width: min(92vw, 540px);
+      border: 0;
+      border-radius: 18px;
+      padding: 0;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+    }}
+
+    .notes-modal::backdrop {{
+      background: rgba(15, 23, 42, 0.45);
+    }}
+
+    .notes-form {{
+      display: grid;
+      gap: 0.8rem;
+      padding: 1.4rem;
+    }}
+
+    .notes-modal-header {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }}
+
+    .notes-modal-header h2 {{
+      margin: 0;
+      font-size: 1.25rem;
+      color: #102a43;
+    }}
+
+    .notes-close-button {{
+      border: 0;
+      background: transparent;
+      color: #52606d;
+      font-size: 1.7rem;
+      line-height: 1;
+      cursor: pointer;
+    }}
+
+    .notes-form label {{
+      font-weight: 600;
+      color: #334e68;
+    }}
+
+    .notes-form input,
+    .notes-form textarea {{
+      border: 1px solid #cbd2d9;
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      font: inherit;
+      color: #102a43;
+      background: #ffffff;
+    }}
+
+    .notes-form textarea {{
+      resize: vertical;
+      min-height: 140px;
+    }}
+
+    .notes-actions {{
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 0.4rem;
+    }}
+
+    .notes-primary-button,
+    .notes-secondary-button {{
+      border: 0;
+      border-radius: 999px;
+      padding: 0.7rem 1rem;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }}
+
+    .notes-primary-button {{
+      background: #0b7285;
+      color: #ffffff;
+    }}
+
+    .notes-secondary-button {{
+      background: #e4e7eb;
+      color: #334e68;
+    }}
+
     @media (max-width: 600px) {{
       main {{
         padding: 2rem 1.5rem;
@@ -1102,7 +1658,7 @@ def generer_html_multi(
 <body>
   <main>
     <header>
-      <h1>Analyse conseils communaux</h1>
+      <h1>Conseils communaux</h1>
       <p>Mise à jour automatique le {generated_at}</p>
     </header>
     <section class="filters" aria-label="Filtres">
@@ -1143,7 +1699,9 @@ def generer_html_multi(
       </label>
     </section>
     {contenu_section}
+    {_notes_modal_html()}
   </main>
+{_notes_bootstrap_script()}
   <script>
     const main = document.querySelector("main");
     const allProvincesView = document.getElementById("all-provinces-view");
@@ -1296,6 +1854,7 @@ def generer_html_multi(
       applyFilters();
     }}
   </script>
+{_notes_script()}
 </body>
 </html>
 """
@@ -1414,7 +1973,7 @@ def main() -> None:
         print("Aucune délibération à analyser. Arrêt.")
         return
 
-    sujets = analyser_globalement(client, deliberations, modele=args.modele, commune_nom=commune_nom)
+    sujets = analyser_globalement(client, deliberations, modele=args.modele, commune_nom=commune_nom, seance=seance)
     sujets = _associer_sources_aux_sujets(sujets, deliberations, seance)
 
     analyses_detaillees: Dict[int, str] = {}

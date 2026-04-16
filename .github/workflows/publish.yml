@@ -34,6 +34,8 @@ jobs:
       - name: 📰 Génération des analyses
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           python pipeline_journalistique.py --groupes bw namur lux
 

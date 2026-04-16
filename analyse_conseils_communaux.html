@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Analyse conseils communaux</title>
+  <title>Conseils communaux</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {
@@ -142,7 +142,11 @@
     }
 
     td:nth-child(4) {
-      width: 46%;
+      width: 34%;
+    }
+
+    td:nth-child(5) {
+      width: 12%;
     }
 
     details {
@@ -175,6 +179,147 @@
       font-size: 0.95rem;
     }
 
+    .notes-cell {
+      min-width: 220px;
+    }
+
+    .notes-list {
+      display: grid;
+      gap: 0.55rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .notes-empty {
+      margin: 0;
+      color: #7b8794;
+      font-size: 0.9rem;
+    }
+
+    .note-item {
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid #d9e2ec;
+    }
+
+    .note-author {
+      margin: 0 0 0.35rem;
+      font-weight: 700;
+      color: #102a43;
+      font-size: 0.9rem;
+    }
+
+    .note-content {
+      margin: 0;
+      color: #334e68;
+      white-space: pre-wrap;
+      font-size: 0.92rem;
+    }
+
+    .notes-add-button {
+      width: 2rem;
+      height: 2rem;
+      border: 0;
+      border-radius: 999px;
+      background: #0b7285;
+      color: #ffffff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .notes-add-button:hover,
+    .notes-add-button:focus {
+      background: #095c6b;
+    }
+
+    .notes-modal {
+      width: min(92vw, 540px);
+      border: 0;
+      border-radius: 18px;
+      padding: 0;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+    }
+
+    .notes-modal::backdrop {
+      background: rgba(15, 23, 42, 0.45);
+    }
+
+    .notes-form {
+      display: grid;
+      gap: 0.8rem;
+      padding: 1.4rem;
+    }
+
+    .notes-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .notes-modal-header h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #102a43;
+    }
+
+    .notes-close-button {
+      border: 0;
+      background: transparent;
+      color: #52606d;
+      font-size: 1.7rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .notes-form label {
+      font-weight: 600;
+      color: #334e68;
+    }
+
+    .notes-form input,
+    .notes-form textarea {
+      border: 1px solid #cbd2d9;
+      border-radius: 10px;
+      padding: 0.75rem 0.9rem;
+      font: inherit;
+      color: #102a43;
+      background: #ffffff;
+    }
+
+    .notes-form textarea {
+      resize: vertical;
+      min-height: 140px;
+    }
+
+    .notes-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 0.4rem;
+    }
+
+    .notes-primary-button,
+    .notes-secondary-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.7rem 1rem;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .notes-primary-button {
+      background: #0b7285;
+      color: #ffffff;
+    }
+
+    .notes-secondary-button {
+      background: #e4e7eb;
+      color: #334e68;
+    }
+
     @media (max-width: 600px) {
       main {
         padding: 2rem 1.5rem;
@@ -197,8 +342,8 @@
 <body>
   <main>
     <header>
-      <h1>Analyse conseils communaux</h1>
-      <p>Mise à jour automatique le 16/04/2026 à 11:13</p>
+      <h1>Conseils communaux</h1>
+      <p>Mise à jour automatique le 16/04/2026 à 15:11</p>
     </header>
     <section class="filters" aria-label="Filtres">
       <div class="filter-field">
@@ -319,6 +464,7 @@
             <th>Date</th>
             <th>Type</th>
             <th>Ordre du jour</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -417,7 +563,7 @@
 <details>
   <summary>24. Tutelle - Communication</summary>
   <p class="point-description">Une communication a été faite concernant la tutelle, abordant des aspects de gouvernance et de supervision administrative.</p>
-</details></td></tr> <tr data-commune="Arlon" data-date-sort="2026-03-19 19:00"><td>Arlon</td><td>19 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="andenne-23-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="andenne-23-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Arlon" data-date-sort="2026-03-19 19:00"><td>Arlon</td><td>19 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Démission d&#x27;une Conseillère communale</summary>
   <p class="point-description">Une conseillère communale a présenté sa démission, entraînant une vacance de poste au sein du conseil.</p>
 </details>
@@ -528,7 +674,7 @@
 <details>
   <summary>28. Demande d&#x27;inscription d&#x27;un point à l&#x27;OJ du Conseil communal du 19 mars</summary>
   <p class="point-description">Une demande a été faite pour inscrire à l&#x27;ordre du jour un point relatif aux conditions du débat démocratique au sein du Conseil communal.</p>
-</details></td></tr> <tr data-commune="Assesse" data-date-sort="2026-03-12 20:00"><td>Assesse</td><td>12 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="arlon-19-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="arlon-19-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Assesse" data-date-sort="2026-03-12 20:00"><td>Assesse</td><td>12 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Profil Local de Santé - Présentation par la Cellule Observation de la Province de Namur</summary>
   <p class="point-description">Cette délibération concerne la présentation d&#x27;un profil de santé local par la Cellule Observation de la Province de Namur, fournissant des données et des informations sur la santé dans la région.</p>
 </details>
@@ -595,7 +741,7 @@
 <details>
   <summary>17. Fourniture et livraison d&#x27;une camionnette de type plateau - Approbation des conditions, du mode de passation et du montant estimé</summary>
   <p class="point-description">Ce point a porté sur l&#x27;approbation des conditions, du mode de passation et du montant estimé pour la fourniture d&#x27;une camionnette de type plateau destinée aux services communaux.</p>
-</details></td></tr> <tr data-commune="Bastogne" data-date-sort="2026-03-11 20:00"><td>Bastogne</td><td>11 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="assesse-12-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="assesse-12-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Bastogne" data-date-sort="2026-03-11 20:00"><td>Bastogne</td><td>11 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance antérieure - Approbation.</summary>
   <p class="point-description">L&#x27;approbation du procès-verbal de la séance précédente a été soumise au vote.</p>
 </details>
@@ -702,7 +848,7 @@
 <details>
   <summary>27. IDELUX : Secteur &quot;Développement d&#x27;équipements touristiques à Bastogne&quot; - Modification désignation.</summary>
   <p class="point-description">Une modification concernant la désignation des équipements touristiques à Bastogne a été votée.</p>
-</details></td></tr> <tr data-commune="Bertrix" data-date-sort="2026-01-29 19:30"><td>Bertrix</td><td>29 Janvier 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="bastogne-11-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="bastogne-11-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Bertrix" data-date-sort="2026-01-29 19:30"><td>Bertrix</td><td>29 Janvier 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente.</p>
 </details>
@@ -773,7 +919,7 @@
 <details>
   <summary>18. Interpellation sur la vidéosurveillance intelligente</summary>
   <p class="point-description">Un point déposé par le groupe Ecolo a porté sur l&#x27;investissement dans la vidéosurveillance dite « intelligente ».</p>
-</details></td></tr> <tr data-commune="Braine-l&#x27;Alleud" data-date-sort="2026-01-26 20:00"><td>Braine-l&#x27;Alleud</td><td>26 Janvier 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="bertrix-29-janvier-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="bertrix-29-janvier-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Braine-l&#x27;Alleud" data-date-sort="2026-01-26 20:00"><td>Braine-l&#x27;Alleud</td><td>26 Janvier 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. 505.3 - SECRETARIAT - DECISIONS DES AUTORITES DE TUTELLE - INFORMATION</summary>
   <p class="point-description">Ce point porte sur les décisions prises par les autorités de tutelle concernant le secrétariat. Il vise à informer les membres du conseil communal des développements récents dans ce domaine.</p>
 </details>
@@ -804,7 +950,7 @@
 <details>
   <summary>8. 172.20 - QUESTIONS DIVERSES (ARTICLE 79 DU REGLEMENT D&#x27;ORDRE INTERIEUR)</summary>
   <p class="point-description">Cette délibération ouvre un espace pour les questions diverses, conformément à l&#x27;article 79 du règlement d&#x27;ordre intérieur. Elle permet aux membres du conseil de discuter de sujets variés non abordés précédemment.</p>
-</details></td></tr> <tr data-commune="Braine-le-Château" data-date-sort="2026-03-11 20:00"><td>Braine-le-Château</td><td>11 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="braine-l-alleud-26-janvier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="braine-l-alleud-26-janvier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Braine-le-Château" data-date-sort="2026-03-11 20:00"><td>Braine-le-Château</td><td>11 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Communications : décisions de tutelle et autres informations</summary>
   <p class="point-description">Cette délibération présente les décisions de tutelle ainsi que d&#x27;autres informations pertinentes pour la commune.</p>
 </details>
@@ -823,7 +969,7 @@
 <details>
   <summary>5. Installation de panneaux solaires photovoltaïques sur les salles de sport du complexe scolaire et sportif des « Rives du Hain »</summary>
   <p class="point-description">Cette délibération porte sur l&#x27;approbation d&#x27;une dépense engagée en situation d&#x27;urgence pour l&#x27;installation de panneaux solaires sur les salles de sport, après étude du raccordement par ORES.</p>
-</details></td></tr> <tr data-commune="Cerfontaine" data-date-sort="2026-03-23 20:00"><td>Cerfontaine</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="braine-le-chateau-11-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="braine-le-chateau-11-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Cerfontaine" data-date-sort="2026-03-23 20:00"><td>Cerfontaine</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. INASEP - Assemblée Générale Extraordinaire du 08 avril 2026 - Décision</summary>
   <p class="point-description">Cette délibération concerne la décision relative à l&#x27;Assemblée Générale Extraordinaire de l&#x27;INASEP qui se tiendra le 08 avril 2026. Les détails et les implications de cette assemblée ne sont pas fournis dans le document.</p>
 </details>
@@ -846,7 +992,7 @@
 <details>
   <summary>6. Création d’un Conseil Consultatif Communal des Aînés (CCCA) - Approbation</summary>
   <p class="point-description">La création d&#x27;un Conseil Consultatif Communal des Aînés a été approuvée par le conseil. Un montant de 2.500€ a également été alloué pour garantir le bon fonctionnement de ce conseil.</p>
-</details></td></tr> <tr data-commune="Chastre" data-date-sort="2026-03-26 19:00"><td>Chastre</td><td>26 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="cerfontaine-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="cerfontaine-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Chastre" data-date-sort="2026-03-26 19:00"><td>Chastre</td><td>26 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Institution provinciale - Réponse au Ministre Desquesnes sur les missions supracommunales de la Province</summary>
   <p class="point-description">Le conseil communal a discuté de la réponse à fournir au Ministre Desquesnes concernant les missions supracommunales attribuées à la Province.</p>
 </details>
@@ -877,7 +1023,7 @@
 <details>
   <summary>8. Vente de matériel et de matériaux 2026.01 - Déclassement - Approbation/ml</summary>
   <p class="point-description">Le conseil a approuvé le déclassement et la vente de matériel et de matériaux pour l&#x27;année 2026.</p>
-</details></td></tr> <tr data-commune="Chaumont-Gistoux" data-date-sort="2026-03-02 20:00"><td>Chaumont-Gistoux</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="chastre-26-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="chastre-26-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Chaumont-Gistoux" data-date-sort="2026-03-02 20:00"><td>Chaumont-Gistoux</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Interpellation citoyenne - Réponse du Collège communal</summary>
   <p class="point-description">Le collège communal a répondu à une interpellation citoyenne, abordant les préoccupations soulevées par les habitants de Chaumont Gistoux.</p>
 </details>
@@ -956,7 +1102,7 @@
 <details>
   <summary>20. Convention - Implantation de ruches sur terrain communal - Jardins partagés du Bonly - Validation</summary>
   <p class="point-description">La convention pour l’implantation de ruches sur un terrain communal dédié aux Jardins partagés du Bonly a été validée.</p>
-</details></td></tr> <tr data-commune="Chiny" data-date-sort="2026-03-23 20:00"><td>Chiny</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="chaumont-gistoux-02-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="chaumont-gistoux-02-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Chiny" data-date-sort="2026-03-23 20:00"><td>Chiny</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil a voté pour approuver le procès-verbal de la séance précédente afin d&#x27;assurer la transparence et la continuité des délibérations.</p>
 </details>
@@ -1011,7 +1157,7 @@
 <details>
   <summary>14. Projet de mise en place de rues réservées aux jeux - accord de principe</summary>
   <p class="point-description">Le conseil a donné un accord de principe pour un projet visant à créer des rues réservées aux jeux, favorisant ainsi les activités ludiques en plein air.</p>
-</details></td></tr> <tr data-commune="Court-Saint-Etienne" data-date-sort="2026-03-03 20:15"><td>Court-Saint-Etienne</td><td>03 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="chiny-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="chiny-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Court-Saint-Etienne" data-date-sort="2026-03-03 20:15"><td>Court-Saint-Etienne</td><td>03 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal - Conseil communal du 27 janvier 2026 : approbation</summary>
   <p class="point-description">Le Conseil communal est invité à approuver le procès-verbal de la séance du Conseil communal du 27 janvier 2026. Cette délibération comprend un article unique pour valider la documentation annexée.</p>
 </details>
@@ -1102,7 +1248,7 @@
 <details>
   <summary>23. Ecole communale fondamentale de Sart-Messire-Guillaume - Ouverture d&#x27;une demi-classe maternelle au 19 janvier 2026 : ratification</summary>
   <p class="point-description">La ratification pour la création d&#x27;une demi-classe à l&#x27;école de Sart-Messire-Guillaume est également envisagée. Cette mesure répond aux mêmes critères liés à l&#x27;effectif scolaire.</p>
-</details></td></tr> <tr data-commune="Daverdisse" data-date-sort="2026-03-02 20:15"><td>Daverdisse</td><td>02 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="court-saint-etienne-03-mars-2026-20-15-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="court-saint-etienne-03-mars-2026-20-15-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Daverdisse" data-date-sort="2026-03-02 20:15"><td>Daverdisse</td><td>02 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
   <summary>1. Patrimoine forestier – Mise en valeur de territoires privés</summary>
   <p class="point-description">Cette délibération concerne l&#x27;accompagnement des propriétaires privés sur le territoire communal en vue de la mise en valeur de leur patrimoine forestier.</p>
 </details>
@@ -1141,7 +1287,7 @@
 <details>
   <summary>10. Personnel communal – Engagement d’un/e ouvrier/ère forestier/ère à temps plein.</summary>
   <p class="point-description">La délibération porte sur l&#x27;engagement d&#x27;un(e) ouvrier/ère forestier/ère à temps plein à l&#x27;échelle D2, ainsi que la révision de ses conditions.</p>
-</details></td></tr> <tr data-commune="Dinant" data-date-sort="2026-03-09 20:00"><td>Dinant</td><td>09 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="daverdisse-02-mars-2026-20-15-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="daverdisse-02-mars-2026-20-15-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Dinant" data-date-sort="2026-03-09 20:00"><td>Dinant</td><td>09 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. SECRETARIAT - Intercommunale INASEP - AG Extraordinaire du mercredi 08 avril 2026 - 17h30.</summary>
   <p class="point-description">Une assemblée générale extraordinaire de l&#x27;Intercommunale INASEP est prévue pour le 08 avril 2026 à 17h30.</p>
 </details>
@@ -1212,7 +1358,7 @@
 <details>
   <summary>18. SECRETARIAT - Demandes de conseillers</summary>
   <p class="point-description">Des demandes formulées par des conseillers ont été abordées lors de la séance.</p>
-</details></td></tr> <tr data-commune="Doische" data-date-sort="2026-02-25 20:00"><td>Doische</td><td>25 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="dinant-09-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="dinant-09-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Doische" data-date-sort="2026-02-25 20:00"><td>Doische</td><td>25 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Finances - Budget communal 2026 - Arrêté ministériel de réformation du 26 janvier 2026 - Communication</summary>
   <p class="point-description">Ce point concerne l&#x27;arrêté ministériel qui modifie le budget communal pour l&#x27;année 2026. Une communication a été faite lors de la séance pour informer les membres du conseil.</p>
 </details>
@@ -1251,7 +1397,7 @@
 <details>
   <summary>10. Secrétariat - Séance du 29 janvier 2026 : Approbation du procès-verbal</summary>
   <p class="point-description">Le procès-verbal de la séance du 29 janvier 2026 a été approuvé par le conseil. Cette approbation formalise les décisions prises lors de cette réunion.</p>
-</details></td></tr> <tr data-commune="Durbuy" data-date-sort="2026-03-23 20:00"><td>Durbuy</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="doische-25-fevrier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="doische-25-fevrier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Durbuy" data-date-sort="2026-03-23 20:00"><td>Durbuy</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Vérification des pouvoirs d’un Conseiller communal</summary>
   <p class="point-description">Cette délibération concerne la vérification des pouvoirs d&#x27;un conseiller communal, étape cruciale dans le cadre des procédures administratives du conseil.</p>
 </details>
@@ -1394,7 +1540,7 @@
 <details>
   <summary>36. R.F.: acquisition d&#x27;une parcelle de terrain au parc résidentiel des Macralles</summary>
   <p class="point-description">Cette délibération concerne l&#x27;acquisition d&#x27;une parcelle de terrain située dans le parc résidentiel des Macralles, visant à développer l&#x27;urbanisme local.</p>
-</details></td></tr> <tr data-commune="Eghezée" data-date-sort="2026-03-26 20:00"><td>Eghezée</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="durbuy-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="durbuy-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Eghezée" data-date-sort="2026-03-26 20:00"><td>Eghezée</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance du 26 février 2026 - Approbation</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, qui s&#x27;est tenue le 26 février 2026. Cette approbation constitue un acte formel nécessaire dans les délibérations communautaires.</p>
 </details>
@@ -1445,7 +1591,7 @@
 <details>
   <summary>13. Communication en vertu de l’article 4, alinéa 2 du règlement général de la comptabilité communale</summary>
   <p class="point-description">Une communication a été faite en vertu de l&#x27;article 4, alinéa 2 du règlement général de la comptabilité communale. Ce point fait partie des obligations de communication financière.</p>
-</details></td></tr> <tr data-commune="Erezée" data-date-sort="2026-02-17 20:00"><td>Erezée</td><td>17 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="eghezee-26-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="eghezee-26-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Erezée" data-date-sort="2026-02-17 20:00"><td>Erezée</td><td>17 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance précédente</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été présenté pour approbation afin de valider les détails des délibérations antérieures.</p>
 </details>
@@ -1484,7 +1630,7 @@
 <details>
   <summary>10. Lotissement communal à Fisenne (Rues de la Chapelle et des Roches) - Vente du lot 23 - Annulation</summary>
   <p class="point-description">La vente du lot 23 dans le lotissement communal à Fisenne a été annulée par décision du conseil.</p>
-</details></td></tr> <tr data-commune="Etalle" data-date-sort="2026-03-23 20:00"><td>Etalle</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="erezee-17-fevrier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="erezee-17-fevrier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Etalle" data-date-sort="2026-03-23 20:00"><td>Etalle</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Zone de police de Gaume - Fixation de la dotation communale</summary>
   <p class="point-description">Cette délibération concerne la fixation de la dotation communale au budget 2026 destinée à la zone de police de Gaume. Elle s&#x27;inscrit dans le cadre de la loi du 07 décembre 1998 relative à l&#x27;organisation d&#x27;un service de police intégré.</p>
 </details>
@@ -1531,7 +1677,7 @@
 <details>
   <summary>12. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil approuve le procès-verbal de la séance du Conseil communal du 3 février 2026. Cette approbation est faite en conformité avec les articles pertinents du Code de la Démocratie Locale.</p>
-</details></td></tr> <tr data-commune="Florennes" data-date-sort="2026-02-23 19:30"><td>Florennes</td><td>23 Février 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="etalle-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="etalle-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Florennes" data-date-sort="2026-02-23 19:30"><td>Florennes</td><td>23 Février 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Tutelle générale - Redevance</summary>
   <p class="point-description">Une délibération a été prise concernant la redevance qui sera en vigueur de 2025 jusqu&#x27;à 2031 inclus.</p>
 </details>
@@ -1602,7 +1748,7 @@
 <details>
   <summary>18. Décisions de la séance du 26 janvier 2026</summary>
   <p class="point-description">Les décisions prises lors de la séance du 26 janvier 2026 ont été approuvées.</p>
-</details></td></tr> <tr data-commune="Florenville" data-date-sort="2026-02-19 20:00"><td>Florenville</td><td>19 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="florennes-23-fevrier-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="florennes-23-fevrier-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Florenville" data-date-sort="2026-02-19 20:00"><td>Florenville</td><td>19 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation des procès-verbaux des séances des Conseils communaux des 15 et 29 janvier 2026</summary>
   <p class="point-description">Le conseil communal a approuvé les procès-verbaux des séances tenues les 15 et 29 janvier 2026. Cette étape est cruciale pour la validation et l&#x27;archivage des décisions prises lors de ces réunions.</p>
 </details>
@@ -1653,7 +1799,7 @@
 <details>
   <summary>13. Communication décision de Tutelle - Intercommunale VIVALIA - Assemblée générale du 12 février 2026 et souscription de capital</summary>
   <p class="point-description">Une communication a été faite concernant une décision de tutelle liée à l&#x27;intercommunale VIVALIA. Ce point comprenait l&#x27;assemblée générale prévue pour le 12 février 2026 et la souscription de capital nécessaire.</p>
-</details></td></tr> <tr data-commune="Gembloux" data-date-sort="2026-03-03 19:00"><td>Gembloux</td><td>03 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="florenville-19-fevrier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="florenville-19-fevrier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Gembloux" data-date-sort="2026-03-03 19:00"><td>Gembloux</td><td>03 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Communication d&#x27;une décision de l&#x27;autorité de tutelle</summary>
   <p class="point-description">Une décision de l&#x27;autorité de tutelle a été communiquée lors de cette délibération.</p>
 </details>
@@ -1708,7 +1854,7 @@
 <details>
   <summary>14. Fabrique d&#x27;église de GRAND-MANIL - Rejointoiement et renforcement des contreforts de l&#x27;église de GRAND-MANIL - Liquidation de subside - Adjudication - Autorisation</summary>
   <p class="point-description">Cette délibération porte sur l&#x27;adjudication pour des travaux de rejointoiement et de renforcement des contreforts de l&#x27;église de Grand-Manil.</p>
-</details></td></tr> <tr data-commune="Genappe" data-date-sort="2026-03-24 00:00"><td>Genappe</td><td>24 Mars 2026 (00:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="gembloux-03-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="gembloux-03-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Genappe" data-date-sort="2026-03-24 00:00"><td>Genappe</td><td>24 Mars 2026 (00:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Subvention pour le Conseiller en aménagement du territoire - Rapport d&#x27;activités de l&#x27;année 2025 - Prise d&#x27;acte.</summary>
   <p class="point-description">Cette délibération concerne la prise d&#x27;acte du rapport d&#x27;activités du Conseiller en aménagement du territoire pour l&#x27;année 2025. Elle inclut la reconnaissance des efforts et des réalisations dans ce domaine.</p>
 </details>
@@ -1787,7 +1933,7 @@
 <details>
   <summary>20. Approbation du procès-verbal de la séance du Conseil communal du 24 février 2026.</summary>
   <p class="point-description">Le procès-verbal de la séance du Conseil communal du 24 février 2026 a été approuvé. Cela officialise les décisions prises lors de cette réunion et en garantit la validité.</p>
-</details></td></tr> <tr data-commune="Grez-Doiceau" data-date-sort="2026-03-17 20:00"><td>Grez-Doiceau</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="genappe-24-mars-2026-00-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="genappe-24-mars-2026-00-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Grez-Doiceau" data-date-sort="2026-03-17 20:00"><td>Grez-Doiceau</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Présentation et prestation de serment symbolique des membres du CCCJ</summary>
   <p class="point-description">Cette délibération concerne la présentation et la prestation de serment symbolique des membres du Conseil Consulte de la Jeunesse de Grez Doiceau.</p>
 </details>
@@ -1890,7 +2036,7 @@
 <details>
   <summary>26. Accord de principe : rénovation de l’infrastructure sportive de quartier – Hèze - Approbation</summary>
   <p class="point-description">Le conseil a approuvé un accord de principe concernant la rénovation de l&#x27;infrastructure sportive à Hèze.</p>
-</details></td></tr> <tr data-commune="Habay" data-date-sort="2026-02-11 20:00"><td>Habay</td><td>11 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="grez-doiceau-17-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="grez-doiceau-17-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Habay" data-date-sort="2026-02-11 20:00"><td>Habay</td><td>11 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approuve le procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, marquant ainsi la validation des discussions et décisions antérieures.</p>
 </details>
@@ -1957,7 +2103,7 @@
 <details>
   <summary>17. URGENCE - Désignation d&#x27;un représentant communal au sein de l&#x27;ASBL Les Vergers de Habay</summary>
   <p class="point-description">Une mesure d&#x27;urgence a conduit à la désignation d&#x27;un représentant communal pour l&#x27;ASBL Les Vergers de Habay.</p>
-</details></td></tr> <tr data-commune="Hamois" data-date-sort="2026-03-23 19:30"><td>Hamois</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="habay-11-fevrier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="habay-11-fevrier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Hamois" data-date-sort="2026-03-23 19:30"><td>Hamois</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, officialisant ainsi les décisions et discussions antérieures.</p>
 </details>
@@ -2032,7 +2178,7 @@
 <details>
   <summary>19. Divers - Information</summary>
   <p class="point-description">Un point d&#x27;information divers a été abordé, permettant de traiter plusieurs sujets non prévus à l&#x27;ordre du jour.</p>
-</details></td></tr> <tr data-commune="Havelange" data-date-sort="2026-01-26 20:00"><td>Havelange</td><td>26 Janvier 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="hamois-23-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="hamois-23-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Havelange" data-date-sort="2026-01-26 20:00"><td>Havelange</td><td>26 Janvier 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approuve le procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a voté en faveur de l&#x27;approbation du procès-verbal de la séance antérieure.</p>
 </details>
@@ -2059,7 +2205,7 @@
 <details>
   <summary>7. ATL/AES - Convention Partenariat Automne Détente (PAD) Stage Détente - Arlequin &amp; Compagnie - Approbation</summary>
   <p class="point-description">Une convention de partenariat pour le stage détente automnal proposé par Arlequin &amp; Compagnie a été approuvée par le conseil.</p>
-</details></td></tr> <tr data-commune="Hélécine" data-date-sort="2026-02-25 17:30"><td>Hélécine</td><td>25 Février 2026 (17:30)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="havelange-26-janvier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="havelange-26-janvier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Hélécine" data-date-sort="2026-02-25 17:30"><td>Hélécine</td><td>25 Février 2026 (17:30)</td><td>Décision</td><td><details>
   <summary>1. PROCES-VERBAL</summary>
   <p class="point-description">Approbation du procès-verbal de la séance du 27 janvier 2026.</p>
 </details>
@@ -2102,7 +2248,7 @@
 <details>
   <summary>11. DIVERS ET QUESTIONS</summary>
   <p class="point-description">Discussion sur divers sujets et questions diverses.</p>
-</details></td></tr> <tr data-commune="Houyet" data-date-sort="2026-03-18 20:00"><td>Houyet</td><td>18 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="helecine-25-fevrier-2026-17-30-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="helecine-25-fevrier-2026-17-30-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Houyet" data-date-sort="2026-03-18 20:00"><td>Houyet</td><td>18 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance antérieure - Approbation</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été soumis pour approbation, permettant de documenter les décisions prises lors de cette réunion.</p>
 </details>
@@ -2165,7 +2311,7 @@
 <details>
   <summary>16. INASEP : Assemblée générale extraordinaire du 08 avril 2026 - Approbation des points à l&#x27;ordre du jour</summary>
   <p class="point-description">Les points à l&#x27;ordre du jour de l&#x27;Assemblée générale extraordinaire de l&#x27;INASEP prévue le 08 avril 2026 ont été approuvés.</p>
-</details></td></tr> <tr data-commune="Incourt" data-date-sort="2026-03-25 19:30"><td>Incourt</td><td>25 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="houyet-18-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="houyet-18-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Incourt" data-date-sort="2026-03-25 19:30"><td>Incourt</td><td>25 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Administration générale - Démission d&#x27;un membre du Conseil communal - Prise d&#x27;acte.</summary>
   <p class="point-description">La démission d&#x27;un conseiller communal a été prise en compte par le conseil communal lors de cette délibération.</p>
 </details>
@@ -2224,7 +2370,7 @@
 <details>
   <summary>15. Approbation du procès-verbal de la séance du 25 février 2026.</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été approuvé par le conseil communal.</p>
-</details></td></tr> <tr data-commune="Ittre" data-date-sort="2026-03-17 19:00"><td>Ittre</td><td>17 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="incourt-25-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="incourt-25-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Ittre" data-date-sort="2026-03-17 19:00"><td>Ittre</td><td>17 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. PCDR - Rapport annuel 2025 - Approbation - Décision</summary>
   <p class="point-description">Le conseil communal a approuvé le rapport annuel 2025 du Plan Communal de Développement Rural (PCDR). Cette décision marque une étape importante dans le suivi et l&#x27;évaluation des projets de développement rural dans la commune.</p>
 </details>
@@ -2243,7 +2389,7 @@
 <details>
   <summary>5. Questions orales</summary>
   <p class="point-description">Le conseil a permis la pose de questions orales par les membres présents. Ce point de l&#x27;ordre du jour favorise l&#x27;échange direct entre les conseillers et le Collège communal sur des sujets divers.</p>
-</details></td></tr> <tr data-commune="Jemeppe-sur-Sambre" data-date-sort="2026-03-30 20:00"><td>Jemeppe-sur-Sambre</td><td>30 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="ittre-17-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="ittre-17-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Jemeppe-sur-Sambre" data-date-sort="2026-03-30 20:00"><td>Jemeppe-sur-Sambre</td><td>30 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Administration communale - Approbation du procès-verbal de la séance du Conseil communal du 02 mars 2026</summary>
   <p class="point-description">Ce point porte sur l&#x27;approbation du compte rendu de la séance du Conseil communal tenue le 02 mars 2026. Cela permet de valider les décisions prises lors de cette réunion.</p>
 </details>
@@ -2362,7 +2508,7 @@
 <details>
   <summary>30. Zone de Police - CaLog B contractuel SIPPT à 1/5 temps - Ouverture du poste - Description de fonction et modalités de recrutement - Approbation</summary>
   <p class="point-description">Ce point concerne l&#x27;approbation de l&#x27;ouverture d&#x27;un poste de CaLog B contractuel à temps partiel au sein du service Police, comprenant la définition des fonctions et modalités de recrutement.</p>
-</details></td></tr> <tr data-commune="La Bruyère" data-date-sort="2026-03-26 19:30"><td>La Bruyère</td><td>26 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="jemeppe-sur-sambre-30-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="jemeppe-sur-sambre-30-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="La Bruyère" data-date-sort="2026-03-26 19:30"><td>La Bruyère</td><td>26 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, validant ainsi les décisions prises lors de cette réunion.</p>
 </details>
@@ -2429,7 +2575,7 @@
 <details>
   <summary>17. Patrimoine communal: Financement des dépenses extraordinaires 2025-2026: Marché d&#x27;emprunts: Décision</summary>
   <p class="point-description">Une décision a été prise concernant le financement des dépenses extraordinaires pour les années 2025 et 2026 à travers un marché d&#x27;emprunts.</p>
-</details></td></tr> <tr data-commune="La Hulpe" data-date-sort="2026-03-16 19:00"><td>La Hulpe</td><td>16 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="la-bruyere-26-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="la-bruyere-26-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="La Hulpe" data-date-sort="2026-03-16 19:00"><td>La Hulpe</td><td>16 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance du 10 février 2026 - Approbation</summary>
   <p class="point-description">Le procès-verbal de la séance du 10 février 2026 a été présenté pour approbation. Cette étape est essentielle pour valider les décisions prises durant cette réunion.</p>
 </details>
@@ -2468,7 +2614,7 @@
 <details>
   <summary>10. Questions d&#x27;actualité</summary>
   <p class="point-description">Des questions d&#x27;actualité ont été abordées lors de cette session. Cela permet de traiter des sujets récents et pertinents pour la commune.</p>
-</details></td></tr> <tr data-commune="La Roche-en-Ardenne" data-date-sort="2026-03-02 19:30"><td>La Roche-en-Ardenne</td><td>02 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="la-hulpe-16-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="la-hulpe-16-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="La Roche-en-Ardenne" data-date-sort="2026-03-02 19:30"><td>La Roche-en-Ardenne</td><td>02 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approuve le procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a validé le procès-verbal de la séance précédente, confirmant son contenu et son exactitude.</p>
 </details>
@@ -2523,7 +2669,7 @@
 <details>
   <summary>14. Acquisition des immeubles situés rue de l’Eglise à la Roche-en-Ardenne - décision de principe</summary>
   <p class="point-description">Le conseil a pris une décision de principe pour l&#x27;acquisition d&#x27;immeubles situés rue de l’Eglise à la Roche-en-Ardenne.</p>
-</details></td></tr> <tr data-commune="Lasne" data-date-sort="2026-03-23 19:30"><td>Lasne</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="la-roche-en-ardenne-02-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="la-roche-en-ardenne-02-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Lasne" data-date-sort="2026-03-23 19:30"><td>Lasne</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Démission des fonctions du Bourgmestre - Prise d&#x27;acte</summary>
   <p class="point-description">Ce point porte sur la prise d&#x27;acte de la démission du Bourgmestre, marquant un changement dans la direction du conseil communal.</p>
 </details>
@@ -2542,7 +2688,7 @@
 <details>
   <summary>5. Approbation du procès-verbal de la séance du 10 février 2026</summary>
   <p class="point-description">Le conseil communal approuve le procès-verbal de la séance précédente, permettant ainsi de valider les décisions prises lors de celle-ci.</p>
-</details></td></tr> <tr data-commune="Léglise" data-date-sort="2026-03-25 19:00"><td>Léglise</td><td>25 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="lasne-23-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="lasne-23-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Léglise" data-date-sort="2026-03-25 19:00"><td>Léglise</td><td>25 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Cette délibération vise à approuver le procès-verbal de la séance précédente du conseil communal, assurant ainsi la bonne tenue des documents administratifs.</p>
 </details>
@@ -2641,7 +2787,7 @@
 <details>
   <summary>25. Questions d&#x27;actualité</summary>
   <p class="point-description">Le conseil aborde diverses questions d&#x27;actualité lors de cette séance, permettant aux membres de discuter des enjeux récents.</p>
-</details></td></tr> <tr data-commune="Libin" data-date-sort="2026-03-09 19:30"><td>Libin</td><td>09 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="leglise-25-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="leglise-25-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Libin" data-date-sort="2026-03-09 19:30"><td>Libin</td><td>09 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la réunion précédente. Cette étape est nécessaire pour valider les discussions et décisions antérieures.</p>
 </details>
@@ -2672,7 +2818,7 @@
 <details>
   <summary>8. Règlement complémentaire de circulation - Emplacement de stationnement à durée limitée</summary>
   <p class="point-description">Un règlement complémentaire de circulation a été proposé concernant la création d&#x27;emplacements de stationnement à durée limitée. Cela a pour but d&#x27;améliorer la gestion du stationnement dans la commune.</p>
-</details></td></tr> <tr data-commune="Libramont-Chevigny" data-date-sort="2026-03-17 20:00"><td>Libramont-Chevigny</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="libin-09-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="libin-09-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Libramont-Chevigny" data-date-sort="2026-03-17 20:00"><td>Libramont-Chevigny</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Communication des décisions de la tutelle concernant le budget pour l&#x27;exercice 2026.</summary>
   <p class="point-description">Cette délibération concerne la transmission des décisions prises par la tutelle en rapport avec le budget prévu pour l&#x27;année 2026. Elle vise à informer les membres du conseil des orientations budgétaires.</p>
 </details>
@@ -2715,7 +2861,7 @@
 <details>
   <summary>11. Point dont l&#x27;inscription est sollicitée par un conseiller communal : &#x27;Taxe sur les dispositifs publicitaires numériques (écrans LED/LCD) visibles de la voie publique&#x27;.</summary>
   <p class="point-description">Ce point aborde la proposition d&#x27;instaurer une taxe sur les dispositifs publicitaires numériques, telles que les écrans LED/LCD visibles depuis la voie publique. Il a été demandé par un conseiller communal.</p>
-</details></td></tr> <tr data-commune="Manhay" data-date-sort="2026-03-03 20:00"><td>Manhay</td><td>03 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="libramont-chevigny-17-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="libramont-chevigny-17-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Manhay" data-date-sort="2026-03-03 20:00"><td>Manhay</td><td>03 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approuve le procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, documentant ainsi les décisions prises lors de cette réunion.</p>
 </details>
@@ -2798,7 +2944,7 @@
 <details>
   <summary>21. Entretien voiries forestières - Approbation des conditions et du mode de passation</summary>
   <p class="point-description">Les conditions et le mode de passation concernant l&#x27;entretien des voiries forestières ont été approuvés, essentielles pour la gestion des infrastructures forestières.</p>
-</details></td></tr> <tr data-commune="Marche-en-Famenne" data-date-sort="2026-03-02 19:00"><td>Marche-en-Famenne</td><td>02 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="manhay-03-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="manhay-03-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Marche-en-Famenne" data-date-sort="2026-03-02 19:00"><td>Marche-en-Famenne</td><td>02 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente - Séance publique</summary>
   <p class="point-description">Le conseil a approuvé le procès-verbal de la séance publique précédente, assurant ainsi la continuité des délibérations.</p>
 </details>
@@ -2885,7 +3031,7 @@
 <details>
   <summary>22. Marchés publics - Information au Conseil communal</summary>
   <p class="point-description">Le conseil communal a été informé sur les marchés publics en cours et leurs implications.</p>
-</details></td></tr> <tr data-commune="Martelange" data-date-sort="2026-03-19 19:00"><td>Martelange</td><td>19 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="marche-en-famenne-02-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="marche-en-famenne-02-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Martelange" data-date-sort="2026-03-19 19:00"><td>Martelange</td><td>19 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Rapport 2025 relatif aux économies d&#x27;échelle</summary>
   <p class="point-description">Information sur les économies d&#x27;échelle et les suppressions de doubles emplois ou chevauchement d&#x27;activités du CPAS et de la Commune.</p>
 </details>
@@ -2952,7 +3098,7 @@
 <details>
   <summary>17. Modifications budgétaires n°1</summary>
   <p class="point-description">Approbation des modifications budgétaires ordinaire et extraordinaire n°1.</p>
-</details></td></tr> <tr data-commune="Meix-devant-Virton" data-date-sort="2026-03-18 18:30"><td>Meix-devant-Virton</td><td>18 Mars 2026 (18:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="martelange-19-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="martelange-19-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Meix-devant-Virton" data-date-sort="2026-03-18 18:30"><td>Meix-devant-Virton</td><td>18 Mars 2026 (18:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Compte communal 2025 - Approbation</summary>
   <p class="point-description">Le conseil communal a approuvé le compte communal de l&#x27;année 2025, marquant ainsi la fin d&#x27;une année comptable.</p>
 </details>
@@ -3019,7 +3165,7 @@
 <details>
   <summary>17. Rapport sur le fond social de l&#x27;eau 2025 - information</summary>
   <p class="point-description">Une information a été faite sur le rapport concernant le fond social de l&#x27;eau pour l&#x27;année 2025.</p>
-</details></td></tr> <tr data-commune="Mettet" data-date-sort="2026-02-26 19:00"><td>Mettet</td><td>26 Février 2026 (19:00)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="meix-devant-virton-18-mars-2026-18-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="meix-devant-virton-18-mars-2026-18-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Mettet" data-date-sort="2026-02-26 19:00"><td>Mettet</td><td>26 Février 2026 (19:00)</td><td>Décision</td><td><details>
   <summary>1. Ajout d&#x27;un point à l&#x27;ordre du jour du Conseil communal</summary>
   <p class="point-description">Un point a été ajouté à l&#x27;ordre du jour du Conseil communal pour examen et discussion.</p>
 </details>
@@ -3082,7 +3228,7 @@
 <details>
   <summary>16. Approbation du procès-verbal de la séance antérieure</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été approuvé lors de cette réunion.</p>
-</details></td></tr> <tr data-commune="Mont-Saint-Guibert" data-date-sort="2026-03-05 20:00"><td>Mont-Saint-Guibert</td><td>05 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="mettet-26-fevrier-2026-19-00-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="mettet-26-fevrier-2026-19-00-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Mont-Saint-Guibert" data-date-sort="2026-03-05 20:00"><td>Mont-Saint-Guibert</td><td>05 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Affaires générales - Démission d&#x27;un conseiller de CPAS - Prise d&#x27;acte</summary>
   <p class="point-description">Le conseil communal a pris acte de la démission d&#x27;un conseiller du CPAS, ce qui nécessite des ajustements au sein de l&#x27;organisme.</p>
 </details>
@@ -3153,7 +3299,7 @@
 <details>
   <summary>18. FINANCES : Dotation communale à la Zone de Secours du Brabant wallon pour l’exercice budgétaire de l’année 2026 – Approbation</summary>
   <p class="point-description">Le conseil a approuvé la dotation communale pour la Zone de Secours du Brabant wallon pour le budget de 2026.</p>
-</details></td></tr> <tr data-commune="Namur" data-date-sort="2026-03-17 18:15"><td>Namur</td><td>17 Mars 2026 (18:15)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="mont-saint-guibert-05-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="mont-saint-guibert-05-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Namur" data-date-sort="2026-03-17 18:15"><td>Namur</td><td>17 Mars 2026 (18:15)</td><td>Projet de décision</td><td><details>
   <summary>1. Interpellation citoyenne</summary>
   <p class="point-description">Le conseil a abordé la question du maintien ou de la réintégration de l’organisation des stages vélo à l&#x27;école communale de Jambes Velaine, en lien avec la réorganisation des stages et plaines de vacances.</p>
 </details>
@@ -3376,7 +3522,7 @@
 <details>
   <summary>56. L&#x27;état des voiries communales</summary>
   <p class="point-description">Une question sur l&#x27;état des voiries communales a été posée par un conseiller.</p>
-</details></td></tr> <tr data-commune="Nassogne" data-date-sort="2026-02-23 19:30"><td>Nassogne</td><td>23 Février 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="namur-17-mars-2026-18-15-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="namur-17-mars-2026-18-15-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Nassogne" data-date-sort="2026-02-23 19:30"><td>Nassogne</td><td>23 Février 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Achat sans crédit: Acquisition de 2 containers maritimes - Ratification</summary>
   <p class="point-description">Cette délibération concerne l&#x27;acquisition de deux containers maritimes sans recours à un crédit. La ratification de cet achat est présentée lors de la séance.</p>
 </details>
@@ -3439,7 +3585,7 @@
 <details>
   <summary>16. Communications</summary>
   <p class="point-description">Cette section aborde des communications diverses au sein du conseil communal. Elle présente des informations et des annonces importantes.</p>
-</details></td></tr> <tr data-commune="Nivelles" data-date-sort="2026-03-02 20:00"><td>Nivelles</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="nassogne-23-fevrier-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="nassogne-23-fevrier-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Nivelles" data-date-sort="2026-03-02 20:00"><td>Nivelles</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance du Conseil communal du 26/01/2026</summary>
   <p class="point-description">Le Conseil communal a approuvé le procès-verbal de la séance tenue le 26 janvier 2026, validant ainsi les échanges et décisions qui y ont eu lieu.</p>
 </details>
@@ -3522,7 +3668,7 @@
 <details>
   <summary>21. Soutien envers la Ville de Saintes - Gaëtan THIBAUT</summary>
   <p class="point-description">Le Conseil a abordé le sujet du soutien à la Ville de Saintes, récemment touchée par des inondations, en raison de leur jumelage avec Nivelles.</p>
-</details></td></tr> <tr data-commune="Ohey" data-date-sort="2026-03-19 19:30"><td>Ohey</td><td>19 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="nivelles-02-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="nivelles-02-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Ohey" data-date-sort="2026-03-19 19:30"><td>Ohey</td><td>19 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. COMMUNICATIONS DE MONSIEUR LE BOURGMESTRE</summary>
   <p class="point-description">Monsieur le Bourgmestre a effectué des communications concernant des affaires municipales.</p>
 </details>
@@ -3577,7 +3723,7 @@
 <details>
   <summary>14. QUESTIONS DES CONSEILLERS</summary>
   <p class="point-description">Les questions des conseillers ont été discutées lors de la session.</p>
-</details></td></tr> <tr data-commune="Onhaye" data-date-sort="2026-03-26 20:00"><td>Onhaye</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="ohey-19-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="ohey-19-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Onhaye" data-date-sort="2026-03-26 20:00"><td>Onhaye</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Conseil Communal des Enfants - Renouvellement partiel des membres</summary>
   <p class="point-description">Cette délibération vise à procéder au renouvellement partiel des membres du Conseil Communal des Enfants, afin d&#x27;assurer une représentation adéquate des jeunes de la commune.</p>
 </details>
@@ -3604,7 +3750,7 @@
 <details>
   <summary>7. Procès-verbal de la séance antérieure</summary>
   <p class="point-description">Le procès-verbal de la séance antérieure sera validé, consignant les discussions et décisions prises lors de la réunion précédente.</p>
-</details></td></tr> <tr data-commune="Ottignies-Louvain-la-Neuve" data-date-sort="2026-03-02 20:15"><td>Ottignies-Louvain-la-Neuve</td><td>02 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="onhaye-26-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="onhaye-26-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Ottignies-Louvain-la-Neuve" data-date-sort="2026-03-02 20:15"><td>Ottignies-Louvain-la-Neuve</td><td>02 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
   <summary>1. Démission d&#x27;une Conseillère communale</summary>
   <p class="point-description">Le conseil a pris acte de la démission d&#x27;une Conseillère communale. Cette décision a été inscrite à l&#x27;ordre du jour pour officialisation.</p>
 </details>
@@ -3739,7 +3885,7 @@
 <details>
   <summary>34. Points pour information et communication des décisions des autorités de tutelle</summary>
   <p class="point-description">Des points concernant l&#x27;information et la communication des décisions des autorités de tutelle ont été abordés au cours de la séance du conseil.</p>
-</details></td></tr> <tr data-commune="Paliseul" data-date-sort="2026-03-18 20:00"><td>Paliseul</td><td>18 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="ottignies-louvain-la-neuve-02-mars-2026-20-15-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="ottignies-louvain-la-neuve-02-mars-2026-20-15-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Paliseul" data-date-sort="2026-03-18 20:00"><td>Paliseul</td><td>18 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Démission d&#x27;un conseiller communal</summary>
   <p class="point-description">Proposition de prendre acte de la démission de M. Claudy THOMASSINT de ses fonctions de conseiller communal, comme mentionné dans son courrier du 18/02/2026.</p>
 </details>
@@ -3858,7 +4004,7 @@
 <details>
   <summary>30. Désignation d&#x27;un nouveau conseiller de l&#x27;action sociale - Election de plein droit</summary>
   <p class="point-description">Désignation d&#x27;un nouveau conseiller de l&#x27;action sociale suite à la démission de M. Achille BODSON, par élection de plein droit.</p>
-</details></td></tr> <tr data-commune="Philippeville" data-date-sort="2026-02-26 19:30"><td>Philippeville</td><td>26 Février 2026 (19:30)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="paliseul-18-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="paliseul-18-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Philippeville" data-date-sort="2026-02-26 19:30"><td>Philippeville</td><td>26 Février 2026 (19:30)</td><td>Décision</td><td><details>
   <summary>1. Budget 2026 - Approbation</summary>
   <p class="point-description">Le conseil communal a approuvé le budget du C.P.A.S pour 2026. Ce budget est essentiel pour la gestion des finances communales.</p>
 </details>
@@ -3929,7 +4075,7 @@
 <details>
   <summary>18. Installation de bornes de distribution de sacs à déjections canines</summary>
   <p class="point-description">Une décision a été prise concernant l&#x27;installation de bornes pour distributeurs de sacs à déjections canines. Cela vise à améliorer la propreté des espaces publics.</p>
-</details></td></tr> <tr data-commune="Ramillies" data-date-sort="2026-03-25 20:00"><td>Ramillies</td><td>25 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="philippeville-26-fevrier-2026-19-30-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="philippeville-26-fevrier-2026-19-30-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Ramillies" data-date-sort="2026-03-25 20:00"><td>Ramillies</td><td>25 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Coopération : accueil et échanges avec la délégation Burkinabé de Kombissiri en Belgique.</summary>
   <p class="point-description">Cette délibération concerne un projet de coopération entre la commune de Ramillies et la délégation de Kombissiri au Burkina Faso. Le projet a été validé par le Directeur général en mars 2026.</p>
 </details>
@@ -3996,7 +4142,7 @@
 <details>
   <summary>17. Interpellations du Collège communal.</summary>
   <p class="point-description">Les interpellations du Collège communal ont été abordées durant la séance. Ces mises au point font partie des échanges réguliers entre les membres.</p>
-</details></td></tr> <tr data-commune="Rebecq" data-date-sort="2026-03-24 20:00"><td>Rebecq</td><td>24 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="ramillies-25-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="ramillies-25-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rebecq" data-date-sort="2026-03-24 20:00"><td>Rebecq</td><td>24 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance antérieure</summary>
   <p class="point-description">Ce point porte sur l&#x27;approbation du procès-verbal de la précédente séance du conseil communal, assurant ainsi la validation des décisions antérieures.</p>
 </details>
@@ -4035,7 +4181,7 @@
 <details>
   <summary>10. Permis d&#x27;urbanisme 2025/Purb/035 - Rue Bruyère, 26 - Demande d&#x27;accord du conseil pour la suppression d&#x27;une partie du sentier vicinal n° 38</summary>
   <p class="point-description">Ce point concerne une demande d&#x27;accord du conseil pour la suppression d&#x27;une portion du sentier vicinal n° 38 à proximité de la Rue Bruyère, 26.</p>
-</details></td></tr> <tr data-commune="Rendeux" data-date-sort="2026-03-19 20:00"><td>Rendeux</td><td>19 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rebecq-24-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rebecq-24-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rendeux" data-date-sort="2026-03-19 20:00"><td>Rendeux</td><td>19 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Examen et approbation du PV de la séance précédente</summary>
   <p class="point-description">Ce point concerne la validation du procès-verbal de la séance précédente, afin d&#x27;assurer la continuité des travaux du conseil communal.</p>
 </details>
@@ -4154,7 +4300,7 @@
 <details>
   <summary>30. Divers</summary>
   <p class="point-description">Ce point permet d&#x27;aborder tout sujet non prévu à l&#x27;ordre du jour ou des affaires courantes.</p>
-</details></td></tr> <tr data-commune="Rixensart" data-date-sort="2026-03-25 20:00"><td>Rixensart</td><td>25 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rendeux-19-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rendeux-19-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rixensart" data-date-sort="2026-03-25 20:00"><td>Rixensart</td><td>25 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance publique du Conseil communal du 4 mars 2026 - Approbation - Vote</summary>
   <p class="point-description">Le conseil a approuvé le procès-verbal de sa séance publique du 4 mars 2026 après un vote formel.</p>
 </details>
@@ -4221,7 +4367,7 @@
 <details>
   <summary>17. Participation citoyenne - Budget Participatif 2025 - Projet &quot;Vélo sans âge&quot;</summary>
   <p class="point-description">Un vote a eu lieu concernant le projet « Vélo sans âge » dans le cadre du budget participatif de 2025.</p>
-</details></td></tr> <tr data-commune="Rochefort" data-date-sort="2026-03-02 20:00"><td>Rochefort</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rixensart-25-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rixensart-25-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rochefort" data-date-sort="2026-03-02 20:00"><td>Rochefort</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Communication des décisions de l&#x27;Autorité de Tutelle</summary>
   <p class="point-description">L’article 4, al. 2 de l&#x27;Arrêté du Gouvernement wallon du 05 juillet 2007 stipule la procédure de communication des décisions prises par l&#x27;autorité de tutelle.</p>
 </details>
@@ -4312,7 +4458,7 @@
 <details>
   <summary>23. Intercommunale A.I.E.G. - Décisions en vue d&#x27;une Assemblée générale extraordinaire</summary>
   <p class="point-description">La Ville est convoquée à une Assemblée générale extraordinaire de l&#x27;Intercommunale A.I.E.G. pour discuter des décisions prises.</p>
-</details></td></tr> <tr data-commune="Rouvroy" data-date-sort="2026-02-23 19:00"><td>Rouvroy</td><td>23 Février 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rochefort-02-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rochefort-02-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rouvroy" data-date-sort="2026-02-23 19:00"><td>Rouvroy</td><td>23 Février 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Conseil communal - 19 janvier 2026 - Procès-verbal - Approbation</summary>
   <p class="point-description">Le procès-verbal de la séance du conseil communal du 19 janvier 2026 a été soumis à l&#x27;approbation.</p>
 </details>
@@ -4391,7 +4537,7 @@
 <details>
   <summary>20. COMMUNICATION - Intercommunale VIVALIA – Assemblée générale du 12 février 2026 et souscription de capital – Tutelle spéciale d’approbation - Arrêté d’approbation de l’autorité de tutelle.</summary>
   <p class="point-description">Un arrêté d&#x27;approbation de l&#x27;autorité de tutelle concernant l&#x27;assemblée générale de l&#x27;intercommunale VIVALIA a été mentionné.</p>
-</details></td></tr> <tr data-commune="Saint-Hubert" data-date-sort="2026-01-29 00:00"><td>Saint-Hubert</td><td>29 Janvier 2026 (00:00)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rouvroy-23-fevrier-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rouvroy-23-fevrier-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Saint-Hubert" data-date-sort="2026-01-29 00:00"><td>Saint-Hubert</td><td>29 Janvier 2026 (00:00)</td><td>Décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance du 23 décembre 2025</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, ce qui formalise les décisions prises lors de cette réunion.</p>
 </details>
@@ -4450,7 +4596,7 @@
 <details>
   <summary>15. Création d&#x27;une commission budgétaire</summary>
   <p class="point-description">Le conseil a décidé de créer une commission budgétaire pour superviser les questions financières de la commune.</p>
-</details></td></tr> <tr data-commune="Saint-Léger" data-date-sort="2026-03-04 20:00"><td>Saint-Léger</td><td>04 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="saint-hubert-29-janvier-2026-00-00-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="saint-hubert-29-janvier-2026-00-00-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Saint-Léger" data-date-sort="2026-03-04 20:00"><td>Saint-Léger</td><td>04 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance du Conseil du 28 janvier 2026</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été présenté pour approbation afin de valider les décisions prises durant cette réunion.</p>
 </details>
@@ -4493,7 +4639,7 @@
 <details>
   <summary>11. Point supplémentaire : adoption d&#x27;une motion relative à la situation du Département de la Nature et des Forêts (DNF)</summary>
   <p class="point-description">Un point supplémentaire a été ajouté à l&#x27;ordre du jour concernant l&#x27;adoption d&#x27;une motion sur la situation actuelle du Département de la Nature et des Forêts.</p>
-</details></td></tr> <tr data-commune="Sainte-Ode" data-date-sort="2026-03-12 20:00"><td>Sainte-Ode</td><td>12 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="saint-leger-04-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="saint-leger-04-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Sainte-Ode" data-date-sort="2026-03-12 20:00"><td>Sainte-Ode</td><td>12 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance du 12 février 2026</summary>
   <p class="point-description">Ce point concerne l&#x27;approbation du procès-verbal de la séance précédente. Il vise à formaliser les décisions et les discussions tenues lors de cette séance.</p>
 </details>
@@ -4528,7 +4674,7 @@
 <details>
   <summary>9. Règlement-redevance relative à l&#x27;accueil temps libres et repas scolaires – Du 1er avril 2026 au 3 juillet 2026</summary>
   <p class="point-description">Ce point aborde le règlement et la redevance pour les services d&#x27;accueil temps libres et de repas scolaires pour la période définie. Cela inclut les modalités de gestion de ces services.</p>
-</details></td></tr> <tr data-commune="Sambreville" data-date-sort="2026-03-23 19:00"><td>Sambreville</td><td>23 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="sainte-ode-12-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="sainte-ode-12-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Sambreville" data-date-sort="2026-03-23 19:00"><td>Sambreville</td><td>23 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Désignation de Monsieur Marc PARMENTIER</summary>
   <p class="point-description">Le groupe PS a désigné Monsieur Marc PARMENTIER en tant que représentant de l&#x27;organe d&#x27;administration à la Maison de la Jeunesse AROCA.</p>
 </details>
@@ -4735,7 +4881,7 @@
 <details>
   <summary>52. Question orale sur l&#x27;avenir du site hospitalier d&#x27;Auvelais</summary>
   <p class="point-description">Une question a été posée concernant l&#x27;avenir du site hospitalier du CHR d&#x27;Auvelais.</p>
-</details></td></tr> <tr data-commune="Sombreffe" data-date-sort="2026-03-23 19:30"><td>Sombreffe</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="sambreville-23-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="sambreville-23-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Sombreffe" data-date-sort="2026-03-23 19:30"><td>Sombreffe</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la précédente séance</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la précédente séance, validant ainsi les décisions prises lors de celle-ci.</p>
 </details>
@@ -4790,7 +4936,7 @@
 <details>
   <summary>14. Questions orales des Conseillers communaux (sous réserve)</summary>
   <p class="point-description">Les conseillers communaux ont soulevé diverses questions orales, indiquant les préoccupations et les points à discuter lors de la séance.</p>
-</details></td></tr> <tr data-commune="Somme-Leuze" data-date-sort="2026-03-23 20:00"><td>Somme-Leuze</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="sombreffe-23-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="sombreffe-23-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Somme-Leuze" data-date-sort="2026-03-23 20:00"><td>Somme-Leuze</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Installation d’un conseiller communal en remplacement d’un conseiller démissionnaire</summary>
   <p class="point-description">Cette délibération concerne l&#x27;installation d&#x27;un nouveau conseiller communal pour remplacer un conseiller ayant récemment démissionné.</p>
 </details>
@@ -4837,7 +4983,7 @@
 <details>
   <summary>12. Information - Décision(s) de la tutelle</summary>
   <p class="point-description">Le Conseil reçoit des informations concernant les décisions prises par la tutelle.</p>
-</details></td></tr> <tr data-commune="Tellin" data-date-sort="2026-03-10 19:00"><td>Tellin</td><td>10 Mars 2026 (19:00)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="somme-leuze-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="somme-leuze-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Tellin" data-date-sort="2026-03-10 19:00"><td>Tellin</td><td>10 Mars 2026 (19:00)</td><td>Décision</td><td><details>
   <summary>1. SA - 854 - 2026 - TERRE ASBL - Renouvellement convention collecte textile - Décision</summary>
   <p class="point-description">Cette délibération concerne le renouvellement d&#x27;une convention avec l&#x27;ASBL TERRE pour la collecte de textiles. La décision a été prise lors de la séance.</p>
 </details>
@@ -4868,7 +5014,7 @@
 <details>
   <summary>8. CM - 2024 - 924 - Campagne de stérilisation des chats errants - Bien-être animal - Décision</summary>
   <p class="point-description">Une décision a été prise concernant le lancement d&#x27;une campagne de stérilisation des chats errants pour favoriser le bien-être animal. Cela souligne l&#x27;engagement de la commune envers la protection des animaux.</p>
-</details></td></tr> <tr data-commune="Tubize" data-date-sort="2026-03-05 19:30"><td>Tubize</td><td>05 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="tellin-10-mars-2026-19-00-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="tellin-10-mars-2026-19-00-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Tubize" data-date-sort="2026-03-05 19:30"><td>Tubize</td><td>05 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Démission d&#x27;une conseillère communale - Madame Valérie MENUGE</summary>
   <p class="point-description">Madame Valérie MENUGE a présenté sa démission de ses fonctions de conseillère communale au Bourgmestre par courrier daté du 12 février 2026.</p>
 </details>
@@ -4971,7 +5117,7 @@
 <details>
   <summary>26. Divers et questions orales d&#x27;actualité</summary>
   <p class="point-description">Des questions orales concernant divers sujets en lien avec la gestion de la commune ont été abordées, dont la gestion du stationnement à Tubize.</p>
-</details></td></tr> <tr data-commune="Viroinval" data-date-sort="2026-03-25 19:00"><td>Viroinval</td><td>25 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="tubize-05-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="tubize-05-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Viroinval" data-date-sort="2026-03-25 19:00"><td>Viroinval</td><td>25 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. MOTION POUR LE MAINTIEN DES SOINS DE PROXIMITE DANS LE SUD DE L&#x27;ENTRE-SAMBRE-ET-MEUSE - DECISION</summary>
   <p class="point-description">Cette motion vise à garantir le maintien des soins de proximité pour les habitants du sud de l&#x27;Entre-Sambre-et-Meuse. Le conseil communal a pris une décision à ce sujet, soulignant l&#x27;importance des services de santé locaux.</p>
 </details>
@@ -5034,7 +5180,7 @@
 <details>
   <summary>16. APPROBATION DU PROCES-VERBAL DE LA SEANCE ANTERIEURE DU 25 FEVRIER 2026</summary>
   <p class="point-description">L&#x27;approbation du procès-verbal de la séance antérieure, tenue le 25 février 2026, a été validée. Cela garantit la continuité et la transparence des débats du conseil.</p>
-</details></td></tr> <tr data-commune="Virton" data-date-sort="2026-03-02 20:30"><td>Virton</td><td>02 Mars 2026 (20:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="viroinval-25-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="viroinval-25-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Virton" data-date-sort="2026-03-02 20:30"><td>Virton</td><td>02 Mars 2026 (20:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente - Séance publique</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, conformément aux articles 62 et 63 du ROI voté le 26 juin 2025.</p>
 </details>
@@ -5085,7 +5231,7 @@
 <details>
   <summary>13. Divers et communications - Arrêté du Vice-Président et Ministre du territoire et des infrastructures</summary>
   <p class="point-description">Le conseil a pris connaissance de l&#x27;arrêté concernant le budget ordinaire et extraordinaire exercice 2026, voté durant la séance du 22 décembre 2025.</p>
-</details></td></tr> <tr data-commune="Vresse-sur-Semois" data-date-sort="2026-03-26 19:00"><td>Vresse-sur-Semois</td><td>26 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="virton-02-mars-2026-20-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="virton-02-mars-2026-20-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Vresse-sur-Semois" data-date-sort="2026-03-26 19:00"><td>Vresse-sur-Semois</td><td>26 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. INSTITUT ROYAL DES ÉLITES DU TRAVAIL - TITRE ET INSIGNE D&#x27;HONNEUR D&#x27;OR DE LAUREAT DU TRAVAIL - LURKIN CELINE</summary>
   <p class="point-description">Ce point concerne la remise du titre et de l&#x27;insigne d&#x27;honneur d&#x27;or à Céline Lurkin par l&#x27;Institut Royal des Élites du Travail. La cérémonie vise à reconnaître ses contributions exceptionnelles dans le cadre de son travail.</p>
 </details>
@@ -5128,7 +5274,7 @@
 <details>
   <summary>11. DEMANDES DE CONSEILLERS</summary>
   <p class="point-description">Ce point aborde les diverses demandes formulées par les conseillers durant la séance. Il permet de noter les préoccupations et propositions des membres du conseil.</p>
-</details></td></tr> <tr data-commune="Walcourt" data-date-sort="2026-03-02 19:30"><td>Walcourt</td><td>02 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="vresse-sur-semois-26-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="vresse-sur-semois-26-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Walcourt" data-date-sort="2026-03-02 19:30"><td>Walcourt</td><td>02 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance du 26/01/2026 : approbation</summary>
   <p class="point-description">Le procès-verbal de la séance du 26 janvier 2026 a été soumis pour approbation. Ce document sert de compte rendu des délibérations effectuées durant cette séance.</p>
 </details>
@@ -5251,7 +5397,7 @@
 <details>
   <summary>31. Emploi des travailleurs handicapés : rapport annuel</summary>
   <p class="point-description">Le rapport annuel sur l&#x27;emploi des travailleurs handicapés a été présenté. Ce rapport évalue les mesures et les actions entreprises pour favoriser leur intégration dans le monde du travail.</p>
-</details></td></tr> <tr data-commune="Walhain" data-date-sort="2026-03-09 19:30"><td>Walhain</td><td>09 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="walcourt-02-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="walcourt-02-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Walhain" data-date-sort="2026-03-09 19:30"><td>Walhain</td><td>09 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. SECRETARIAT : Procès-verbal de la séance du 9 février 2026</summary>
   <p class="point-description">Le procès-verbal de la séance du 9 février 2026 a été présenté pour approbation. Ce document retrace les délibérations et décisions prises au cours de cette séance.</p>
 </details>
@@ -5302,7 +5448,7 @@
 <details>
   <summary>13. RURALITE : Convention avec la Fondation Rurale de Wallonie relative à son accompagnement dans le cadre de l’élaboration et du suivi du nouveau PCDR</summary>
   <p class="point-description">Une convention a été signée avec la Fondation Rurale de Wallonie pour son accompagnement dans l&#x27;élaboration et le suivi du nouveau Plan Communal de Développement Rural.</p>
-</details></td></tr> <tr data-commune="Wavre" data-date-sort="2026-03-17 19:00"><td>Wavre</td><td>17 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="walhain-09-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="walhain-09-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Wavre" data-date-sort="2026-03-17 19:00"><td>Wavre</td><td>17 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Pôle cadre de vie - Service Bâtiments - Centrale d&#x27;achats - Convention avec RenoWatt</summary>
   <p class="point-description">Le service bâtiments souhaite obtenir un audit sur les cogénérations installées dans les différents sites de la Ville afin d&#x27;évaluer l&#x27;intérêt de leur acquisition.</p>
 </details>
@@ -5357,7 +5503,7 @@
 <details>
   <summary>14. Questions d&#x27;actualité</summary>
   <p class="point-description">Des questions éventuelles posées par les membres du Conseil au Collège sont abordées.</p>
-</details></td></tr> <tr data-commune="Wellin" data-date-sort="2026-03-26 20:00"><td>Wellin</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="wavre-17-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="wavre-17-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Wellin" data-date-sort="2026-03-26 20:00"><td>Wellin</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal du 26 février 2026</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la réunion du 26 février 2026.</p>
 </details>
@@ -5396,7 +5542,7 @@
 <details>
   <summary>10. Attribution des marchés publics à l&#x27;extraordinaire. Rapportage</summary>
   <p class="point-description">Un rapport sur l&#x27;attribution des marchés publics à l&#x27;extraordinaire a été présenté au conseil communal pour information.</p>
-</details></td></tr> <tr data-commune="Yvoir" data-date-sort="2026-03-17 20:00"><td>Yvoir</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="wellin-26-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="wellin-26-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Yvoir" data-date-sort="2026-03-17 20:00"><td>Yvoir</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Acte d&#x27;exclusion d&#x27;un conseiller communal de son groupe politique - prise de connaissance</summary>
   <p class="point-description">Le conseil communal a pris connaissance de l&#x27;acte d&#x27;exclusion d&#x27;un conseiller communal de son groupe politique.</p>
 </details>
@@ -5479,7 +5625,7 @@
 <details>
   <summary>21. Questions d&#x27;actualités - art. 46, 75 à 77 du R.O.I.</summary>
   <p class="point-description">Des questions d&#x27;actualité en lien avec le règlement d&#x27;ordre intérieur ont été abordées durant la séance.</p>
-</details></td></tr>
+</details></td><td class="notes-cell" data-note-key="yvoir-17-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="yvoir-17-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr>
         </tbody>
       </table>
     </section></section><section class="province-section" data-province="Brabant wallon">
@@ -5492,6 +5638,7 @@
             <th>Date</th>
             <th>Type</th>
             <th>Ordre du jour</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -5526,7 +5673,7 @@
 <details>
   <summary>8. 172.20 - QUESTIONS DIVERSES (ARTICLE 79 DU REGLEMENT D&#x27;ORDRE INTERIEUR)</summary>
   <p class="point-description">Cette délibération ouvre un espace pour les questions diverses, conformément à l&#x27;article 79 du règlement d&#x27;ordre intérieur. Elle permet aux membres du conseil de discuter de sujets variés non abordés précédemment.</p>
-</details></td></tr> <tr data-commune="Braine-le-Château" data-date-sort="2026-03-11 20:00"><td>Braine-le-Château</td><td>11 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="braine-l-alleud-26-janvier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="braine-l-alleud-26-janvier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Braine-le-Château" data-date-sort="2026-03-11 20:00"><td>Braine-le-Château</td><td>11 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Communications : décisions de tutelle et autres informations</summary>
   <p class="point-description">Cette délibération présente les décisions de tutelle ainsi que d&#x27;autres informations pertinentes pour la commune.</p>
 </details>
@@ -5545,7 +5692,7 @@
 <details>
   <summary>5. Installation de panneaux solaires photovoltaïques sur les salles de sport du complexe scolaire et sportif des « Rives du Hain »</summary>
   <p class="point-description">Cette délibération porte sur l&#x27;approbation d&#x27;une dépense engagée en situation d&#x27;urgence pour l&#x27;installation de panneaux solaires sur les salles de sport, après étude du raccordement par ORES.</p>
-</details></td></tr> <tr data-commune="Chastre" data-date-sort="2026-03-26 19:00"><td>Chastre</td><td>26 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="braine-le-chateau-11-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="braine-le-chateau-11-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Chastre" data-date-sort="2026-03-26 19:00"><td>Chastre</td><td>26 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Institution provinciale - Réponse au Ministre Desquesnes sur les missions supracommunales de la Province</summary>
   <p class="point-description">Le conseil communal a discuté de la réponse à fournir au Ministre Desquesnes concernant les missions supracommunales attribuées à la Province.</p>
 </details>
@@ -5576,7 +5723,7 @@
 <details>
   <summary>8. Vente de matériel et de matériaux 2026.01 - Déclassement - Approbation/ml</summary>
   <p class="point-description">Le conseil a approuvé le déclassement et la vente de matériel et de matériaux pour l&#x27;année 2026.</p>
-</details></td></tr> <tr data-commune="Chaumont-Gistoux" data-date-sort="2026-03-02 20:00"><td>Chaumont-Gistoux</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="chastre-26-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="chastre-26-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Chaumont-Gistoux" data-date-sort="2026-03-02 20:00"><td>Chaumont-Gistoux</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Interpellation citoyenne - Réponse du Collège communal</summary>
   <p class="point-description">Le collège communal a répondu à une interpellation citoyenne, abordant les préoccupations soulevées par les habitants de Chaumont Gistoux.</p>
 </details>
@@ -5655,7 +5802,7 @@
 <details>
   <summary>20. Convention - Implantation de ruches sur terrain communal - Jardins partagés du Bonly - Validation</summary>
   <p class="point-description">La convention pour l’implantation de ruches sur un terrain communal dédié aux Jardins partagés du Bonly a été validée.</p>
-</details></td></tr> <tr data-commune="Court-Saint-Etienne" data-date-sort="2026-03-03 20:15"><td>Court-Saint-Etienne</td><td>03 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="chaumont-gistoux-02-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="chaumont-gistoux-02-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Court-Saint-Etienne" data-date-sort="2026-03-03 20:15"><td>Court-Saint-Etienne</td><td>03 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal - Conseil communal du 27 janvier 2026 : approbation</summary>
   <p class="point-description">Le Conseil communal est invité à approuver le procès-verbal de la séance du Conseil communal du 27 janvier 2026. Cette délibération comprend un article unique pour valider la documentation annexée.</p>
 </details>
@@ -5746,7 +5893,7 @@
 <details>
   <summary>23. Ecole communale fondamentale de Sart-Messire-Guillaume - Ouverture d&#x27;une demi-classe maternelle au 19 janvier 2026 : ratification</summary>
   <p class="point-description">La ratification pour la création d&#x27;une demi-classe à l&#x27;école de Sart-Messire-Guillaume est également envisagée. Cette mesure répond aux mêmes critères liés à l&#x27;effectif scolaire.</p>
-</details></td></tr> <tr data-commune="Genappe" data-date-sort="2026-03-24 00:00"><td>Genappe</td><td>24 Mars 2026 (00:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="court-saint-etienne-03-mars-2026-20-15-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="court-saint-etienne-03-mars-2026-20-15-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Genappe" data-date-sort="2026-03-24 00:00"><td>Genappe</td><td>24 Mars 2026 (00:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Subvention pour le Conseiller en aménagement du territoire - Rapport d&#x27;activités de l&#x27;année 2025 - Prise d&#x27;acte.</summary>
   <p class="point-description">Cette délibération concerne la prise d&#x27;acte du rapport d&#x27;activités du Conseiller en aménagement du territoire pour l&#x27;année 2025. Elle inclut la reconnaissance des efforts et des réalisations dans ce domaine.</p>
 </details>
@@ -5825,7 +5972,7 @@
 <details>
   <summary>20. Approbation du procès-verbal de la séance du Conseil communal du 24 février 2026.</summary>
   <p class="point-description">Le procès-verbal de la séance du Conseil communal du 24 février 2026 a été approuvé. Cela officialise les décisions prises lors de cette réunion et en garantit la validité.</p>
-</details></td></tr> <tr data-commune="Grez-Doiceau" data-date-sort="2026-03-17 20:00"><td>Grez-Doiceau</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="genappe-24-mars-2026-00-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="genappe-24-mars-2026-00-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Grez-Doiceau" data-date-sort="2026-03-17 20:00"><td>Grez-Doiceau</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Présentation et prestation de serment symbolique des membres du CCCJ</summary>
   <p class="point-description">Cette délibération concerne la présentation et la prestation de serment symbolique des membres du Conseil Consulte de la Jeunesse de Grez Doiceau.</p>
 </details>
@@ -5928,7 +6075,7 @@
 <details>
   <summary>26. Accord de principe : rénovation de l’infrastructure sportive de quartier – Hèze - Approbation</summary>
   <p class="point-description">Le conseil a approuvé un accord de principe concernant la rénovation de l&#x27;infrastructure sportive à Hèze.</p>
-</details></td></tr> <tr data-commune="Hélécine" data-date-sort="2026-02-25 17:30"><td>Hélécine</td><td>25 Février 2026 (17:30)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="grez-doiceau-17-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="grez-doiceau-17-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Hélécine" data-date-sort="2026-02-25 17:30"><td>Hélécine</td><td>25 Février 2026 (17:30)</td><td>Décision</td><td><details>
   <summary>1. PROCES-VERBAL</summary>
   <p class="point-description">Approbation du procès-verbal de la séance du 27 janvier 2026.</p>
 </details>
@@ -5971,7 +6118,7 @@
 <details>
   <summary>11. DIVERS ET QUESTIONS</summary>
   <p class="point-description">Discussion sur divers sujets et questions diverses.</p>
-</details></td></tr> <tr data-commune="Incourt" data-date-sort="2026-03-25 19:30"><td>Incourt</td><td>25 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="helecine-25-fevrier-2026-17-30-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="helecine-25-fevrier-2026-17-30-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Incourt" data-date-sort="2026-03-25 19:30"><td>Incourt</td><td>25 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Administration générale - Démission d&#x27;un membre du Conseil communal - Prise d&#x27;acte.</summary>
   <p class="point-description">La démission d&#x27;un conseiller communal a été prise en compte par le conseil communal lors de cette délibération.</p>
 </details>
@@ -6030,7 +6177,7 @@
 <details>
   <summary>15. Approbation du procès-verbal de la séance du 25 février 2026.</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été approuvé par le conseil communal.</p>
-</details></td></tr> <tr data-commune="Ittre" data-date-sort="2026-03-17 19:00"><td>Ittre</td><td>17 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="incourt-25-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="incourt-25-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Ittre" data-date-sort="2026-03-17 19:00"><td>Ittre</td><td>17 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. PCDR - Rapport annuel 2025 - Approbation - Décision</summary>
   <p class="point-description">Le conseil communal a approuvé le rapport annuel 2025 du Plan Communal de Développement Rural (PCDR). Cette décision marque une étape importante dans le suivi et l&#x27;évaluation des projets de développement rural dans la commune.</p>
 </details>
@@ -6049,7 +6196,7 @@
 <details>
   <summary>5. Questions orales</summary>
   <p class="point-description">Le conseil a permis la pose de questions orales par les membres présents. Ce point de l&#x27;ordre du jour favorise l&#x27;échange direct entre les conseillers et le Collège communal sur des sujets divers.</p>
-</details></td></tr> <tr data-commune="La Hulpe" data-date-sort="2026-03-16 19:00"><td>La Hulpe</td><td>16 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="ittre-17-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="ittre-17-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="La Hulpe" data-date-sort="2026-03-16 19:00"><td>La Hulpe</td><td>16 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance du 10 février 2026 - Approbation</summary>
   <p class="point-description">Le procès-verbal de la séance du 10 février 2026 a été présenté pour approbation. Cette étape est essentielle pour valider les décisions prises durant cette réunion.</p>
 </details>
@@ -6088,7 +6235,7 @@
 <details>
   <summary>10. Questions d&#x27;actualité</summary>
   <p class="point-description">Des questions d&#x27;actualité ont été abordées lors de cette session. Cela permet de traiter des sujets récents et pertinents pour la commune.</p>
-</details></td></tr> <tr data-commune="Lasne" data-date-sort="2026-03-23 19:30"><td>Lasne</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="la-hulpe-16-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="la-hulpe-16-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Lasne" data-date-sort="2026-03-23 19:30"><td>Lasne</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Démission des fonctions du Bourgmestre - Prise d&#x27;acte</summary>
   <p class="point-description">Ce point porte sur la prise d&#x27;acte de la démission du Bourgmestre, marquant un changement dans la direction du conseil communal.</p>
 </details>
@@ -6107,7 +6254,7 @@
 <details>
   <summary>5. Approbation du procès-verbal de la séance du 10 février 2026</summary>
   <p class="point-description">Le conseil communal approuve le procès-verbal de la séance précédente, permettant ainsi de valider les décisions prises lors de celle-ci.</p>
-</details></td></tr> <tr data-commune="Mont-Saint-Guibert" data-date-sort="2026-03-05 20:00"><td>Mont-Saint-Guibert</td><td>05 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="lasne-23-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="lasne-23-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Mont-Saint-Guibert" data-date-sort="2026-03-05 20:00"><td>Mont-Saint-Guibert</td><td>05 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Affaires générales - Démission d&#x27;un conseiller de CPAS - Prise d&#x27;acte</summary>
   <p class="point-description">Le conseil communal a pris acte de la démission d&#x27;un conseiller du CPAS, ce qui nécessite des ajustements au sein de l&#x27;organisme.</p>
 </details>
@@ -6178,7 +6325,7 @@
 <details>
   <summary>18. FINANCES : Dotation communale à la Zone de Secours du Brabant wallon pour l’exercice budgétaire de l’année 2026 – Approbation</summary>
   <p class="point-description">Le conseil a approuvé la dotation communale pour la Zone de Secours du Brabant wallon pour le budget de 2026.</p>
-</details></td></tr> <tr data-commune="Nivelles" data-date-sort="2026-03-02 20:00"><td>Nivelles</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="mont-saint-guibert-05-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="mont-saint-guibert-05-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Nivelles" data-date-sort="2026-03-02 20:00"><td>Nivelles</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance du Conseil communal du 26/01/2026</summary>
   <p class="point-description">Le Conseil communal a approuvé le procès-verbal de la séance tenue le 26 janvier 2026, validant ainsi les échanges et décisions qui y ont eu lieu.</p>
 </details>
@@ -6261,7 +6408,7 @@
 <details>
   <summary>21. Soutien envers la Ville de Saintes - Gaëtan THIBAUT</summary>
   <p class="point-description">Le Conseil a abordé le sujet du soutien à la Ville de Saintes, récemment touchée par des inondations, en raison de leur jumelage avec Nivelles.</p>
-</details></td></tr> <tr data-commune="Ottignies-Louvain-la-Neuve" data-date-sort="2026-03-02 20:15"><td>Ottignies-Louvain-la-Neuve</td><td>02 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="nivelles-02-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="nivelles-02-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Ottignies-Louvain-la-Neuve" data-date-sort="2026-03-02 20:15"><td>Ottignies-Louvain-la-Neuve</td><td>02 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
   <summary>1. Démission d&#x27;une Conseillère communale</summary>
   <p class="point-description">Le conseil a pris acte de la démission d&#x27;une Conseillère communale. Cette décision a été inscrite à l&#x27;ordre du jour pour officialisation.</p>
 </details>
@@ -6396,7 +6543,7 @@
 <details>
   <summary>34. Points pour information et communication des décisions des autorités de tutelle</summary>
   <p class="point-description">Des points concernant l&#x27;information et la communication des décisions des autorités de tutelle ont été abordés au cours de la séance du conseil.</p>
-</details></td></tr> <tr data-commune="Ramillies" data-date-sort="2026-03-25 20:00"><td>Ramillies</td><td>25 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="ottignies-louvain-la-neuve-02-mars-2026-20-15-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="ottignies-louvain-la-neuve-02-mars-2026-20-15-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Ramillies" data-date-sort="2026-03-25 20:00"><td>Ramillies</td><td>25 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Coopération : accueil et échanges avec la délégation Burkinabé de Kombissiri en Belgique.</summary>
   <p class="point-description">Cette délibération concerne un projet de coopération entre la commune de Ramillies et la délégation de Kombissiri au Burkina Faso. Le projet a été validé par le Directeur général en mars 2026.</p>
 </details>
@@ -6463,7 +6610,7 @@
 <details>
   <summary>17. Interpellations du Collège communal.</summary>
   <p class="point-description">Les interpellations du Collège communal ont été abordées durant la séance. Ces mises au point font partie des échanges réguliers entre les membres.</p>
-</details></td></tr> <tr data-commune="Rebecq" data-date-sort="2026-03-24 20:00"><td>Rebecq</td><td>24 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="ramillies-25-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="ramillies-25-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rebecq" data-date-sort="2026-03-24 20:00"><td>Rebecq</td><td>24 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance antérieure</summary>
   <p class="point-description">Ce point porte sur l&#x27;approbation du procès-verbal de la précédente séance du conseil communal, assurant ainsi la validation des décisions antérieures.</p>
 </details>
@@ -6502,7 +6649,7 @@
 <details>
   <summary>10. Permis d&#x27;urbanisme 2025/Purb/035 - Rue Bruyère, 26 - Demande d&#x27;accord du conseil pour la suppression d&#x27;une partie du sentier vicinal n° 38</summary>
   <p class="point-description">Ce point concerne une demande d&#x27;accord du conseil pour la suppression d&#x27;une portion du sentier vicinal n° 38 à proximité de la Rue Bruyère, 26.</p>
-</details></td></tr> <tr data-commune="Rixensart" data-date-sort="2026-03-25 20:00"><td>Rixensart</td><td>25 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rebecq-24-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rebecq-24-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rixensart" data-date-sort="2026-03-25 20:00"><td>Rixensart</td><td>25 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance publique du Conseil communal du 4 mars 2026 - Approbation - Vote</summary>
   <p class="point-description">Le conseil a approuvé le procès-verbal de sa séance publique du 4 mars 2026 après un vote formel.</p>
 </details>
@@ -6569,7 +6716,7 @@
 <details>
   <summary>17. Participation citoyenne - Budget Participatif 2025 - Projet &quot;Vélo sans âge&quot;</summary>
   <p class="point-description">Un vote a eu lieu concernant le projet « Vélo sans âge » dans le cadre du budget participatif de 2025.</p>
-</details></td></tr> <tr data-commune="Tubize" data-date-sort="2026-03-05 19:30"><td>Tubize</td><td>05 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rixensart-25-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rixensart-25-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Tubize" data-date-sort="2026-03-05 19:30"><td>Tubize</td><td>05 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Démission d&#x27;une conseillère communale - Madame Valérie MENUGE</summary>
   <p class="point-description">Madame Valérie MENUGE a présenté sa démission de ses fonctions de conseillère communale au Bourgmestre par courrier daté du 12 février 2026.</p>
 </details>
@@ -6672,7 +6819,7 @@
 <details>
   <summary>26. Divers et questions orales d&#x27;actualité</summary>
   <p class="point-description">Des questions orales concernant divers sujets en lien avec la gestion de la commune ont été abordées, dont la gestion du stationnement à Tubize.</p>
-</details></td></tr> <tr data-commune="Walhain" data-date-sort="2026-03-09 19:30"><td>Walhain</td><td>09 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="tubize-05-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="tubize-05-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Walhain" data-date-sort="2026-03-09 19:30"><td>Walhain</td><td>09 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. SECRETARIAT : Procès-verbal de la séance du 9 février 2026</summary>
   <p class="point-description">Le procès-verbal de la séance du 9 février 2026 a été présenté pour approbation. Ce document retrace les délibérations et décisions prises au cours de cette séance.</p>
 </details>
@@ -6723,7 +6870,7 @@
 <details>
   <summary>13. RURALITE : Convention avec la Fondation Rurale de Wallonie relative à son accompagnement dans le cadre de l’élaboration et du suivi du nouveau PCDR</summary>
   <p class="point-description">Une convention a été signée avec la Fondation Rurale de Wallonie pour son accompagnement dans l&#x27;élaboration et le suivi du nouveau Plan Communal de Développement Rural.</p>
-</details></td></tr> <tr data-commune="Wavre" data-date-sort="2026-03-17 19:00"><td>Wavre</td><td>17 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="walhain-09-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="walhain-09-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Wavre" data-date-sort="2026-03-17 19:00"><td>Wavre</td><td>17 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Pôle cadre de vie - Service Bâtiments - Centrale d&#x27;achats - Convention avec RenoWatt</summary>
   <p class="point-description">Le service bâtiments souhaite obtenir un audit sur les cogénérations installées dans les différents sites de la Ville afin d&#x27;évaluer l&#x27;intérêt de leur acquisition.</p>
 </details>
@@ -6778,7 +6925,7 @@
 <details>
   <summary>14. Questions d&#x27;actualité</summary>
   <p class="point-description">Des questions éventuelles posées par les membres du Conseil au Collège sont abordées.</p>
-</details></td></tr>
+</details></td><td class="notes-cell" data-note-key="wavre-17-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="wavre-17-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr>
         </tbody>
       </table>
     </section>
@@ -6793,6 +6940,7 @@
             <th>Date</th>
             <th>Type</th>
             <th>Ordre du jour</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -6891,7 +7039,7 @@
 <details>
   <summary>24. Tutelle - Communication</summary>
   <p class="point-description">Une communication a été faite concernant la tutelle, abordant des aspects de gouvernance et de supervision administrative.</p>
-</details></td></tr> <tr data-commune="Assesse" data-date-sort="2026-03-12 20:00"><td>Assesse</td><td>12 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="andenne-23-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="andenne-23-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Assesse" data-date-sort="2026-03-12 20:00"><td>Assesse</td><td>12 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Profil Local de Santé - Présentation par la Cellule Observation de la Province de Namur</summary>
   <p class="point-description">Cette délibération concerne la présentation d&#x27;un profil de santé local par la Cellule Observation de la Province de Namur, fournissant des données et des informations sur la santé dans la région.</p>
 </details>
@@ -6958,7 +7106,7 @@
 <details>
   <summary>17. Fourniture et livraison d&#x27;une camionnette de type plateau - Approbation des conditions, du mode de passation et du montant estimé</summary>
   <p class="point-description">Ce point a porté sur l&#x27;approbation des conditions, du mode de passation et du montant estimé pour la fourniture d&#x27;une camionnette de type plateau destinée aux services communaux.</p>
-</details></td></tr> <tr data-commune="Cerfontaine" data-date-sort="2026-03-23 20:00"><td>Cerfontaine</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="assesse-12-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="assesse-12-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Cerfontaine" data-date-sort="2026-03-23 20:00"><td>Cerfontaine</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. INASEP - Assemblée Générale Extraordinaire du 08 avril 2026 - Décision</summary>
   <p class="point-description">Cette délibération concerne la décision relative à l&#x27;Assemblée Générale Extraordinaire de l&#x27;INASEP qui se tiendra le 08 avril 2026. Les détails et les implications de cette assemblée ne sont pas fournis dans le document.</p>
 </details>
@@ -6981,7 +7129,7 @@
 <details>
   <summary>6. Création d’un Conseil Consultatif Communal des Aînés (CCCA) - Approbation</summary>
   <p class="point-description">La création d&#x27;un Conseil Consultatif Communal des Aînés a été approuvée par le conseil. Un montant de 2.500€ a également été alloué pour garantir le bon fonctionnement de ce conseil.</p>
-</details></td></tr> <tr data-commune="Dinant" data-date-sort="2026-03-09 20:00"><td>Dinant</td><td>09 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="cerfontaine-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="cerfontaine-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Dinant" data-date-sort="2026-03-09 20:00"><td>Dinant</td><td>09 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. SECRETARIAT - Intercommunale INASEP - AG Extraordinaire du mercredi 08 avril 2026 - 17h30.</summary>
   <p class="point-description">Une assemblée générale extraordinaire de l&#x27;Intercommunale INASEP est prévue pour le 08 avril 2026 à 17h30.</p>
 </details>
@@ -7052,7 +7200,7 @@
 <details>
   <summary>18. SECRETARIAT - Demandes de conseillers</summary>
   <p class="point-description">Des demandes formulées par des conseillers ont été abordées lors de la séance.</p>
-</details></td></tr> <tr data-commune="Doische" data-date-sort="2026-02-25 20:00"><td>Doische</td><td>25 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="dinant-09-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="dinant-09-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Doische" data-date-sort="2026-02-25 20:00"><td>Doische</td><td>25 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Finances - Budget communal 2026 - Arrêté ministériel de réformation du 26 janvier 2026 - Communication</summary>
   <p class="point-description">Ce point concerne l&#x27;arrêté ministériel qui modifie le budget communal pour l&#x27;année 2026. Une communication a été faite lors de la séance pour informer les membres du conseil.</p>
 </details>
@@ -7091,7 +7239,7 @@
 <details>
   <summary>10. Secrétariat - Séance du 29 janvier 2026 : Approbation du procès-verbal</summary>
   <p class="point-description">Le procès-verbal de la séance du 29 janvier 2026 a été approuvé par le conseil. Cette approbation formalise les décisions prises lors de cette réunion.</p>
-</details></td></tr> <tr data-commune="Eghezée" data-date-sort="2026-03-26 20:00"><td>Eghezée</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="doische-25-fevrier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="doische-25-fevrier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Eghezée" data-date-sort="2026-03-26 20:00"><td>Eghezée</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance du 26 février 2026 - Approbation</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, qui s&#x27;est tenue le 26 février 2026. Cette approbation constitue un acte formel nécessaire dans les délibérations communautaires.</p>
 </details>
@@ -7142,7 +7290,7 @@
 <details>
   <summary>13. Communication en vertu de l’article 4, alinéa 2 du règlement général de la comptabilité communale</summary>
   <p class="point-description">Une communication a été faite en vertu de l&#x27;article 4, alinéa 2 du règlement général de la comptabilité communale. Ce point fait partie des obligations de communication financière.</p>
-</details></td></tr> <tr data-commune="Florennes" data-date-sort="2026-02-23 19:30"><td>Florennes</td><td>23 Février 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="eghezee-26-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="eghezee-26-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Florennes" data-date-sort="2026-02-23 19:30"><td>Florennes</td><td>23 Février 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Tutelle générale - Redevance</summary>
   <p class="point-description">Une délibération a été prise concernant la redevance qui sera en vigueur de 2025 jusqu&#x27;à 2031 inclus.</p>
 </details>
@@ -7213,7 +7361,7 @@
 <details>
   <summary>18. Décisions de la séance du 26 janvier 2026</summary>
   <p class="point-description">Les décisions prises lors de la séance du 26 janvier 2026 ont été approuvées.</p>
-</details></td></tr> <tr data-commune="Gembloux" data-date-sort="2026-03-03 19:00"><td>Gembloux</td><td>03 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="florennes-23-fevrier-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="florennes-23-fevrier-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Gembloux" data-date-sort="2026-03-03 19:00"><td>Gembloux</td><td>03 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Communication d&#x27;une décision de l&#x27;autorité de tutelle</summary>
   <p class="point-description">Une décision de l&#x27;autorité de tutelle a été communiquée lors de cette délibération.</p>
 </details>
@@ -7268,7 +7416,7 @@
 <details>
   <summary>14. Fabrique d&#x27;église de GRAND-MANIL - Rejointoiement et renforcement des contreforts de l&#x27;église de GRAND-MANIL - Liquidation de subside - Adjudication - Autorisation</summary>
   <p class="point-description">Cette délibération porte sur l&#x27;adjudication pour des travaux de rejointoiement et de renforcement des contreforts de l&#x27;église de Grand-Manil.</p>
-</details></td></tr> <tr data-commune="Hamois" data-date-sort="2026-03-23 19:30"><td>Hamois</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="gembloux-03-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="gembloux-03-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Hamois" data-date-sort="2026-03-23 19:30"><td>Hamois</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, officialisant ainsi les décisions et discussions antérieures.</p>
 </details>
@@ -7343,7 +7491,7 @@
 <details>
   <summary>19. Divers - Information</summary>
   <p class="point-description">Un point d&#x27;information divers a été abordé, permettant de traiter plusieurs sujets non prévus à l&#x27;ordre du jour.</p>
-</details></td></tr> <tr data-commune="Havelange" data-date-sort="2026-01-26 20:00"><td>Havelange</td><td>26 Janvier 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="hamois-23-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="hamois-23-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Havelange" data-date-sort="2026-01-26 20:00"><td>Havelange</td><td>26 Janvier 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approuve le procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a voté en faveur de l&#x27;approbation du procès-verbal de la séance antérieure.</p>
 </details>
@@ -7370,7 +7518,7 @@
 <details>
   <summary>7. ATL/AES - Convention Partenariat Automne Détente (PAD) Stage Détente - Arlequin &amp; Compagnie - Approbation</summary>
   <p class="point-description">Une convention de partenariat pour le stage détente automnal proposé par Arlequin &amp; Compagnie a été approuvée par le conseil.</p>
-</details></td></tr> <tr data-commune="Houyet" data-date-sort="2026-03-18 20:00"><td>Houyet</td><td>18 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="havelange-26-janvier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="havelange-26-janvier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Houyet" data-date-sort="2026-03-18 20:00"><td>Houyet</td><td>18 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance antérieure - Approbation</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été soumis pour approbation, permettant de documenter les décisions prises lors de cette réunion.</p>
 </details>
@@ -7433,7 +7581,7 @@
 <details>
   <summary>16. INASEP : Assemblée générale extraordinaire du 08 avril 2026 - Approbation des points à l&#x27;ordre du jour</summary>
   <p class="point-description">Les points à l&#x27;ordre du jour de l&#x27;Assemblée générale extraordinaire de l&#x27;INASEP prévue le 08 avril 2026 ont été approuvés.</p>
-</details></td></tr> <tr data-commune="Jemeppe-sur-Sambre" data-date-sort="2026-03-30 20:00"><td>Jemeppe-sur-Sambre</td><td>30 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="houyet-18-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="houyet-18-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Jemeppe-sur-Sambre" data-date-sort="2026-03-30 20:00"><td>Jemeppe-sur-Sambre</td><td>30 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Administration communale - Approbation du procès-verbal de la séance du Conseil communal du 02 mars 2026</summary>
   <p class="point-description">Ce point porte sur l&#x27;approbation du compte rendu de la séance du Conseil communal tenue le 02 mars 2026. Cela permet de valider les décisions prises lors de cette réunion.</p>
 </details>
@@ -7552,7 +7700,7 @@
 <details>
   <summary>30. Zone de Police - CaLog B contractuel SIPPT à 1/5 temps - Ouverture du poste - Description de fonction et modalités de recrutement - Approbation</summary>
   <p class="point-description">Ce point concerne l&#x27;approbation de l&#x27;ouverture d&#x27;un poste de CaLog B contractuel à temps partiel au sein du service Police, comprenant la définition des fonctions et modalités de recrutement.</p>
-</details></td></tr> <tr data-commune="La Bruyère" data-date-sort="2026-03-26 19:30"><td>La Bruyère</td><td>26 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="jemeppe-sur-sambre-30-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="jemeppe-sur-sambre-30-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="La Bruyère" data-date-sort="2026-03-26 19:30"><td>La Bruyère</td><td>26 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, validant ainsi les décisions prises lors de cette réunion.</p>
 </details>
@@ -7619,7 +7767,7 @@
 <details>
   <summary>17. Patrimoine communal: Financement des dépenses extraordinaires 2025-2026: Marché d&#x27;emprunts: Décision</summary>
   <p class="point-description">Une décision a été prise concernant le financement des dépenses extraordinaires pour les années 2025 et 2026 à travers un marché d&#x27;emprunts.</p>
-</details></td></tr> <tr data-commune="Mettet" data-date-sort="2026-02-26 19:00"><td>Mettet</td><td>26 Février 2026 (19:00)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="la-bruyere-26-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="la-bruyere-26-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Mettet" data-date-sort="2026-02-26 19:00"><td>Mettet</td><td>26 Février 2026 (19:00)</td><td>Décision</td><td><details>
   <summary>1. Ajout d&#x27;un point à l&#x27;ordre du jour du Conseil communal</summary>
   <p class="point-description">Un point a été ajouté à l&#x27;ordre du jour du Conseil communal pour examen et discussion.</p>
 </details>
@@ -7682,7 +7830,7 @@
 <details>
   <summary>16. Approbation du procès-verbal de la séance antérieure</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été approuvé lors de cette réunion.</p>
-</details></td></tr> <tr data-commune="Namur" data-date-sort="2026-03-17 18:15"><td>Namur</td><td>17 Mars 2026 (18:15)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="mettet-26-fevrier-2026-19-00-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="mettet-26-fevrier-2026-19-00-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Namur" data-date-sort="2026-03-17 18:15"><td>Namur</td><td>17 Mars 2026 (18:15)</td><td>Projet de décision</td><td><details>
   <summary>1. Interpellation citoyenne</summary>
   <p class="point-description">Le conseil a abordé la question du maintien ou de la réintégration de l’organisation des stages vélo à l&#x27;école communale de Jambes Velaine, en lien avec la réorganisation des stages et plaines de vacances.</p>
 </details>
@@ -7905,7 +8053,7 @@
 <details>
   <summary>56. L&#x27;état des voiries communales</summary>
   <p class="point-description">Une question sur l&#x27;état des voiries communales a été posée par un conseiller.</p>
-</details></td></tr> <tr data-commune="Ohey" data-date-sort="2026-03-19 19:30"><td>Ohey</td><td>19 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="namur-17-mars-2026-18-15-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="namur-17-mars-2026-18-15-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Ohey" data-date-sort="2026-03-19 19:30"><td>Ohey</td><td>19 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. COMMUNICATIONS DE MONSIEUR LE BOURGMESTRE</summary>
   <p class="point-description">Monsieur le Bourgmestre a effectué des communications concernant des affaires municipales.</p>
 </details>
@@ -7960,7 +8108,7 @@
 <details>
   <summary>14. QUESTIONS DES CONSEILLERS</summary>
   <p class="point-description">Les questions des conseillers ont été discutées lors de la session.</p>
-</details></td></tr> <tr data-commune="Onhaye" data-date-sort="2026-03-26 20:00"><td>Onhaye</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="ohey-19-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="ohey-19-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Onhaye" data-date-sort="2026-03-26 20:00"><td>Onhaye</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Conseil Communal des Enfants - Renouvellement partiel des membres</summary>
   <p class="point-description">Cette délibération vise à procéder au renouvellement partiel des membres du Conseil Communal des Enfants, afin d&#x27;assurer une représentation adéquate des jeunes de la commune.</p>
 </details>
@@ -7987,7 +8135,7 @@
 <details>
   <summary>7. Procès-verbal de la séance antérieure</summary>
   <p class="point-description">Le procès-verbal de la séance antérieure sera validé, consignant les discussions et décisions prises lors de la réunion précédente.</p>
-</details></td></tr> <tr data-commune="Philippeville" data-date-sort="2026-02-26 19:30"><td>Philippeville</td><td>26 Février 2026 (19:30)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="onhaye-26-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="onhaye-26-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Philippeville" data-date-sort="2026-02-26 19:30"><td>Philippeville</td><td>26 Février 2026 (19:30)</td><td>Décision</td><td><details>
   <summary>1. Budget 2026 - Approbation</summary>
   <p class="point-description">Le conseil communal a approuvé le budget du C.P.A.S pour 2026. Ce budget est essentiel pour la gestion des finances communales.</p>
 </details>
@@ -8058,7 +8206,7 @@
 <details>
   <summary>18. Installation de bornes de distribution de sacs à déjections canines</summary>
   <p class="point-description">Une décision a été prise concernant l&#x27;installation de bornes pour distributeurs de sacs à déjections canines. Cela vise à améliorer la propreté des espaces publics.</p>
-</details></td></tr> <tr data-commune="Rochefort" data-date-sort="2026-03-02 20:00"><td>Rochefort</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="philippeville-26-fevrier-2026-19-30-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="philippeville-26-fevrier-2026-19-30-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rochefort" data-date-sort="2026-03-02 20:00"><td>Rochefort</td><td>02 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Communication des décisions de l&#x27;Autorité de Tutelle</summary>
   <p class="point-description">L’article 4, al. 2 de l&#x27;Arrêté du Gouvernement wallon du 05 juillet 2007 stipule la procédure de communication des décisions prises par l&#x27;autorité de tutelle.</p>
 </details>
@@ -8149,7 +8297,7 @@
 <details>
   <summary>23. Intercommunale A.I.E.G. - Décisions en vue d&#x27;une Assemblée générale extraordinaire</summary>
   <p class="point-description">La Ville est convoquée à une Assemblée générale extraordinaire de l&#x27;Intercommunale A.I.E.G. pour discuter des décisions prises.</p>
-</details></td></tr> <tr data-commune="Sambreville" data-date-sort="2026-03-23 19:00"><td>Sambreville</td><td>23 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rochefort-02-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rochefort-02-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Sambreville" data-date-sort="2026-03-23 19:00"><td>Sambreville</td><td>23 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Désignation de Monsieur Marc PARMENTIER</summary>
   <p class="point-description">Le groupe PS a désigné Monsieur Marc PARMENTIER en tant que représentant de l&#x27;organe d&#x27;administration à la Maison de la Jeunesse AROCA.</p>
 </details>
@@ -8356,7 +8504,7 @@
 <details>
   <summary>52. Question orale sur l&#x27;avenir du site hospitalier d&#x27;Auvelais</summary>
   <p class="point-description">Une question a été posée concernant l&#x27;avenir du site hospitalier du CHR d&#x27;Auvelais.</p>
-</details></td></tr> <tr data-commune="Sombreffe" data-date-sort="2026-03-23 19:30"><td>Sombreffe</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="sambreville-23-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="sambreville-23-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Sombreffe" data-date-sort="2026-03-23 19:30"><td>Sombreffe</td><td>23 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la précédente séance</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la précédente séance, validant ainsi les décisions prises lors de celle-ci.</p>
 </details>
@@ -8411,7 +8559,7 @@
 <details>
   <summary>14. Questions orales des Conseillers communaux (sous réserve)</summary>
   <p class="point-description">Les conseillers communaux ont soulevé diverses questions orales, indiquant les préoccupations et les points à discuter lors de la séance.</p>
-</details></td></tr> <tr data-commune="Somme-Leuze" data-date-sort="2026-03-23 20:00"><td>Somme-Leuze</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="sombreffe-23-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="sombreffe-23-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Somme-Leuze" data-date-sort="2026-03-23 20:00"><td>Somme-Leuze</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Installation d’un conseiller communal en remplacement d’un conseiller démissionnaire</summary>
   <p class="point-description">Cette délibération concerne l&#x27;installation d&#x27;un nouveau conseiller communal pour remplacer un conseiller ayant récemment démissionné.</p>
 </details>
@@ -8458,7 +8606,7 @@
 <details>
   <summary>12. Information - Décision(s) de la tutelle</summary>
   <p class="point-description">Le Conseil reçoit des informations concernant les décisions prises par la tutelle.</p>
-</details></td></tr> <tr data-commune="Viroinval" data-date-sort="2026-03-25 19:00"><td>Viroinval</td><td>25 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="somme-leuze-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="somme-leuze-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Viroinval" data-date-sort="2026-03-25 19:00"><td>Viroinval</td><td>25 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. MOTION POUR LE MAINTIEN DES SOINS DE PROXIMITE DANS LE SUD DE L&#x27;ENTRE-SAMBRE-ET-MEUSE - DECISION</summary>
   <p class="point-description">Cette motion vise à garantir le maintien des soins de proximité pour les habitants du sud de l&#x27;Entre-Sambre-et-Meuse. Le conseil communal a pris une décision à ce sujet, soulignant l&#x27;importance des services de santé locaux.</p>
 </details>
@@ -8521,7 +8669,7 @@
 <details>
   <summary>16. APPROBATION DU PROCES-VERBAL DE LA SEANCE ANTERIEURE DU 25 FEVRIER 2026</summary>
   <p class="point-description">L&#x27;approbation du procès-verbal de la séance antérieure, tenue le 25 février 2026, a été validée. Cela garantit la continuité et la transparence des débats du conseil.</p>
-</details></td></tr> <tr data-commune="Vresse-sur-Semois" data-date-sort="2026-03-26 19:00"><td>Vresse-sur-Semois</td><td>26 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="viroinval-25-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="viroinval-25-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Vresse-sur-Semois" data-date-sort="2026-03-26 19:00"><td>Vresse-sur-Semois</td><td>26 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. INSTITUT ROYAL DES ÉLITES DU TRAVAIL - TITRE ET INSIGNE D&#x27;HONNEUR D&#x27;OR DE LAUREAT DU TRAVAIL - LURKIN CELINE</summary>
   <p class="point-description">Ce point concerne la remise du titre et de l&#x27;insigne d&#x27;honneur d&#x27;or à Céline Lurkin par l&#x27;Institut Royal des Élites du Travail. La cérémonie vise à reconnaître ses contributions exceptionnelles dans le cadre de son travail.</p>
 </details>
@@ -8564,7 +8712,7 @@
 <details>
   <summary>11. DEMANDES DE CONSEILLERS</summary>
   <p class="point-description">Ce point aborde les diverses demandes formulées par les conseillers durant la séance. Il permet de noter les préoccupations et propositions des membres du conseil.</p>
-</details></td></tr> <tr data-commune="Walcourt" data-date-sort="2026-03-02 19:30"><td>Walcourt</td><td>02 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="vresse-sur-semois-26-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="vresse-sur-semois-26-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Walcourt" data-date-sort="2026-03-02 19:30"><td>Walcourt</td><td>02 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance du 26/01/2026 : approbation</summary>
   <p class="point-description">Le procès-verbal de la séance du 26 janvier 2026 a été soumis pour approbation. Ce document sert de compte rendu des délibérations effectuées durant cette séance.</p>
 </details>
@@ -8687,7 +8835,7 @@
 <details>
   <summary>31. Emploi des travailleurs handicapés : rapport annuel</summary>
   <p class="point-description">Le rapport annuel sur l&#x27;emploi des travailleurs handicapés a été présenté. Ce rapport évalue les mesures et les actions entreprises pour favoriser leur intégration dans le monde du travail.</p>
-</details></td></tr> <tr data-commune="Yvoir" data-date-sort="2026-03-17 20:00"><td>Yvoir</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="walcourt-02-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="walcourt-02-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Yvoir" data-date-sort="2026-03-17 20:00"><td>Yvoir</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Acte d&#x27;exclusion d&#x27;un conseiller communal de son groupe politique - prise de connaissance</summary>
   <p class="point-description">Le conseil communal a pris connaissance de l&#x27;acte d&#x27;exclusion d&#x27;un conseiller communal de son groupe politique.</p>
 </details>
@@ -8770,7 +8918,7 @@
 <details>
   <summary>21. Questions d&#x27;actualités - art. 46, 75 à 77 du R.O.I.</summary>
   <p class="point-description">Des questions d&#x27;actualité en lien avec le règlement d&#x27;ordre intérieur ont été abordées durant la séance.</p>
-</details></td></tr>
+</details></td><td class="notes-cell" data-note-key="yvoir-17-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="yvoir-17-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr>
         </tbody>
       </table>
     </section>
@@ -8785,6 +8933,7 @@
             <th>Date</th>
             <th>Type</th>
             <th>Ordre du jour</th>
+            <th>Notes</th>
           </tr>
         </thead>
         <tbody>
@@ -8899,7 +9048,7 @@
 <details>
   <summary>28. Demande d&#x27;inscription d&#x27;un point à l&#x27;OJ du Conseil communal du 19 mars</summary>
   <p class="point-description">Une demande a été faite pour inscrire à l&#x27;ordre du jour un point relatif aux conditions du débat démocratique au sein du Conseil communal.</p>
-</details></td></tr> <tr data-commune="Bastogne" data-date-sort="2026-03-11 20:00"><td>Bastogne</td><td>11 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="arlon-19-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="arlon-19-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Bastogne" data-date-sort="2026-03-11 20:00"><td>Bastogne</td><td>11 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance antérieure - Approbation.</summary>
   <p class="point-description">L&#x27;approbation du procès-verbal de la séance précédente a été soumise au vote.</p>
 </details>
@@ -9006,7 +9155,7 @@
 <details>
   <summary>27. IDELUX : Secteur &quot;Développement d&#x27;équipements touristiques à Bastogne&quot; - Modification désignation.</summary>
   <p class="point-description">Une modification concernant la désignation des équipements touristiques à Bastogne a été votée.</p>
-</details></td></tr> <tr data-commune="Bertrix" data-date-sort="2026-01-29 19:30"><td>Bertrix</td><td>29 Janvier 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="bastogne-11-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="bastogne-11-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Bertrix" data-date-sort="2026-01-29 19:30"><td>Bertrix</td><td>29 Janvier 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente.</p>
 </details>
@@ -9077,7 +9226,7 @@
 <details>
   <summary>18. Interpellation sur la vidéosurveillance intelligente</summary>
   <p class="point-description">Un point déposé par le groupe Ecolo a porté sur l&#x27;investissement dans la vidéosurveillance dite « intelligente ».</p>
-</details></td></tr> <tr data-commune="Chiny" data-date-sort="2026-03-23 20:00"><td>Chiny</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="bertrix-29-janvier-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="bertrix-29-janvier-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Chiny" data-date-sort="2026-03-23 20:00"><td>Chiny</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil a voté pour approuver le procès-verbal de la séance précédente afin d&#x27;assurer la transparence et la continuité des délibérations.</p>
 </details>
@@ -9132,7 +9281,7 @@
 <details>
   <summary>14. Projet de mise en place de rues réservées aux jeux - accord de principe</summary>
   <p class="point-description">Le conseil a donné un accord de principe pour un projet visant à créer des rues réservées aux jeux, favorisant ainsi les activités ludiques en plein air.</p>
-</details></td></tr> <tr data-commune="Daverdisse" data-date-sort="2026-03-02 20:15"><td>Daverdisse</td><td>02 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="chiny-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="chiny-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Daverdisse" data-date-sort="2026-03-02 20:15"><td>Daverdisse</td><td>02 Mars 2026 (20:15)</td><td>Projet de décision</td><td><details>
   <summary>1. Patrimoine forestier – Mise en valeur de territoires privés</summary>
   <p class="point-description">Cette délibération concerne l&#x27;accompagnement des propriétaires privés sur le territoire communal en vue de la mise en valeur de leur patrimoine forestier.</p>
 </details>
@@ -9171,7 +9320,7 @@
 <details>
   <summary>10. Personnel communal – Engagement d’un/e ouvrier/ère forestier/ère à temps plein.</summary>
   <p class="point-description">La délibération porte sur l&#x27;engagement d&#x27;un(e) ouvrier/ère forestier/ère à temps plein à l&#x27;échelle D2, ainsi que la révision de ses conditions.</p>
-</details></td></tr> <tr data-commune="Durbuy" data-date-sort="2026-03-23 20:00"><td>Durbuy</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="daverdisse-02-mars-2026-20-15-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="daverdisse-02-mars-2026-20-15-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Durbuy" data-date-sort="2026-03-23 20:00"><td>Durbuy</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Vérification des pouvoirs d’un Conseiller communal</summary>
   <p class="point-description">Cette délibération concerne la vérification des pouvoirs d&#x27;un conseiller communal, étape cruciale dans le cadre des procédures administratives du conseil.</p>
 </details>
@@ -9314,7 +9463,7 @@
 <details>
   <summary>36. R.F.: acquisition d&#x27;une parcelle de terrain au parc résidentiel des Macralles</summary>
   <p class="point-description">Cette délibération concerne l&#x27;acquisition d&#x27;une parcelle de terrain située dans le parc résidentiel des Macralles, visant à développer l&#x27;urbanisme local.</p>
-</details></td></tr> <tr data-commune="Erezée" data-date-sort="2026-02-17 20:00"><td>Erezée</td><td>17 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="durbuy-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="durbuy-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Erezée" data-date-sort="2026-02-17 20:00"><td>Erezée</td><td>17 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Procès-verbal de la séance précédente</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été présenté pour approbation afin de valider les détails des délibérations antérieures.</p>
 </details>
@@ -9353,7 +9502,7 @@
 <details>
   <summary>10. Lotissement communal à Fisenne (Rues de la Chapelle et des Roches) - Vente du lot 23 - Annulation</summary>
   <p class="point-description">La vente du lot 23 dans le lotissement communal à Fisenne a été annulée par décision du conseil.</p>
-</details></td></tr> <tr data-commune="Etalle" data-date-sort="2026-03-23 20:00"><td>Etalle</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="erezee-17-fevrier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="erezee-17-fevrier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Etalle" data-date-sort="2026-03-23 20:00"><td>Etalle</td><td>23 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Zone de police de Gaume - Fixation de la dotation communale</summary>
   <p class="point-description">Cette délibération concerne la fixation de la dotation communale au budget 2026 destinée à la zone de police de Gaume. Elle s&#x27;inscrit dans le cadre de la loi du 07 décembre 1998 relative à l&#x27;organisation d&#x27;un service de police intégré.</p>
 </details>
@@ -9400,7 +9549,7 @@
 <details>
   <summary>12. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil approuve le procès-verbal de la séance du Conseil communal du 3 février 2026. Cette approbation est faite en conformité avec les articles pertinents du Code de la Démocratie Locale.</p>
-</details></td></tr> <tr data-commune="Florenville" data-date-sort="2026-02-19 20:00"><td>Florenville</td><td>19 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="etalle-23-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="etalle-23-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Florenville" data-date-sort="2026-02-19 20:00"><td>Florenville</td><td>19 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation des procès-verbaux des séances des Conseils communaux des 15 et 29 janvier 2026</summary>
   <p class="point-description">Le conseil communal a approuvé les procès-verbaux des séances tenues les 15 et 29 janvier 2026. Cette étape est cruciale pour la validation et l&#x27;archivage des décisions prises lors de ces réunions.</p>
 </details>
@@ -9451,7 +9600,7 @@
 <details>
   <summary>13. Communication décision de Tutelle - Intercommunale VIVALIA - Assemblée générale du 12 février 2026 et souscription de capital</summary>
   <p class="point-description">Une communication a été faite concernant une décision de tutelle liée à l&#x27;intercommunale VIVALIA. Ce point comprenait l&#x27;assemblée générale prévue pour le 12 février 2026 et la souscription de capital nécessaire.</p>
-</details></td></tr> <tr data-commune="Habay" data-date-sort="2026-02-11 20:00"><td>Habay</td><td>11 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="florenville-19-fevrier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="florenville-19-fevrier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Habay" data-date-sort="2026-02-11 20:00"><td>Habay</td><td>11 Février 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approuve le procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, marquant ainsi la validation des discussions et décisions antérieures.</p>
 </details>
@@ -9518,7 +9667,7 @@
 <details>
   <summary>17. URGENCE - Désignation d&#x27;un représentant communal au sein de l&#x27;ASBL Les Vergers de Habay</summary>
   <p class="point-description">Une mesure d&#x27;urgence a conduit à la désignation d&#x27;un représentant communal pour l&#x27;ASBL Les Vergers de Habay.</p>
-</details></td></tr> <tr data-commune="La Roche-en-Ardenne" data-date-sort="2026-03-02 19:30"><td>La Roche-en-Ardenne</td><td>02 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="habay-11-fevrier-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="habay-11-fevrier-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="La Roche-en-Ardenne" data-date-sort="2026-03-02 19:30"><td>La Roche-en-Ardenne</td><td>02 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approuve le procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a validé le procès-verbal de la séance précédente, confirmant son contenu et son exactitude.</p>
 </details>
@@ -9573,7 +9722,7 @@
 <details>
   <summary>14. Acquisition des immeubles situés rue de l’Eglise à la Roche-en-Ardenne - décision de principe</summary>
   <p class="point-description">Le conseil a pris une décision de principe pour l&#x27;acquisition d&#x27;immeubles situés rue de l’Eglise à la Roche-en-Ardenne.</p>
-</details></td></tr> <tr data-commune="Léglise" data-date-sort="2026-03-25 19:00"><td>Léglise</td><td>25 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="la-roche-en-ardenne-02-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="la-roche-en-ardenne-02-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Léglise" data-date-sort="2026-03-25 19:00"><td>Léglise</td><td>25 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Cette délibération vise à approuver le procès-verbal de la séance précédente du conseil communal, assurant ainsi la bonne tenue des documents administratifs.</p>
 </details>
@@ -9672,7 +9821,7 @@
 <details>
   <summary>25. Questions d&#x27;actualité</summary>
   <p class="point-description">Le conseil aborde diverses questions d&#x27;actualité lors de cette séance, permettant aux membres de discuter des enjeux récents.</p>
-</details></td></tr> <tr data-commune="Libin" data-date-sort="2026-03-09 19:30"><td>Libin</td><td>09 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="leglise-25-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="leglise-25-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Libin" data-date-sort="2026-03-09 19:30"><td>Libin</td><td>09 Mars 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la réunion précédente. Cette étape est nécessaire pour valider les discussions et décisions antérieures.</p>
 </details>
@@ -9703,7 +9852,7 @@
 <details>
   <summary>8. Règlement complémentaire de circulation - Emplacement de stationnement à durée limitée</summary>
   <p class="point-description">Un règlement complémentaire de circulation a été proposé concernant la création d&#x27;emplacements de stationnement à durée limitée. Cela a pour but d&#x27;améliorer la gestion du stationnement dans la commune.</p>
-</details></td></tr> <tr data-commune="Libramont-Chevigny" data-date-sort="2026-03-17 20:00"><td>Libramont-Chevigny</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="libin-09-mars-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="libin-09-mars-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Libramont-Chevigny" data-date-sort="2026-03-17 20:00"><td>Libramont-Chevigny</td><td>17 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Communication des décisions de la tutelle concernant le budget pour l&#x27;exercice 2026.</summary>
   <p class="point-description">Cette délibération concerne la transmission des décisions prises par la tutelle en rapport avec le budget prévu pour l&#x27;année 2026. Elle vise à informer les membres du conseil des orientations budgétaires.</p>
 </details>
@@ -9746,7 +9895,7 @@
 <details>
   <summary>11. Point dont l&#x27;inscription est sollicitée par un conseiller communal : &#x27;Taxe sur les dispositifs publicitaires numériques (écrans LED/LCD) visibles de la voie publique&#x27;.</summary>
   <p class="point-description">Ce point aborde la proposition d&#x27;instaurer une taxe sur les dispositifs publicitaires numériques, telles que les écrans LED/LCD visibles depuis la voie publique. Il a été demandé par un conseiller communal.</p>
-</details></td></tr> <tr data-commune="Manhay" data-date-sort="2026-03-03 20:00"><td>Manhay</td><td>03 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="libramont-chevigny-17-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="libramont-chevigny-17-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Manhay" data-date-sort="2026-03-03 20:00"><td>Manhay</td><td>03 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approuve le procès-verbal de la séance précédente</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, documentant ainsi les décisions prises lors de cette réunion.</p>
 </details>
@@ -9829,7 +9978,7 @@
 <details>
   <summary>21. Entretien voiries forestières - Approbation des conditions et du mode de passation</summary>
   <p class="point-description">Les conditions et le mode de passation concernant l&#x27;entretien des voiries forestières ont été approuvés, essentielles pour la gestion des infrastructures forestières.</p>
-</details></td></tr> <tr data-commune="Marche-en-Famenne" data-date-sort="2026-03-02 19:00"><td>Marche-en-Famenne</td><td>02 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="manhay-03-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="manhay-03-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Marche-en-Famenne" data-date-sort="2026-03-02 19:00"><td>Marche-en-Famenne</td><td>02 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente - Séance publique</summary>
   <p class="point-description">Le conseil a approuvé le procès-verbal de la séance publique précédente, assurant ainsi la continuité des délibérations.</p>
 </details>
@@ -9916,7 +10065,7 @@
 <details>
   <summary>22. Marchés publics - Information au Conseil communal</summary>
   <p class="point-description">Le conseil communal a été informé sur les marchés publics en cours et leurs implications.</p>
-</details></td></tr> <tr data-commune="Martelange" data-date-sort="2026-03-19 19:00"><td>Martelange</td><td>19 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="marche-en-famenne-02-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="marche-en-famenne-02-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Martelange" data-date-sort="2026-03-19 19:00"><td>Martelange</td><td>19 Mars 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Rapport 2025 relatif aux économies d&#x27;échelle</summary>
   <p class="point-description">Information sur les économies d&#x27;échelle et les suppressions de doubles emplois ou chevauchement d&#x27;activités du CPAS et de la Commune.</p>
 </details>
@@ -9983,7 +10132,7 @@
 <details>
   <summary>17. Modifications budgétaires n°1</summary>
   <p class="point-description">Approbation des modifications budgétaires ordinaire et extraordinaire n°1.</p>
-</details></td></tr> <tr data-commune="Meix-devant-Virton" data-date-sort="2026-03-18 18:30"><td>Meix-devant-Virton</td><td>18 Mars 2026 (18:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="martelange-19-mars-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="martelange-19-mars-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Meix-devant-Virton" data-date-sort="2026-03-18 18:30"><td>Meix-devant-Virton</td><td>18 Mars 2026 (18:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Compte communal 2025 - Approbation</summary>
   <p class="point-description">Le conseil communal a approuvé le compte communal de l&#x27;année 2025, marquant ainsi la fin d&#x27;une année comptable.</p>
 </details>
@@ -10050,7 +10199,7 @@
 <details>
   <summary>17. Rapport sur le fond social de l&#x27;eau 2025 - information</summary>
   <p class="point-description">Une information a été faite sur le rapport concernant le fond social de l&#x27;eau pour l&#x27;année 2025.</p>
-</details></td></tr> <tr data-commune="Nassogne" data-date-sort="2026-02-23 19:30"><td>Nassogne</td><td>23 Février 2026 (19:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="meix-devant-virton-18-mars-2026-18-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="meix-devant-virton-18-mars-2026-18-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Nassogne" data-date-sort="2026-02-23 19:30"><td>Nassogne</td><td>23 Février 2026 (19:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Achat sans crédit: Acquisition de 2 containers maritimes - Ratification</summary>
   <p class="point-description">Cette délibération concerne l&#x27;acquisition de deux containers maritimes sans recours à un crédit. La ratification de cet achat est présentée lors de la séance.</p>
 </details>
@@ -10113,7 +10262,7 @@
 <details>
   <summary>16. Communications</summary>
   <p class="point-description">Cette section aborde des communications diverses au sein du conseil communal. Elle présente des informations et des annonces importantes.</p>
-</details></td></tr> <tr data-commune="Paliseul" data-date-sort="2026-03-18 20:00"><td>Paliseul</td><td>18 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="nassogne-23-fevrier-2026-19-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="nassogne-23-fevrier-2026-19-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Paliseul" data-date-sort="2026-03-18 20:00"><td>Paliseul</td><td>18 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Démission d&#x27;un conseiller communal</summary>
   <p class="point-description">Proposition de prendre acte de la démission de M. Claudy THOMASSINT de ses fonctions de conseiller communal, comme mentionné dans son courrier du 18/02/2026.</p>
 </details>
@@ -10232,7 +10381,7 @@
 <details>
   <summary>30. Désignation d&#x27;un nouveau conseiller de l&#x27;action sociale - Election de plein droit</summary>
   <p class="point-description">Désignation d&#x27;un nouveau conseiller de l&#x27;action sociale suite à la démission de M. Achille BODSON, par élection de plein droit.</p>
-</details></td></tr> <tr data-commune="Rendeux" data-date-sort="2026-03-19 20:00"><td>Rendeux</td><td>19 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="paliseul-18-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="paliseul-18-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rendeux" data-date-sort="2026-03-19 20:00"><td>Rendeux</td><td>19 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Examen et approbation du PV de la séance précédente</summary>
   <p class="point-description">Ce point concerne la validation du procès-verbal de la séance précédente, afin d&#x27;assurer la continuité des travaux du conseil communal.</p>
 </details>
@@ -10351,7 +10500,7 @@
 <details>
   <summary>30. Divers</summary>
   <p class="point-description">Ce point permet d&#x27;aborder tout sujet non prévu à l&#x27;ordre du jour ou des affaires courantes.</p>
-</details></td></tr> <tr data-commune="Rouvroy" data-date-sort="2026-02-23 19:00"><td>Rouvroy</td><td>23 Février 2026 (19:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rendeux-19-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rendeux-19-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Rouvroy" data-date-sort="2026-02-23 19:00"><td>Rouvroy</td><td>23 Février 2026 (19:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Conseil communal - 19 janvier 2026 - Procès-verbal - Approbation</summary>
   <p class="point-description">Le procès-verbal de la séance du conseil communal du 19 janvier 2026 a été soumis à l&#x27;approbation.</p>
 </details>
@@ -10430,7 +10579,7 @@
 <details>
   <summary>20. COMMUNICATION - Intercommunale VIVALIA – Assemblée générale du 12 février 2026 et souscription de capital – Tutelle spéciale d’approbation - Arrêté d’approbation de l’autorité de tutelle.</summary>
   <p class="point-description">Un arrêté d&#x27;approbation de l&#x27;autorité de tutelle concernant l&#x27;assemblée générale de l&#x27;intercommunale VIVALIA a été mentionné.</p>
-</details></td></tr> <tr data-commune="Saint-Hubert" data-date-sort="2026-01-29 00:00"><td>Saint-Hubert</td><td>29 Janvier 2026 (00:00)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="rouvroy-23-fevrier-2026-19-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="rouvroy-23-fevrier-2026-19-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Saint-Hubert" data-date-sort="2026-01-29 00:00"><td>Saint-Hubert</td><td>29 Janvier 2026 (00:00)</td><td>Décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance du 23 décembre 2025</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, ce qui formalise les décisions prises lors de cette réunion.</p>
 </details>
@@ -10489,7 +10638,7 @@
 <details>
   <summary>15. Création d&#x27;une commission budgétaire</summary>
   <p class="point-description">Le conseil a décidé de créer une commission budgétaire pour superviser les questions financières de la commune.</p>
-</details></td></tr> <tr data-commune="Saint-Léger" data-date-sort="2026-03-04 20:00"><td>Saint-Léger</td><td>04 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="saint-hubert-29-janvier-2026-00-00-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="saint-hubert-29-janvier-2026-00-00-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Saint-Léger" data-date-sort="2026-03-04 20:00"><td>Saint-Léger</td><td>04 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance du Conseil du 28 janvier 2026</summary>
   <p class="point-description">Le procès-verbal de la séance précédente a été présenté pour approbation afin de valider les décisions prises durant cette réunion.</p>
 </details>
@@ -10532,7 +10681,7 @@
 <details>
   <summary>11. Point supplémentaire : adoption d&#x27;une motion relative à la situation du Département de la Nature et des Forêts (DNF)</summary>
   <p class="point-description">Un point supplémentaire a été ajouté à l&#x27;ordre du jour concernant l&#x27;adoption d&#x27;une motion sur la situation actuelle du Département de la Nature et des Forêts.</p>
-</details></td></tr> <tr data-commune="Sainte-Ode" data-date-sort="2026-03-12 20:00"><td>Sainte-Ode</td><td>12 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="saint-leger-04-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="saint-leger-04-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Sainte-Ode" data-date-sort="2026-03-12 20:00"><td>Sainte-Ode</td><td>12 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance du 12 février 2026</summary>
   <p class="point-description">Ce point concerne l&#x27;approbation du procès-verbal de la séance précédente. Il vise à formaliser les décisions et les discussions tenues lors de cette séance.</p>
 </details>
@@ -10567,7 +10716,7 @@
 <details>
   <summary>9. Règlement-redevance relative à l&#x27;accueil temps libres et repas scolaires – Du 1er avril 2026 au 3 juillet 2026</summary>
   <p class="point-description">Ce point aborde le règlement et la redevance pour les services d&#x27;accueil temps libres et de repas scolaires pour la période définie. Cela inclut les modalités de gestion de ces services.</p>
-</details></td></tr> <tr data-commune="Tellin" data-date-sort="2026-03-10 19:00"><td>Tellin</td><td>10 Mars 2026 (19:00)</td><td>Décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="sainte-ode-12-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="sainte-ode-12-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Tellin" data-date-sort="2026-03-10 19:00"><td>Tellin</td><td>10 Mars 2026 (19:00)</td><td>Décision</td><td><details>
   <summary>1. SA - 854 - 2026 - TERRE ASBL - Renouvellement convention collecte textile - Décision</summary>
   <p class="point-description">Cette délibération concerne le renouvellement d&#x27;une convention avec l&#x27;ASBL TERRE pour la collecte de textiles. La décision a été prise lors de la séance.</p>
 </details>
@@ -10598,7 +10747,7 @@
 <details>
   <summary>8. CM - 2024 - 924 - Campagne de stérilisation des chats errants - Bien-être animal - Décision</summary>
   <p class="point-description">Une décision a été prise concernant le lancement d&#x27;une campagne de stérilisation des chats errants pour favoriser le bien-être animal. Cela souligne l&#x27;engagement de la commune envers la protection des animaux.</p>
-</details></td></tr> <tr data-commune="Virton" data-date-sort="2026-03-02 20:30"><td>Virton</td><td>02 Mars 2026 (20:30)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="tellin-10-mars-2026-19-00-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="tellin-10-mars-2026-19-00-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Virton" data-date-sort="2026-03-02 20:30"><td>Virton</td><td>02 Mars 2026 (20:30)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal de la séance précédente - Séance publique</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la séance précédente, conformément aux articles 62 et 63 du ROI voté le 26 juin 2025.</p>
 </details>
@@ -10649,7 +10798,7 @@
 <details>
   <summary>13. Divers et communications - Arrêté du Vice-Président et Ministre du territoire et des infrastructures</summary>
   <p class="point-description">Le conseil a pris connaissance de l&#x27;arrêté concernant le budget ordinaire et extraordinaire exercice 2026, voté durant la séance du 22 décembre 2025.</p>
-</details></td></tr> <tr data-commune="Wellin" data-date-sort="2026-03-26 20:00"><td>Wellin</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
+</details></td><td class="notes-cell" data-note-key="virton-02-mars-2026-20-30-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="virton-02-mars-2026-20-30-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr> <tr data-commune="Wellin" data-date-sort="2026-03-26 20:00"><td>Wellin</td><td>26 Mars 2026 (20:00)</td><td>Projet de décision</td><td><details>
   <summary>1. Approbation du procès-verbal du 26 février 2026</summary>
   <p class="point-description">Le conseil communal a approuvé le procès-verbal de la réunion du 26 février 2026.</p>
 </details>
@@ -10688,12 +10837,34 @@
 <details>
   <summary>10. Attribution des marchés publics à l&#x27;extraordinaire. Rapportage</summary>
   <p class="point-description">Un rapport sur l&#x27;attribution des marchés publics à l&#x27;extraordinaire a été présenté au conseil communal pour information.</p>
-</details></td></tr>
+</details></td><td class="notes-cell" data-note-key="wellin-26-mars-2026-20-00-projet-de-decision"><div class="notes-list"></div><button type="button" class="notes-add-button" data-note-key="wellin-26-mars-2026-20-00-projet-de-decision" aria-label="Ajouter une note">+</button></td></tr>
         </tbody>
       </table>
     </section>
 </section>
+    <dialog id="notes-modal" class="notes-modal">
+  <form method="dialog" class="notes-form" id="notes-form">
+    <div class="notes-modal-header">
+      <h2>Ajouter une note</h2>
+      <button type="button" class="notes-close-button" id="notes-cancel" aria-label="Fermer">×</button>
+    </div>
+    <input type="hidden" id="notes-target-key" name="notes-target-key">
+    <label for="notes-author">Votre nom</label>
+    <input id="notes-author" name="notes-author" type="text" maxlength="80" required>
+    <label for="notes-content">Note</label>
+    <textarea id="notes-content" name="notes-content" rows="6" maxlength="2000" required></textarea>
+    <div class="notes-actions">
+      <button type="button" class="notes-secondary-button" id="notes-cancel-secondary">Annuler</button>
+      <button type="submit" class="notes-primary-button">Valider</button>
+    </div>
+  </form>
+</dialog>
   </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    window.CONSEILS_COMMUNAUX_SUPABASE = {"url": "", "anon_key": ""};
+  </script>
   <script>
     const main = document.querySelector("main");
     const allProvincesView = document.getElementById("all-provinces-view");
@@ -10845,6 +11016,173 @@
       updateCommuneSuggestions();
       applyFilters();
     }
+  </script>
+
+  <script>
+    const supabaseConfig = window.CONSEILS_COMMUNAUX_SUPABASE || { url: "", anon_key: "" };
+    const canUseSharedNotes =
+      typeof window.supabase !== "undefined" &&
+      !!supabaseConfig.url &&
+      !!supabaseConfig.anon_key;
+    const supabaseClient = canUseSharedNotes
+      ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anon_key)
+      : null;
+    const notesModal = document.getElementById("notes-modal");
+    const notesForm = document.getElementById("notes-form");
+    const notesTargetKey = document.getElementById("notes-target-key");
+    const notesAuthor = document.getElementById("notes-author");
+    const notesContent = document.getElementById("notes-content");
+    const notesCancel = document.getElementById("notes-cancel");
+    const notesCancelSecondary = document.getElementById("notes-cancel-secondary");
+    const renderNotesForKey = async (noteKey) => {
+      const cell = document.querySelector(`.notes-cell[data-note-key="${noteKey}"]`);
+      if (!cell) {
+        return;
+      }
+
+      const notesList = cell.querySelector(".notes-list");
+      if (!notesList) {
+        return;
+      }
+
+      notesList.innerHTML = "";
+
+      if (!canUseSharedNotes || !supabaseClient) {
+        const disabledState = document.createElement("p");
+        disabledState.className = "notes-empty";
+        disabledState.textContent = "Notes non configurées";
+        notesList.appendChild(disabledState);
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from("notes")
+        .select("author, content, created_at")
+        .eq("note_key", noteKey)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        const errorState = document.createElement("p");
+        errorState.className = "notes-empty";
+        errorState.textContent = "Erreur de chargement";
+        notesList.appendChild(errorState);
+        return;
+      }
+
+      const notes = Array.isArray(data) ? data : [];
+
+      if (!notes.length) {
+        const emptyState = document.createElement("p");
+        emptyState.className = "notes-empty";
+        emptyState.textContent = "Aucune note";
+        notesList.appendChild(emptyState);
+        return;
+      }
+
+      notes.forEach((note) => {
+        const article = document.createElement("article");
+        article.className = "note-item";
+
+        const author = document.createElement("p");
+        author.className = "note-author";
+        author.textContent = note.author || "Nom inconnu";
+
+        const content = document.createElement("p");
+        content.className = "note-content";
+        content.textContent = note.content || "";
+
+        article.appendChild(author);
+        article.appendChild(content);
+        notesList.appendChild(article);
+      });
+    };
+
+    const renderAllNotes = () => {
+      document.querySelectorAll(".notes-cell[data-note-key]").forEach((cell) => {
+        void renderNotesForKey(cell.dataset.noteKey || "");
+      });
+    };
+
+    const closeNotesModal = () => {
+      if (notesModal && notesModal.open) {
+        notesModal.close();
+      }
+      if (notesForm) {
+        notesForm.reset();
+      }
+    };
+
+    document.querySelectorAll(".notes-add-button[data-note-key]").forEach((button) => {
+      if (!canUseSharedNotes) {
+        button.disabled = true;
+        button.title = "Notes partagées non configurées";
+      }
+      button.addEventListener("click", () => {
+        if (!canUseSharedNotes || !notesModal || !notesForm || !notesTargetKey || !notesAuthor) {
+          return;
+        }
+        notesTargetKey.value = button.dataset.noteKey || "";
+        notesForm.reset();
+        if (typeof notesModal.showModal === "function") {
+          notesModal.showModal();
+        }
+        notesAuthor.focus();
+      });
+    });
+
+    if (notesCancel) {
+      notesCancel.addEventListener("click", closeNotesModal);
+    }
+
+    if (notesCancelSecondary) {
+      notesCancelSecondary.addEventListener("click", closeNotesModal);
+    }
+
+    if (notesModal) {
+      notesModal.addEventListener("click", (event) => {
+        const rect = notesModal.getBoundingClientRect();
+        const inside =
+          rect.top <= event.clientY &&
+          event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX &&
+          event.clientX <= rect.left + rect.width;
+        if (!inside) {
+          closeNotesModal();
+        }
+      });
+    }
+
+    if (notesForm) {
+      notesForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const noteKey = (notesTargetKey && notesTargetKey.value) || "";
+        const authorValue = ((notesAuthor && notesAuthor.value) || "").trim();
+        const contentValue = ((notesContent && notesContent.value) || "").trim();
+
+        if (!noteKey || !authorValue || !contentValue) {
+          return;
+        }
+
+        if (!supabaseClient) {
+          return;
+        }
+
+        const { error } = await supabaseClient.from("notes").insert({
+          note_key: noteKey,
+          author: authorValue,
+          content: contentValue
+        });
+
+        if (error) {
+          return;
+        }
+
+        await renderNotesForKey(noteKey);
+        closeNotesModal();
+      });
+    }
+
+    renderAllNotes();
   </script>
 </body>
 </html>
