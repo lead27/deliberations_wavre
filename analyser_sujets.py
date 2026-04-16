@@ -1080,13 +1080,6 @@ def generer_html_multi(
       font-size: 0.95rem;
     }}
 
-    footer {{
-      margin-top: 2.5rem;
-      text-align: center;
-      color: #7b8794;
-      font-size: 0.9rem;
-    }}
-
     @media (max-width: 600px) {{
       main {{
         padding: 2rem 1.5rem;
@@ -1201,7 +1194,7 @@ def generer_html_multi(
       }};
 
       const sortProvinceSections = () => {{
-        if (!main || !footer || provinceFilter.value !== "Toutes") {{
+        if (!main || provinceFilter.value !== "Toutes") {{
           return;
         }}
 
@@ -1211,7 +1204,7 @@ def generer_html_multi(
           return provinceA.localeCompare(provinceB, "fr");
         }});
 
-        sortedSections.forEach((section) => main.insertBefore(section, footer));
+        sortedSections.forEach((section) => main.appendChild(section));
       }};
 
       const sortRows = () => {{

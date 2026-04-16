@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Analyse des conseils communaux</title>
+  <title>Analyse conseils communaux</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {
@@ -175,13 +175,6 @@
       font-size: 0.95rem;
     }
 
-    footer {
-      margin-top: 2.5rem;
-      text-align: center;
-      color: #7b8794;
-      font-size: 0.9rem;
-    }
-
     @media (max-width: 600px) {
       main {
         padding: 2rem 1.5rem;
@@ -204,8 +197,8 @@
 <body>
   <main>
     <header>
-      <h1>Analyse des conseils communaux</h1>
-      <p>Mise à jour automatique le 02/04/2026 à 11:59</p>
+      <h1>Analyse conseils communaux</h1>
+      <p>Mise à jour automatique le 16/04/2026 à 11:13</p>
     </header>
     <section class="filters" aria-label="Filtres">
       <div class="filter-field">
@@ -10700,13 +10693,9 @@
       </table>
     </section>
 </section>
-    <footer>
-      <p>Compilation générée automatiquement à partir des délibérations les plus récentes.</p>
-    </footer>
   </main>
   <script>
     const main = document.querySelector("main");
-    const footer = main ? main.querySelector("footer") : null;
     const allProvincesView = document.getElementById("all-provinces-view");
     const provinceFilter = document.getElementById("province-filter");
     const communeSearch = document.getElementById("commune-search");
@@ -10755,7 +10744,7 @@
       };
 
       const sortProvinceSections = () => {
-        if (!main || !footer || provinceFilter.value !== "Toutes") {
+        if (!main || provinceFilter.value !== "Toutes") {
           return;
         }
 
@@ -10765,7 +10754,7 @@
           return provinceA.localeCompare(provinceB, "fr");
         });
 
-        sortedSections.forEach((section) => main.insertBefore(section, footer));
+        sortedSections.forEach((section) => main.appendChild(section));
       };
 
       const sortRows = () => {
