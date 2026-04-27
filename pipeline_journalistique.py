@@ -35,6 +35,8 @@ GROUPES_COMMUNES = {
         "helecine",
     ],
     "namur": [
+        "anhee",
+        "beauraing",
         "dinant",
         "hamois",
         "havelange",
@@ -312,92 +314,107 @@ def main() -> None:
         print("Aucune commune fournie.")
         return
 
+    communes_en_echec: List[str] = []
+    communes_traitees = 0
+
     for commune in communes:
-        fichier_delib, fichier_texte, fichier_json, fichier_html = chemins_sortie(commune)
-        url_base = construire_url_base(commune)
+        try:
+            fichier_delib, fichier_texte, fichier_json, fichier_html = chemins_sortie(commune)
+            url_base = construire_url_base(commune)
 
-        if not args.skip_extraction:
-            seance_vue_id, seance_vue_nom = charger_derniere_seance(fichier_delib)
-            nouvelle_seance_id, nouvelle_seance_nom = detecter_seance_la_plus_recente(url_base)
+            if not args.skip_extraction:
+                seance_vue_id, seance_vue_nom = charger_derniere_seance(fichier_delib)
+                nouvelle_seance_id, nouvelle_seance_nom = detecter_seance_la_plus_recente(url_base)
 
-            if (
-                not args.force
-                and seance_identique(seance_vue_id, seance_vue_nom, nouvelle_seance_id, nouvelle_seance_nom)
-            ):
-                print("=" * 80)
-                print(f"Aucune nouvelle séance détectée pour {commune}, extraction ignorée.")
-                print("=" * 80)
+                if (
+                    not args.force
+                    and seance_identique(seance_vue_id, seance_vue_nom, nouvelle_seance_id, nouvelle_seance_nom)
+                ):
+                    print("=" * 80)
+                    print(f"Aucune nouvelle séance détectée pour {commune}, extraction ignorée.")
+                    print("=" * 80)
+                else:
+                    if nouvelle_seance_id is None and not args.force:
+                        print("=" * 80)
+                        print(
+                            f"⚠ Séance la plus récente indétectable pour {commune}, "
+                            "commune ignorée pour éviter d'extraire tout l'historique."
+                        )
+                        print("=" * 80)
+                        continue
+                    if nouvelle_seance_id is None:
+                        print(
+                            f"⚠ Séance la plus récente inconnue pour {commune}. "
+                            "L'extraction complète est forcée (--force)."
+                        )
+
+                    executer(
+                        f"Étape 1/2 - Extraction des délibérations ({commune})",
+                        [sys.executable, "extraire_deliberations.py", "--commune", commune],
+                    )
             else:
-                if nouvelle_seance_id is None and not args.force:
-                    print("=" * 80)
-                    print(
-                        f"⚠ Séance la plus récente indétectable pour {commune}, "
-                        "commune ignorée pour éviter d'extraire tout l'historique."
-                    )
-                    print("=" * 80)
-                    continue
-                if nouvelle_seance_id is None:
-                    print(
-                        f"⚠ Séance la plus récente inconnue pour {commune}. "
-                        "L'extraction complète est forcée (--force)."
-                    )
+                print(f"Extraction ignorée (--skip-extraction) pour {commune}.\n")
 
-                executer(
-                    f"Étape 1/2 - Extraction des délibérations ({commune})",
-                    [sys.executable, "extraire_deliberations.py", "--commune", commune],
-                )
-        else:
-            print(f"Extraction ignorée (--skip-extraction) pour {commune}.\n")
+            seance_analyse_id, seance_analyse_nom = charger_derniere_seance(fichier_json)
+            seance_delib_id, seance_delib_nom = charger_derniere_seance(fichier_delib)
 
-        seance_analyse_id, seance_analyse_nom = charger_derniere_seance(fichier_json)
-        seance_delib_id, seance_delib_nom = charger_derniere_seance(fichier_delib)
+            sorties_analyse_presentes = (
+                fichier_json.exists()
+                and fichier_texte.exists()
+                and (args.skip_html or len(communes) > 1 or fichier_html.exists())
+            )
 
-        sorties_analyse_presentes = (
-            fichier_json.exists()
-            and fichier_texte.exists()
-            and (args.skip_html or len(communes) > 1 or fichier_html.exists())
-        )
+            analyse_a_jour = sorties_analyse_presentes and seance_identique(
+                seance_delib_id,
+                seance_delib_nom,
+                seance_analyse_id,
+                seance_analyse_nom,
+            )
 
-        analyse_a_jour = sorties_analyse_presentes and seance_identique(
-            seance_delib_id,
-            seance_delib_nom,
-            seance_analyse_id,
-            seance_analyse_nom,
-        )
+            if not args.force and analyse_a_jour:
+                print("=" * 80)
+                print(f"Séance inchangée pour {commune}, analyse existante conservée.")
+                print("=" * 80)
+                communes_traitees += 1
+                continue
 
-        if not args.force and analyse_a_jour:
+            if not args.force and not fichier_json.exists():
+                print(f"Analyse absente pour {commune}, génération nécessaire.")
+            elif not args.force and seance_delib_nom:
+                print(f"Nouvelle séance à analyser pour {commune} : {seance_delib_nom}")
+
+            if args.skip_analyse:
+                print(f"Analyse journalistique ignorée (--skip-analyse) pour {commune}.\n")
+                communes_traitees += 1
+                continue
+            if not fichier_deliberations_disponible(fichier_delib):
+                print(f"⚠ Aucune délibération disponible pour {commune}, analyse ignorée.")
+                communes_traitees += 1
+                continue
+
+            commande = [sys.executable, "analyser_sujets.py", "--auto", "--commune", commune]
+            if args.modele:
+                commande.extend(["--modele", args.modele])
+            if args.skip_html or len(communes) > 1:
+                commande.append("--skip-html")
+            if args.skip_json:
+                commande.append("--skip-json")
+            if args.details:
+                commande.append("--details")
+                commande.extend(str(num) for num in args.details)
+
+            executer(
+                f"Étape 2/2 - Analyse journalistique et génération des sorties ({commune})",
+                commande,
+            )
+            communes_traitees += 1
+        except Exception as exc:
             print("=" * 80)
-            print(f"Séance inchangée pour {commune}, analyse existante conservée.")
+            print(f"⚠ Erreur pour {commune}: {exc}")
+            print("La pipeline continue avec les autres communes.")
             print("=" * 80)
+            communes_en_echec.append(commune)
             continue
-
-        if not args.force and not fichier_json.exists():
-            print(f"Analyse absente pour {commune}, génération nécessaire.")
-        elif not args.force and seance_delib_nom:
-            print(f"Nouvelle séance à analyser pour {commune} : {seance_delib_nom}")
-
-        if args.skip_analyse:
-            print(f"Analyse journalistique ignorée (--skip-analyse) pour {commune}.\n")
-            continue
-        if not fichier_deliberations_disponible(fichier_delib):
-            print(f"⚠ Aucune délibération disponible pour {commune}, analyse ignorée.")
-            continue
-
-        commande = [sys.executable, "analyser_sujets.py", "--auto", "--commune", commune]
-        if args.modele:
-            commande.extend(["--modele", args.modele])
-        if args.skip_html or len(communes) > 1:
-            commande.append("--skip-html")
-        if args.skip_json:
-            commande.append("--skip-json")
-        if args.details:
-            commande.append("--details")
-            commande.extend(str(num) for num in args.details)
-
-        executer(
-            f"Étape 2/2 - Analyse journalistique et génération des sorties ({commune})",
-            commande,
-        )
 
     if len(communes) > 1 and not args.skip_html:
         commande_html = [sys.executable, "analyser_sujets.py", "--merge-html", "--communes", *communes]
@@ -407,6 +424,16 @@ def main() -> None:
             commande_html.extend(["--group-labels", *group_labels])
             commande_html.extend(["--group-sizes", *[str(n) for n in group_sizes]])
         executer("Compilation HTML multi-communes", commande_html)
+
+    if communes_en_echec:
+        print("=" * 80)
+        print("Communes en échec ignorées pour cette exécution :")
+        for commune in communes_en_echec:
+            print(f"- {commune}")
+        print("=" * 80)
+
+    if communes_traitees == 0:
+        raise RuntimeError("Aucune commune n'a pu être traitée avec succès.")
 
 
 if __name__ == "__main__":

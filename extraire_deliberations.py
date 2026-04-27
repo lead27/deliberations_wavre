@@ -1,23 +1,52 @@
 import argparse
+import io
 import json
+import re
 import time
 from datetime import datetime
-from urllib.parse import unquote, urlparse
+from typing import List, Optional, Tuple
+from urllib.parse import quote, unquote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
+from pypdf import PdfReader
 
 # Configuration
 BASE_ROOT = "https://www.deliberations.be"
+ANHEE_PROJETS_URL = (
+    "https://www.anhee.be/ma-commune/vie-politique/conseil-communal/projets-de-deliberations"
+)
+BEAURAING_PROCES_VERBAUX_URL = (
+    "https://www.beauraing.be/ma-commune/vie-politique/conseil-communal/proces-verbaux"
+)
 DELAI_ENTRE_REQUETES = 3  # secondes entre chaque requête pour éviter de surcharger le serveur
 TIMEOUT_REQUETE = 30
 NB_TENTATIVES = 3
+MOIS_FR = {
+    "janvier": 1,
+    "fevrier": 2,
+    "février": 2,
+    "mars": 3,
+    "avril": 4,
+    "mai": 5,
+    "juin": 6,
+    "juillet": 7,
+    "aout": 8,
+    "août": 8,
+    "septembre": 9,
+    "octobre": 10,
+    "novembre": 11,
+    "decembre": 12,
+    "décembre": 12,
+}
 
 COMMUNES_LABELS = {
     "andenne": "Andenne",
+    "anhee": "Anhée",
     "arlon": "Arlon",
     "assesse": "Assesse",
     "bastogne": "Bastogne",
+    "beauraing": "Beauraing",
     "bertrix": "Bertrix",
     "braine-lalleud": "Braine-l'Alleud",
     "braine-le-chateau": "Braine-le-Château",
@@ -131,7 +160,383 @@ def _get_with_retries(url: str, timeout: int = TIMEOUT_REQUETE, retries: int = N
     raise derniere_erreur
 
 def construire_url_base(commune: str, base_root: str = BASE_ROOT) -> str:
+    if commune == "anhee":
+        return ANHEE_PROJETS_URL
+    if commune == "beauraing":
+        return f"{BEAURAING_PROCES_VERBAUX_URL}/conseils-communaux-{datetime.now().year}"
     return f"{base_root.rstrip('/')}/{commune}/decisions"
+
+
+def _mois_fr(numero: int) -> str:
+    labels = {
+        1: "Janvier",
+        2: "Février",
+        3: "Mars",
+        4: "Avril",
+        5: "Mai",
+        6: "Juin",
+        7: "Juillet",
+        8: "Août",
+        9: "Septembre",
+        10: "Octobre",
+        11: "Novembre",
+        12: "Décembre",
+    }
+    return labels.get(numero, str(numero))
+
+
+def _anhee_lister_pdfs(url_base: str) -> List[str]:
+    response = _get_with_retries(url_base)
+    soup = BeautifulSoup(response.content, "html.parser")
+    pdfs = []
+    vus = set()
+    for lien in soup.find_all("a", href=True):
+        href = lien["href"].strip()
+        if ".pdf" not in href.lower():
+            continue
+        url = urljoin(url_base, href)
+        if "/view" in url:
+            url = url.split("/view", 1)[0]
+        if url not in vus:
+            vus.add(url)
+            pdfs.append(url)
+    return pdfs
+
+
+def _anhee_extraire_datetime_depuis_url(url: str) -> Optional[datetime]:
+    correspondance = re.search(r"(\d{2})-(\d{2})-(\d{4})", url)
+    if correspondance:
+        jour = int(correspondance.group(1))
+        mois = int(correspondance.group(2))
+        annee = int(correspondance.group(3))
+    else:
+        correspondance = re.search(r"(\d{1,2})-([a-zA-ZÀ-ÿ]+)-(\d{4})", url)
+        if not correspondance:
+            return None
+        jour = int(correspondance.group(1))
+        mois_label = correspondance.group(2).strip().lower()
+        mois = MOIS_FR.get(mois_label)
+        annee = int(correspondance.group(3))
+        if mois is None:
+            return None
+    try:
+        return datetime(annee, mois, jour, 20, 0)
+    except ValueError:
+        return None
+
+
+def _anhee_detecter_pdf_le_plus_recent(url_base: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    print("Détection de la séance la plus récente (source PDF Anhée)...")
+    pdfs = _anhee_lister_pdfs(url_base)
+    candidats = []
+    for pdf_url in pdfs:
+        date_pdf = _anhee_extraire_datetime_depuis_url(pdf_url)
+        if date_pdf is None:
+            continue
+        candidats.append((date_pdf, pdf_url))
+
+    if not candidats:
+        print("Impossible de détecter un PDF de séance récent.\n")
+        return None, None, None
+
+    date_seance, pdf_url = max(candidats, key=lambda item: item[0])
+    seance_nom = f"{date_seance.day:02d} {_mois_fr(date_seance.month)} {date_seance.year} (20:00) — Projet de décision"
+    seance_id = f"{date_seance:%d-%m-%Y}-20-00-projet-de-decision"
+    print(f"Séance détectée : {seance_nom}")
+    print(f"PDF : {pdf_url}\n")
+    return seance_id, seance_nom, pdf_url
+
+
+def _anhee_telecharger_pdf(pdf_url: str) -> PdfReader:
+    response = _get_with_retries(pdf_url, timeout=60)
+    return PdfReader(io.BytesIO(response.content))
+
+
+def _anhee_normaliser_ligne_pdf(ligne: str) -> str:
+    return " ".join((ligne or "").replace("\xa0", " ").split()).strip()
+
+
+def _anhee_ratio_majuscules(texte: str) -> float:
+    lettres = [caractere for caractere in texte if caractere.isalpha()]
+    if not lettres:
+        return 0.0
+    return sum(1 for caractere in lettres if caractere.isupper()) / len(lettres)
+
+
+def _anhee_est_titre_point(texte: str) -> bool:
+    texte = texte.strip()
+    if not texte:
+        return False
+    if len(texte) < 12:
+        return False
+    if _anhee_ratio_majuscules(texte) < 0.8:
+        return False
+    return True
+
+
+def _anhee_est_suite_titre(texte: str) -> bool:
+    texte = texte.strip()
+    if not texte:
+        return False
+    if texte.startswith(("Vu ", "Attendu", "Considérant", "DECIDE", "DÉCIDE", "Sur proposition")):
+        return False
+    return _anhee_est_titre_point(texte)
+
+
+def _anhee_extraire_points_depuis_pdf(pdf_url: str) -> List[dict]:
+    print(f"📄 Extraction du PDF Anhée : {pdf_url.split('/')[-1][:60]}...")
+    time.sleep(DELAI_ENTRE_REQUETES)
+    lecteur = _anhee_telecharger_pdf(pdf_url)
+    points = []
+    point_courant = None
+    motif_point = re.compile(r"^(\d+)\.\s+(.+)$")
+
+    for numero_page, page in enumerate(lecteur.pages, start=1):
+        texte = page.extract_text() or ""
+        for brute in texte.splitlines():
+            ligne = _anhee_normaliser_ligne_pdf(brute)
+            if not ligne:
+                continue
+            if re.fullmatch(r"\d+\s*/\s*\d+", ligne):
+                continue
+
+            correspondance = motif_point.match(ligne)
+            if correspondance:
+                titre = correspondance.group(2).strip()
+                if point_courant and not _anhee_est_titre_point(titre):
+                    point_courant["contenu"] += "\n" + ligne
+                    continue
+
+                if point_courant:
+                    points.append(point_courant)
+                url_point = f"{pdf_url}#page={numero_page}&search={quote(titre[:120])}"
+                point_courant = {
+                    "url": url_point,
+                    "titre": titre,
+                    "contenu": titre,
+                }
+                continue
+
+            if point_courant:
+                if point_courant["contenu"] == point_courant["titre"] and _anhee_est_suite_titre(ligne):
+                    point_courant["titre"] = f"{point_courant['titre']} {ligne}".strip()
+                    point_courant["contenu"] = point_courant["titre"]
+                    point_courant["url"] = f"{pdf_url}#page={numero_page}&search={quote(point_courant['titre'][:120])}"
+                    continue
+                point_courant["contenu"] += "\n" + ligne
+
+    if point_courant:
+        points.append(point_courant)
+
+    print(f"✅ Extraction PDF réussie : {len(points)} point(s)\n")
+    return points
+
+
+def _beauraing_url_annee(annee: int) -> str:
+    return f"{BEAURAING_PROCES_VERBAUX_URL}/conseils-communaux-{annee}"
+
+
+def _beauraing_lister_pdfs(url_base: str) -> List[str]:
+    response = _get_with_retries(url_base)
+    soup = BeautifulSoup(response.content, "html.parser")
+    pdfs = []
+    vus = set()
+    for lien in soup.find_all("a", href=True):
+        href = lien.get("href", "").strip()
+        if ".pdf" not in href.lower():
+            continue
+        url = urljoin(url_base, href)
+        if "/view" in url:
+            url = url.split("/view", 1)[0]
+        if url not in vus:
+            vus.add(url)
+            pdfs.append(url)
+    return pdfs
+
+
+def _beauraing_extraire_datetime_depuis_url(url: str) -> Optional[datetime]:
+    correspondance = re.search(r"cc-(\d{2})-(\d{2})-(\d{2,4})", url.lower())
+    if not correspondance:
+        return None
+    jour = int(correspondance.group(1))
+    mois = int(correspondance.group(2))
+    annee = int(correspondance.group(3))
+    if annee < 100:
+        annee += 2000
+    try:
+        return datetime(annee, mois, jour, 20, 0)
+    except ValueError:
+        return None
+
+
+def _beauraing_detecter_pdf_le_plus_recent(url_base: str) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    print("Détection de la séance la plus récente (source PDF Beauraing)...")
+    pages_a_verifier = [url_base]
+    annee_courante = datetime.now().year
+    if not url_base.endswith(str(annee_courante - 1)):
+        pages_a_verifier.append(_beauraing_url_annee(annee_courante - 1))
+
+    candidats = []
+    for page_url in pages_a_verifier:
+        try:
+            pdfs = _beauraing_lister_pdfs(page_url)
+        except Exception:
+            continue
+        for pdf_url in pdfs:
+            if "projets-de-deliberations" not in pdf_url.lower():
+                continue
+            date_pdf = _beauraing_extraire_datetime_depuis_url(pdf_url)
+            if date_pdf is None:
+                continue
+            candidats.append((date_pdf, pdf_url))
+
+    if not candidats:
+        print("Impossible de détecter un PDF de projets récent.\n")
+        return None, None, None
+
+    date_seance, pdf_url = max(candidats, key=lambda item: item[0])
+    seance_nom = f"{date_seance.day:02d} {_mois_fr(date_seance.month)} {date_seance.year} (20:00) — Projet de décision"
+    seance_id = f"{date_seance:%d-%m-%Y}-20-00-projet-de-decision"
+    print(f"Séance détectée : {seance_nom}")
+    print(f"PDF : {pdf_url}\n")
+    return seance_id, seance_nom, pdf_url
+
+
+def _beauraing_telecharger_pdf(pdf_url: str) -> PdfReader:
+    response = _get_with_retries(pdf_url, timeout=60)
+    return PdfReader(io.BytesIO(response.content))
+
+
+def _beauraing_normaliser_ligne_pdf(ligne: str) -> str:
+    return " ".join((ligne or "").replace("\xa0", " ").split()).strip()
+
+
+def _beauraing_extraire_odj_premiere_page(lecteur: PdfReader) -> List[Tuple[int, str]]:
+    texte = lecteur.pages[0].extract_text() or ""
+    lignes = [_beauraing_normaliser_ligne_pdf(ligne) for ligne in texte.splitlines()]
+    lignes = [ligne for ligne in lignes if ligne]
+
+    try:
+        index_ordre = lignes.index("Ordre du jour")
+    except ValueError:
+        return []
+
+    items = []
+    point_courant = None
+    compteur_seance_publique = 0
+    motif_point = re.compile(r"^(\d+)\.\s+(.+)$")
+
+    for ligne in lignes[index_ordre + 1:]:
+        if ligne == "I. Séance publique":
+            compteur_seance_publique += 1
+            if compteur_seance_publique >= 2:
+                break
+            continue
+        if compteur_seance_publique == 0:
+            continue
+        if ligne.startswith("II."):
+            break
+
+        correspondance = motif_point.match(ligne)
+        if correspondance:
+            if point_courant is not None:
+                items.append(point_courant)
+            point_courant = [int(correspondance.group(1)), correspondance.group(2).strip()]
+        elif point_courant is not None:
+            point_courant[1] = f"{point_courant[1]} {ligne}".strip()
+
+    if point_courant is not None:
+        items.append(point_courant)
+
+    return [(numero, titre) for numero, titre in items]
+
+
+def _beauraing_est_ligne_contenu(texte: str) -> bool:
+    prefixes = (
+        "Vu ",
+        "Attendu",
+        "Considérant",
+        "Aucun avis",
+        "Ouï ",
+        "Sur proposition",
+        "PROPOSITION",
+        "Article",
+        "Art.",
+        "Néant",
+    )
+    return texte.startswith(prefixes)
+
+
+def _beauraing_extraire_points_depuis_pdf(pdf_url: str) -> List[dict]:
+    print(f"📄 Extraction du PDF Beauraing : {pdf_url.split('/')[-1][:60]}...")
+    time.sleep(DELAI_ENTRE_REQUETES)
+    lecteur = _beauraing_telecharger_pdf(pdf_url)
+    ordre_du_jour = _beauraing_extraire_odj_premiere_page(lecteur)
+    if not ordre_du_jour:
+        print("⚠ Impossible d'extraire l'ordre du jour depuis la première page.\n")
+        return []
+
+    titres_par_numero = {numero: titre for numero, titre in ordre_du_jour}
+    points = []
+    point_courant = None
+    motif_point = re.compile(r"^(\d+)\.\s+(.+)$")
+    dans_details = False
+    compteur_seance_publique = 0
+
+    for numero_page, page in enumerate(lecteur.pages, start=1):
+        texte = page.extract_text() or ""
+        for brute in texte.splitlines():
+            ligne = _beauraing_normaliser_ligne_pdf(brute)
+            if not ligne:
+                continue
+            if re.fullmatch(r"\d+\s*/\s*\d+", ligne):
+                continue
+
+            if not dans_details:
+                if ligne == "I. Séance publique":
+                    compteur_seance_publique += 1
+                    if compteur_seance_publique >= 2:
+                        dans_details = True
+                continue
+
+            correspondance = motif_point.match(ligne)
+            if correspondance:
+                numero_point = int(correspondance.group(1))
+                if numero_point not in titres_par_numero:
+                    if point_courant is not None:
+                        point_courant["contenu"] += "\n" + ligne
+                    continue
+
+                if point_courant:
+                    points.append(point_courant)
+                titre = titres_par_numero[numero_point]
+                point_courant = {
+                    "url": f"{pdf_url}#page={numero_page}&search={quote(titre[:120])}",
+                    "titre": titre,
+                    "contenu": "",
+                }
+                continue
+
+            if point_courant is None:
+                continue
+
+            if not point_courant["contenu"] and not _beauraing_est_ligne_contenu(ligne):
+                continue
+
+            if point_courant["contenu"]:
+                point_courant["contenu"] += "\n" + ligne
+            else:
+                point_courant["contenu"] = ligne
+
+    if point_courant:
+        points.append(point_courant)
+
+    for point in points:
+        if not point["contenu"]:
+            point["contenu"] = point["titre"]
+
+    print(f"✅ Extraction PDF réussie : {len(points)} point(s)\n")
+    return points
 
 
 def detecter_seance_la_plus_recente(url_base: str):
@@ -139,6 +544,13 @@ def detecter_seance_la_plus_recente(url_base: str):
     Cette fonction détecte automatiquement la séance la plus récente
     en analysant la première page des décisions
     """
+    if "anhee.be" in url_base:
+        seance_id, seance_nom, _ = _anhee_detecter_pdf_le_plus_recent(url_base)
+        return seance_id, seance_nom
+    if "beauraing.be" in url_base:
+        seance_id, seance_nom, _ = _beauraing_detecter_pdf_le_plus_recent(url_base)
+        return seance_id, seance_nom
+
     print("Détection de la séance la plus récente...")
     
     response = _get_with_retries(url_base)
@@ -339,7 +751,7 @@ def sauvegarder_resultats(
 
     print(f"✅ Sauvegarde terminée !\n")
 
-def creer_resume_texte(deliberations, nom_fichier, seance_nom):
+def creer_resume_texte(deliberations, nom_fichier, seance_nom, commune_nom):
     """
     Étape 4 : Cette fonction crée un fichier texte facile à lire
     avec toutes les délibérations
@@ -348,7 +760,7 @@ def creer_resume_texte(deliberations, nom_fichier, seance_nom):
     
     with open(nom_fichier, 'w', encoding='utf-8') as f:
         f.write("=" * 80 + "\n")
-        f.write("DÉLIBÉRATIONS DU CONSEIL COMMUNAL DE WAVRE\n")
+        f.write(f"DÉLIBÉRATIONS DU CONSEIL COMMUNAL DE {commune_nom.upper()}\n")
         if seance_nom:
             f.write(f"{seance_nom}\n")
         f.write("=" * 80 + "\n\n")
@@ -406,8 +818,13 @@ def main():
     print(f"EXTRACTION DES DÉLIBÉRATIONS DU CONSEIL COMMUNAL DE {commune_nom.upper()}")
     print("="*80 + "\n")
     
-    # Étape 0 : Détecter la séance la plus récente
-    seance_id, seance_nom = detecter_seance_la_plus_recente(url_base)
+    if commune_slug == "anhee":
+        seance_id, seance_nom, pdf_url = _anhee_detecter_pdf_le_plus_recent(url_base)
+    elif commune_slug == "beauraing":
+        seance_id, seance_nom, pdf_url = _beauraing_detecter_pdf_le_plus_recent(url_base)
+    else:
+        pdf_url = None
+        seance_id, seance_nom = detecter_seance_la_plus_recente(url_base)
     
     if not seance_id:
         print(
@@ -417,22 +834,39 @@ def main():
         print("   Utilisez --force via le pipeline si vous voulez vraiment tenter une extraction complète.")
         return
     
-    # Étape 1 : Récupérer tous les liens de cette séance
-    liens = extraire_liens_deliberations(seance_id, url_base)
-    
-    if not liens:
-        print("Aucune délibération trouvée. Vérifiez l'URL.")
-        return
-    
-    # Étape 2 : Extraire le contenu de chaque délibération
-    print(f"Début de l'extraction de {len(liens)} délibérations...")
-    print(f"Temps estimé : environ {len(liens) * DELAI_ENTRE_REQUETES // 60} minutes\n")
-    
-    deliberations = []
-    for i, lien in enumerate(liens, 1):
-        print(f"[{i}/{len(liens)}]")
-        delib = extraire_contenu_deliberation(lien)
-        deliberations.append(delib)
+    if commune_slug == "anhee":
+        if not pdf_url:
+            print("Aucun PDF de séance détecté. Vérifiez la page source.")
+            return
+        deliberations = _anhee_extraire_points_depuis_pdf(pdf_url)
+        if not deliberations:
+            print("Aucun point n'a pu être extrait du PDF.")
+            return
+    elif commune_slug == "beauraing":
+        if not pdf_url:
+            print("Aucun PDF de séance détecté. Vérifiez la page source.")
+            return
+        deliberations = _beauraing_extraire_points_depuis_pdf(pdf_url)
+        if not deliberations:
+            print("Aucun point n'a pu être extrait du PDF.")
+            return
+    else:
+        # Étape 1 : Récupérer tous les liens de cette séance
+        liens = extraire_liens_deliberations(seance_id, url_base)
+        
+        if not liens:
+            print("Aucune délibération trouvée. Vérifiez l'URL.")
+            return
+        
+        # Étape 2 : Extraire le contenu de chaque délibération
+        print(f"Début de l'extraction de {len(liens)} délibérations...")
+        print(f"Temps estimé : environ {len(liens) * DELAI_ENTRE_REQUETES // 60} minutes\n")
+        
+        deliberations = []
+        for i, lien in enumerate(liens, 1):
+            print(f"[{i}/{len(liens)}]")
+            delib = extraire_contenu_deliberation(lien)
+            deliberations.append(delib)
     
     # Étape 3 : Sauvegarder les résultats
     sauvegarder_resultats(
@@ -443,7 +877,7 @@ def main():
         commune_slug=commune_slug,
         commune_nom=commune_nom,
     )
-    creer_resume_texte(deliberations, fichier_texte, seance_nom)
+    creer_resume_texte(deliberations, fichier_texte, seance_nom, commune_nom)
     
     print("\n" + "="*80)
     print("EXTRACTION TERMINÉE !")
