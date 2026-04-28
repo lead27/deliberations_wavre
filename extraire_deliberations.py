@@ -539,6 +539,15 @@ def _beauraing_extraire_points_depuis_pdf(pdf_url: str) -> List[dict]:
     return points
 
 
+def _extraire_nombre_points_depuis_libelle_seance(libelle: Optional[str]) -> Optional[int]:
+    if not libelle:
+        return None
+    correspondance = re.search(r"\((\d+)(?:\s+points?)?\)\s*$", libelle.strip(), re.IGNORECASE)
+    if correspondance:
+        return int(correspondance.group(1))
+    return None
+
+
 def detecter_seance_la_plus_recente(url_base: str):
     """
     Cette fonction détecte automatiquement la séance la plus récente
@@ -546,10 +555,10 @@ def detecter_seance_la_plus_recente(url_base: str):
     """
     if "anhee.be" in url_base:
         seance_id, seance_nom, _ = _anhee_detecter_pdf_le_plus_recent(url_base)
-        return seance_id, seance_nom
+        return seance_id, seance_nom, None
     if "beauraing.be" in url_base:
         seance_id, seance_nom, _ = _beauraing_detecter_pdf_le_plus_recent(url_base)
-        return seance_id, seance_nom
+        return seance_id, seance_nom, None
 
     print("Détection de la séance la plus récente...")
     
@@ -568,12 +577,15 @@ def detecter_seance_la_plus_recente(url_base: str):
         if option_selectionnee:
             seance_id = option_selectionnee.get('value')
             seance_nom = option_selectionnee.get('title') or option_selectionnee.get_text(strip=True)
+            nombre_points = _extraire_nombre_points_depuis_libelle_seance(option_selectionnee.get_text(" ", strip=True))
             print(f"Séance détectée : {seance_nom}")
+            if nombre_points is not None:
+                print(f"Points détectés dans le sélecteur : {nombre_points}")
             print(f"ID : {seance_id}\n")
-            return seance_id, seance_nom
+            return seance_id, seance_nom, nombre_points
 
     print("Impossible de détecter la séance. Utilisation de la liste par défaut...\n")
-    return None, None
+    return None, None, None
 
 def extraire_liens_deliberations(seance_id, url_base: str):
     """
@@ -723,6 +735,7 @@ def sauvegarder_resultats(
     deliberations,
     seance_id=None,
     seance_nom=None,
+    seance_nombre_points=None,
     nom_fichier="deliberations_wavre.json",
     commune_slug="wavre",
     commune_nom=None,
@@ -737,7 +750,8 @@ def sauvegarder_resultats(
         "exported_at": datetime.utcnow().replace(microsecond=0).isoformat() + "Z",
         "seance": {
             "id": seance_id,
-            "nom": seance_nom
+            "nom": seance_nom,
+            "nombre_points": seance_nombre_points,
         },
         "commune": {
             "slug": commune_slug,
@@ -820,11 +834,13 @@ def main():
     
     if commune_slug == "anhee":
         seance_id, seance_nom, pdf_url = _anhee_detecter_pdf_le_plus_recent(url_base)
+        seance_nombre_points = None
     elif commune_slug == "beauraing":
         seance_id, seance_nom, pdf_url = _beauraing_detecter_pdf_le_plus_recent(url_base)
+        seance_nombre_points = None
     else:
         pdf_url = None
-        seance_id, seance_nom = detecter_seance_la_plus_recente(url_base)
+        seance_id, seance_nom, seance_nombre_points = detecter_seance_la_plus_recente(url_base)
     
     if not seance_id:
         print(
@@ -842,6 +858,7 @@ def main():
         if not deliberations:
             print("Aucun point n'a pu être extrait du PDF.")
             return
+        seance_nombre_points = len(deliberations)
     elif commune_slug == "beauraing":
         if not pdf_url:
             print("Aucun PDF de séance détecté. Vérifiez la page source.")
@@ -850,6 +867,7 @@ def main():
         if not deliberations:
             print("Aucun point n'a pu être extrait du PDF.")
             return
+        seance_nombre_points = len(deliberations)
     else:
         # Étape 1 : Récupérer tous les liens de cette séance
         liens = extraire_liens_deliberations(seance_id, url_base)
@@ -867,12 +885,15 @@ def main():
             print(f"[{i}/{len(liens)}]")
             delib = extraire_contenu_deliberation(lien)
             deliberations.append(delib)
+        if seance_nombre_points is None:
+            seance_nombre_points = len(deliberations)
     
     # Étape 3 : Sauvegarder les résultats
     sauvegarder_resultats(
         deliberations,
         seance_id,
         seance_nom,
+        seance_nombre_points=seance_nombre_points,
         nom_fichier=fichier_json,
         commune_slug=commune_slug,
         commune_nom=commune_nom,

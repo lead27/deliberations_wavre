@@ -3,6 +3,8 @@ import json
 import re
 import subprocess
 import sys
+import unicodedata
+from datetime import date
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -10,6 +12,23 @@ from extraire_deliberations import construire_url_base, detecter_seance_la_plus_
 
 
 RACINE = Path(__file__).resolve().parent
+MOIS_FR = {
+    "janvier": 1,
+    "fevrier": 2,
+    "février": 2,
+    "mars": 3,
+    "avril": 4,
+    "mai": 5,
+    "juin": 6,
+    "juillet": 7,
+    "aout": 8,
+    "août": 8,
+    "septembre": 9,
+    "octobre": 10,
+    "novembre": 11,
+    "decembre": 12,
+    "décembre": 12,
+}
 GROUPES_COMMUNES = {
     "bw": [
         "wavre",
@@ -118,28 +137,36 @@ def executer(description: str, commande: List[str]) -> None:
     print(f"✓ {description} terminée.\n")
 
 
-def charger_derniere_seance(path: Path) -> Tuple[Optional[str], Optional[str]]:
+def charger_derniere_seance(path: Path) -> Tuple[Optional[str], Optional[str], Optional[int]]:
     """Lit le fichier JSON des délibérations pour récupérer la séance enregistrée."""
     if not path.exists():
-        return None, None
+        return None, None, None
     try:
         with path.open("r", encoding="utf-8") as handle:
             donnees = json.load(handle)
     except (json.JSONDecodeError, OSError) as err:
         print(f"⚠ Impossible de lire {path}: {err}")
-        return None, None
+        return None, None, None
 
     if isinstance(donnees, dict):
         meta = donnees.get("seance") or {}
-        return meta.get("id"), meta.get("nom")
-    return None, None
+        nombre_points = meta.get("nombre_points")
+        if nombre_points is None:
+            if isinstance(donnees.get("deliberations"), list):
+                nombre_points = len(donnees["deliberations"])
+            elif isinstance(donnees.get("points"), list):
+                nombre_points = len(donnees["points"])
+        return meta.get("id"), meta.get("nom"), nombre_points
+    return None, None, None
 
 
 def seance_identique(
     seance_a_id: Optional[str],
     seance_a_nom: Optional[str],
+    seance_a_nombre_points: Optional[int],
     seance_b_id: Optional[str],
     seance_b_nom: Optional[str],
+    seance_b_nombre_points: Optional[int],
 ) -> bool:
     """
     Compare deux séances par date et type/statut.
@@ -155,10 +182,18 @@ def seance_identique(
         return False
 
     if type_a and type_b:
-        return type_a == type_b
+        if type_a != type_b:
+            return False
 
-    # Si le type manque d'un côté, on s'arrête tout de même sur la date
-    # pour éviter une réanalyse complète nocturne inutile.
+    if (
+        seance_a_nombre_points is not None
+        and seance_b_nombre_points is not None
+        and seance_a_nombre_points != seance_b_nombre_points
+    ):
+        return False
+
+    # Si le type ou le nombre de points manque d'un côté, on s'arrête tout de
+    # même sur la date pour éviter une réanalyse complète nocturne inutile.
     return True
 
 
@@ -193,22 +228,73 @@ def normaliser_date_depuis_nom(date_texte: Optional[str]) -> Optional[str]:
     if not date_texte:
         return None
 
-    # On compare la date telle qu'affichée, normalisée pour absorber les écarts
-    # cosmétiques de casse ou d'espaces.
-    normalisee = " ".join(date_texte.split()).casefold()
-    return normalisee or None
+    texte = " ".join(date_texte.split())
+    if not texte:
+        return None
+
+    # Format le plus fréquent : "21 Avril 2026 (19:00)"
+    correspondance = re.search(r"(\d{1,2})\s+([A-Za-zÀ-ÿ]+)\s+(\d{4})", texte)
+    if correspondance:
+        jour = int(correspondance.group(1))
+        mois_label = enlever_accents(correspondance.group(2)).casefold()
+        annee = int(correspondance.group(3))
+        mois = MOIS_FR.get(mois_label)
+        if mois:
+            try:
+                return date(annee, mois, jour).isoformat()
+            except ValueError:
+                pass
+
+    # Fallback si on ne reconnaît pas le format : on garde une version
+    # cosmétique stable plutôt que la chaîne brute.
+    return texte.casefold()
 
 
 def normaliser_date_depuis_id(seance_id: Optional[str]) -> Optional[str]:
     if not seance_id:
         return None
 
-    # Les IDs ressemblent à 04-novembre-2025-20-00 ; on normalise seulement
-    # la partie date/heure pour comparer les séances d'un même conseil.
-    correspondance = re.match(r"^(\d{1,2}-[a-zA-ZÀ-ÿ]+-\d{4}-\d{1,2}-\d{2})", seance_id.strip())
+    identifiant = seance_id.strip()
+    if not identifiant:
+        return None
+
+    # Certains IDs encodent la date sous la forme 04-novembre-2025-20-00.
+    correspondance = re.match(r"^(\d{1,2})-([a-zA-ZÀ-ÿ]+)-(\d{4})(?:-\d{1,2}-\d{2})?", identifiant)
     if correspondance:
-        return correspondance.group(1).casefold()
-    return seance_id.strip().casefold() or None
+        jour = int(correspondance.group(1))
+        mois_label = enlever_accents(correspondance.group(2)).casefold()
+        annee = int(correspondance.group(3))
+        mois = MOIS_FR.get(mois_label)
+        if mois:
+            try:
+                return date(annee, mois, jour).isoformat()
+            except ValueError:
+                return None
+
+    # D'autres IDs sont de simples UUID/hashs opaques : ils ne doivent pas
+    # déclencher à eux seuls une réanalyse si le nom de séance suffit déjà.
+    return None
+
+
+def enlever_accents(texte: str) -> str:
+    return "".join(
+        caractere
+        for caractere in unicodedata.normalize("NFD", texte)
+        if unicodedata.category(caractere) != "Mn"
+    )
+
+
+def formater_resume_seance(
+    seance_id: Optional[str],
+    seance_nom: Optional[str],
+    seance_nombre_points: Optional[int],
+) -> str:
+    date_cle, type_cle = decrire_seance(seance_id, seance_nom)
+    return (
+        f"id={seance_id or '-'} | nom={seance_nom or '-'} | "
+        f"date_norm={date_cle or '-'} | type_norm={type_cle or '-'} | "
+        f"points={seance_nombre_points if seance_nombre_points is not None else '-'}"
+    )
 
 
 def normaliser_type_seance(type_texte: Optional[str]) -> Optional[str]:
@@ -323,15 +409,32 @@ def main() -> None:
             url_base = construire_url_base(commune)
 
             if not args.skip_extraction:
-                seance_vue_id, seance_vue_nom = charger_derniere_seance(fichier_delib)
-                nouvelle_seance_id, nouvelle_seance_nom = detecter_seance_la_plus_recente(url_base)
+                seance_vue_id, seance_vue_nom, seance_vue_nombre_points = charger_derniere_seance(fichier_delib)
+                nouvelle_seance_id, nouvelle_seance_nom, nouvelle_seance_nombre_points = (
+                    detecter_seance_la_plus_recente(url_base)
+                )
 
                 if (
                     not args.force
-                    and seance_identique(seance_vue_id, seance_vue_nom, nouvelle_seance_id, nouvelle_seance_nom)
+                    and seance_identique(
+                        seance_vue_id,
+                        seance_vue_nom,
+                        seance_vue_nombre_points,
+                        nouvelle_seance_id,
+                        nouvelle_seance_nom,
+                        nouvelle_seance_nombre_points,
+                    )
                 ):
                     print("=" * 80)
                     print(f"Aucune nouvelle séance détectée pour {commune}, extraction ignorée.")
+                    print(
+                        f"Séance connue    : "
+                        f"{formater_resume_seance(seance_vue_id, seance_vue_nom, seance_vue_nombre_points)}"
+                    )
+                    print(
+                        f"Séance détectée  : "
+                        f"{formater_resume_seance(nouvelle_seance_id, nouvelle_seance_nom, nouvelle_seance_nombre_points)}"
+                    )
                     print("=" * 80)
                 else:
                     if nouvelle_seance_id is None and not args.force:
@@ -347,6 +450,16 @@ def main() -> None:
                             f"⚠ Séance la plus récente inconnue pour {commune}. "
                             "L'extraction complète est forcée (--force)."
                         )
+                    elif not args.force:
+                        print(f"Comparaison extraction {commune}:")
+                        print(
+                            f"  connue   -> "
+                            f"{formater_resume_seance(seance_vue_id, seance_vue_nom, seance_vue_nombre_points)}"
+                        )
+                        print(
+                            f"  détectée -> "
+                            f"{formater_resume_seance(nouvelle_seance_id, nouvelle_seance_nom, nouvelle_seance_nombre_points)}"
+                        )
 
                     executer(
                         f"Étape 1/2 - Extraction des délibérations ({commune})",
@@ -355,8 +468,8 @@ def main() -> None:
             else:
                 print(f"Extraction ignorée (--skip-extraction) pour {commune}.\n")
 
-            seance_analyse_id, seance_analyse_nom = charger_derniere_seance(fichier_json)
-            seance_delib_id, seance_delib_nom = charger_derniere_seance(fichier_delib)
+            seance_analyse_id, seance_analyse_nom, seance_analyse_nombre_points = charger_derniere_seance(fichier_json)
+            seance_delib_id, seance_delib_nom, seance_delib_nombre_points = charger_derniere_seance(fichier_delib)
 
             sorties_analyse_presentes = (
                 fichier_json.exists()
@@ -367,13 +480,23 @@ def main() -> None:
             analyse_a_jour = sorties_analyse_presentes and seance_identique(
                 seance_delib_id,
                 seance_delib_nom,
+                seance_delib_nombre_points,
                 seance_analyse_id,
                 seance_analyse_nom,
+                seance_analyse_nombre_points,
             )
 
             if not args.force and analyse_a_jour:
                 print("=" * 80)
                 print(f"Séance inchangée pour {commune}, analyse existante conservée.")
+                print(
+                    f"Délibérations : "
+                    f"{formater_resume_seance(seance_delib_id, seance_delib_nom, seance_delib_nombre_points)}"
+                )
+                print(
+                    f"Analyse      : "
+                    f"{formater_resume_seance(seance_analyse_id, seance_analyse_nom, seance_analyse_nombre_points)}"
+                )
                 print("=" * 80)
                 communes_traitees += 1
                 continue
@@ -382,6 +505,14 @@ def main() -> None:
                 print(f"Analyse absente pour {commune}, génération nécessaire.")
             elif not args.force and seance_delib_nom:
                 print(f"Nouvelle séance à analyser pour {commune} : {seance_delib_nom}")
+                print(
+                    f"Délibérations : "
+                    f"{formater_resume_seance(seance_delib_id, seance_delib_nom, seance_delib_nombre_points)}"
+                )
+                print(
+                    f"Analyse      : "
+                    f"{formater_resume_seance(seance_analyse_id, seance_analyse_nom, seance_analyse_nombre_points)}"
+                )
 
             if args.skip_analyse:
                 print(f"Analyse journalistique ignorée (--skip-analyse) pour {commune}.\n")
