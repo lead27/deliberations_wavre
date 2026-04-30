@@ -6,7 +6,7 @@ on:
     - cron: "0 0 * * *"
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -36,6 +36,25 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           python pipeline_journalistique.py --groupes bw namur lux
+
+      - name: 💾 Sauvegarde des fichiers générés dans le dépôt
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Aucun changement à enregistrer."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "Aucun fichier généré modifié après git add."
+            exit 0
+          fi
+
+          git commit -m "Update generated council analyses"
+          git push
 
       - name: 📁 Préparation des fichiers pour GitHub Pages
         run: |
